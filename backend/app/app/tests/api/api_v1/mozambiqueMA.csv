@@ -1,0 +1,38 @@
+ma;1;AMODEFA;42;MA full Name;STRING;ENG;False;Associação Moçambicana para o Desenvolvimento da Família
+ma;1;AMODEFA;43;MA Acronym;STRING;ENG;False;AMODEFA
+ma;1;AMODEFA;44;Address and telephone;SUBQUESTION;ENG;False;Tanzania Avenue, nr 376, P.O.Box 1535.;+258 21 405 149, +258 82 30 31 649
+ma;1;AMODEFA;45;website;STRING;ENG;False
+ma;1;AMODEFA;46;Date of creation of MA;DATE;ENG;False;15/06/1989
+ma;1;AMODEFA;47;Membership status;CHOICE;ENG;False;Full Member
+ma;1;AMODEFA;48;Is the MA Public Utility?;CHOICE;ENG;False
+ma;1;AMODEFA;49;Where your Headquarter is located?;STRING;ENG;False
+ma;1;AMODEFA;50;Select your working languages (more than one choice is allowed);CHOICE;ENG;False
+ma;1;AMODEFA;51;List the partners you are working with;LIST;ENG;False
+ma;1;AMODEFA;52;The IPPF Focal Point for the MA for the following each;SUBQUESTION;ENG;False
+ma;1;AMODEFA;53;The date of the last accreditation;DATE;ENG;False
+ma;1;AMODEFA;54;The date of the next accreditaition;DATE;ENG;False
+ma;1;AMODEFA;55;Actual board members ;TABLE;ENG;False;Luzia Munete - President//F//luziajamal@gmail.com//84 487 5800;Felizarda Nhancale - Treasurer//F//felizardanhancale@yahoo.com.br//82 327 5440;Belasuica Dotene - Vowel//M//mmubai@hotmail.com//82 469 1780
+ma;1;AMODEFA;56;What is the number of volunteers by gender?;SUBQUESTION;ENG;False
+ma;1;AMODEFA;57;Date of the next board members election;DATE;ENG;False
+ma;1;AMODEFA;58;YAM board member;TABLE;ENG;False
+ma;1;AMODEFA;59;Specify your area of expertise for peer to peer support;LIST;ENG;False
+ma;1;AMODEFA;60;Staffing( by sex,  by age group);TABLE;ENG;False
+ma;1;AMODEFA;61;Does MA capability statementavailable? (cf. https://ippf-gig.org/funding-formula/stage-4/stage-4-visibility-capability-statement-template/ );CHOICE;ENG;False
+ma;1;AMODEFA;62;What is the geographic coverage of intervention?;CHOICE;ENG;False
+ma;1;AMODEFA;63;The area where the following strategic documents/ framework/ guidelines are available;CHOICE;ENG;False
+ma;1;AMODEFA;64;More details (number) on the structural subdivision of MA;SUBQUESTION;ENG;False
+ma;1;AMODEFA;65;Total budget for the current year;FLOAT;ENG;False
+ma;1;AMODEFA;66;List of Main donors ;TABLE;ENG;False
+ma;1;AMODEFA;67;List of key partners;TABLE;ENG;False
+ma;1;AMODEFA;68;The last Audit status of recommendations?;CHOICE;ENG;False
+ma;1;AMODEFA;69;Details the last 5 years and Currently implemented projects;TABLE;ENG;False
+ma;1;AMODEFA;70;Does the Ma implement Social enterprising  activity?;CHOICE;ENG;False
+ma;1;AMODEFA;71;The MA keys achievements towards IPPF expected results;SUBQUESTION;ENG;False
+ma;1;AMODEFA;72;The service statistics data on the last 5 years by the following areas.;SUBQUESTION;ENG;False
+ma;1;AMODEFA;73;Describe the SRH service delivery strategy/model used.;TEXT;ENG;False
+ma;1;AMODEFA;74;Is the MA conduct humanitarian activities?;CHOICE;ENG;False
+ma;1;AMODEFA;75;If the MA condut humanitarian activities, the keys achievement reached.;TEXT;ENG;False
+ma;1;AMODEFA;76;Is the MA making some SRH Advocacy?;CHOICE;ENG;False
+ma;1;AMODEFA;77;The number of the following people groups, reached through the communication campaigns or SBCC activities?;SUBQUESTION;ENG;False
+ma;1;AMODEFA;78;As a summary, can you share some best practices per area?;TEXT;ENG;False
+ma;1;AMODEFA;79;What have been the major "Risks" you were facing?;LIST;ENG;False

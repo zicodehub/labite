@@ -1,0 +1,41 @@
+country;36;Mozambique;1;The Region where the country is located;CHOICE;ENG;False;South Africa
+country;36;Mozambique;2;The Neighboring countries;CHOICE;ENG;False;Tanzania, Malawi; Zambia; Zimbabwe; eSwatini; South Africa
+country;36;Mozambique;3;The general population size of your country;INTEGER;ENG;False;30832244
+country;36;Mozambique;4;The desagregation per;SUBQUESTION;ENG;False;48.28;51.72;55;45
+country;36;Mozambique;5;The global literacy rate in your country;PERCENTAGE;ENG;False;39
+country;36;Mozambique;6;The percentage of population with unmet needs for SRH;PERCENTAGE;ENG;False;17.3
+country;36;Mozambique;7;The percentage population with unmet needs for SRH per location type;SUBQUESTION;ENG;False;32;;68
+country;36;Mozambique;8;What is the proportion of Women at childbearing age;PERCENTAGE;ENG;False;46
+country;36;Mozambique;9;The contraceptive prevalence at country level;PERCENTAGE;ENG;False;27
+country;36;Mozambique;10;What is the adolescent pregnancy rate in your Country;PERCENTAGE;ENG;False;57
+country;36;Mozambique;11;The adolescent birth rate in your Country;PERCENTAGE;ENG;False;38
+country;36;Mozambique;12;What is the child Marriage rate in your Country;PERCENTAGE;ENG;False;43
+country;36;Mozambique;13;Is the Comprehensive Sexual Education included in the national curricula education?;CHOICE;ENG;False;NO
+country;36;Mozambique;14;When was  the Comprehensive Sexual Education included in the national curricula education?;DATE;ENG;False
+country;36;Mozambique;15;If the Comprehensive Sexual Education isn't included in the national curricula education did you conduct any advocacy action related to that?;CHOICE;ENG;False;Y
+country;36;Mozambique;16;The FGM rate;PERCENTAGE;ENG;False
+country;36;Mozambique;17;Is there any law in the country on that which condemn this FGM;CHOICE;ENG;False
+country;36;Mozambique;18;If there is any law that condemn FGM. Is the law applied?;CHOICE;ENG;False
+country;36;Mozambique;19;Is a policy on SGBV exist?;CHOICE;ENG;False;YES
+country;36;Mozambique;20;What is the last revision date?;DATE;ENG;False
+country;36;Mozambique;21;The number of individuals using SGBV services;INTEGER;ENG;False
+country;36;Mozambique;22;The number of health service providers able to identify refer and care for SGBV survivors;INTEGER;ENG;False
+country;36;Mozambique;23;What is the HIV prevalence in the following population type?;SUBQUESTION;ENG;False;13;10.1;15.4;;6.9;9.3;;
+country;36;Mozambique;24;What is the fertility rate in the country?;PERCENTAGE;ENG;False;5.3
+country;36;Mozambique;25;What is the Human development index and rank for the country?;SUBQUESTION;ENG;False;0.456;181
+country;36;Mozambique;26;What is the percentage of national budget allocated to health area;PERCENTAGE;ENG;False
+country;36;Mozambique;27;list the Main statements/laws on SRH taken by the country;LIST;ENG;False;Safe Abortion Law;Law one Prevention and Combating Premature union;Family Law;Labour la
+country;36;Mozambique;28;Is there a law on abortion in the country?;CHOICE;ENG;False;YES
+country;36;Mozambique;29;If there is a law on abortion in the country. Provide the date of the last version;DATE;ENG;False;20/09/2017
+country;36;Mozambique;30;If there isn't a law on abortion. Did the country conduct some advocacy actions related to that?;CHOICE;ENG;False
+country;36;Mozambique;31;What is the life expectancy in the following population group in the country?;SUBQUESTION;ENG;False
+country;36;Mozambique;32;What is the Population growth rate?;PERCENTAGE;ENG;False
+country;36;Mozambique;33;Is the country FP2020 Focus?;CHOICE;ENG;False
+country;36;Mozambique;34;Is the country severely affected by Covid19?;CHOICE;ENG;False
+country;36;Mozambique;35;How the Covid19 has impacted the country\u2019s health system;TEXT;ENG;False
+country;36;Mozambique;36;Is the country starting the vaccination process?;CHOICE;ENG;False
+country;36;Mozambique;37;Does the country have a policy on the management of vulnerable groups?;CHOICE;ENG;False
+country;36;Mozambique;38;Does exist a dedicated structure of vulnerable groups?;CHOICE;ENG;False
+country;36;Mozambique;39;Do the vulnerable groups access to FP services?;CHOICE;ENG;False
+country;36;Mozambique;40;The Health facilities number in the country;SUBQUESTION;ENG;False
+country;36;Mozambique;41;The number of Health facilities providing safe abortion care;INTEGER;ENG;False
