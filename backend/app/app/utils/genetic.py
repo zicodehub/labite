@@ -113,18 +113,20 @@ class Genetic:
                             )
                             crud.vehicule.add_node_to_route(vehicule, node_schema)
                             # S'il y a encore des produits dans la commande, on passe au véhicule suivant 
-                        else:
-                            print(f"Refus d'ajout de trajet dans le véhicule {vehicule.id} car il a packé {qty_packed} <= 0 . Commande {order.id}, Restant {qty_packed}/{order.qty_fixed} ")
-
+                
                 elif isinstance(node, models.Client):
-                    print(f"CLIENT {node.id}, {node.name} livré par le véhicule V{vehicule.id} ")
-                    # node_schema = schemas.Node(
-                    #             name = node.name, coords = node.coords, 
-                    #             code = node.code, type = get_node_type(node),
-                    #             mvt = qty_packed 
-                    #         )
-                    # crud.vehicule.add_node_to_route(vehicule, node_schema)
                     client_holded_orders = crud.vehicule.get_client_holded_orders_in_vehicule(vehicule, node)
+                    qty_delivered = 0
+                    print(f"CLIENT C{node.name} reçu {len(client_holded_orders)} commandes du véhicule V{vehicule.id} ")
                     for h in client_holded_orders:
+                        qty_delivered += h.qty_holded
+                        print(h.qty_holded)
                         crud.vehicule.deactivate_holded_order(h)
-                    print([ f"Commande {h.commande.id}, Qté {h.qty_holded}/{h.commande.qty_fixed} \n" for h in client_holded_orders ])
+                    if qty_delivered != 0:
+                        node_schema = schemas.Node(
+                                    name = node.name, coords = node.coords, 
+                                    code = node.code, type = get_node_type(node),
+                                    mvt = -qty_delivered 
+                                )
+                        crud.vehicule.add_node_to_route(vehicule, node_schema)
+                        print([ f"Commande {h.commande.id}, Qté {h.qty_holded}/{h.commande.qty_fixed} \n" for h in client_holded_orders ])

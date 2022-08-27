@@ -1,9 +1,10 @@
 from calendar import c
-from app.db.session import SessionLocal
+from app.db.session import SessionLocal, get_db
 from app import models, crud
 
-db = SessionLocal()
-
+# db = SessionLocal()
+db = get_db().send(None)
+# db
 orders = crud.commande.get_all(db)
 for o in orders:
     o.qty = o.qty_fixed

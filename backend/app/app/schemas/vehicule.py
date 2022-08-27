@@ -27,6 +27,7 @@ class HoldedOrder(BaseModel):
     commande_id: int
     compartiment_id: int
     qty_holded: int 
+    is_active: bool
 
     class Config:
         orm_mode = True
