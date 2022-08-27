@@ -9,6 +9,7 @@ from app.schemas.produit import ProduitCreate, ProduitUpdate
 
 
 class CRUDItem(CRUDBase[Produit, ProduitCreate, ProduitUpdate]):
-    pass
+    def are_produits_similar(self, produit_1: Produit, produit_2: Produit) -> bool:
+        return produit_1.id == produit_2.id
 
 produit = CRUDItem(Produit)

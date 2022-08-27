@@ -17,4 +17,6 @@ class Produit(Base):
     name = Column(String)
     type = Column(Integer, ForeignKey('typeproduit.id'))
 
+    commandes = relationship("Commande", back_populates = "produit")
+
 

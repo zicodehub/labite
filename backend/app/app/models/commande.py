@@ -16,6 +16,7 @@ class Commande(Base):
     qty_fixed = Column(Integer)
     is_delivered = Column(Boolean())
 
+    produit = relationship("Produit", back_populates = "commandes")
     holdings = relationship("HoldedOrder", back_populates = "commande")
 
 

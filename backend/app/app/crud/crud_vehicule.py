@@ -35,17 +35,18 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
         qty_holded_by_vehicule = self.get_used_space_in_busy_compartments(vehicule)
         qty_holded_for_order = 0
         for comp in vehicule.compartiments:
+            print("Found compartments")
             if qty_holded_by_vehicule == order.qty :
                 break
             
             elif qty_holded_by_vehicule > max_vehicule_qty :
                 raise Exception("Le véhicule a accueillit plus de produits qu'il ne peut supporter")
             
-            elif len(comp.holded_orders) != 0 and comp.holded_orders[0].commande.produit_id == order.produit_id :
-                size_free = self.get_free_space_in_compartment(comp)
+            elif len(comp.holded_orders) != 0 :
+                size_free = self.get_free_space_in_compartment(comp, comp.holded_orders[0].commande.produit, order.produit)
                 # print(f"Le Compart {comp.id} a {size_free} dispo ")
-                if size_free > 0:
-                    qty_to_hold = min(size_free, order.qty )
+                qty_to_hold = min(size_free, order.qty )
+                if qty_to_hold > 0:
                     self.add_order_to_compartment(comp, order, qty_to_hold)
                     qty_holded_for_order += qty_to_hold
                     qty_holded_by_vehicule += qty_to_hold
@@ -56,16 +57,19 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
         qty_to_hold = min(size_free, order.qty )
         while qty_holded_for_order < order.qty and (qty_holded_by_vehicule + qty_to_hold) <= max_vehicule_qty and vehicule.nb_compartment > len(crud.vehicule.get_compartiments(vehicule.id)) :
             qty_to_hold = min(size_free, order.qty )
-            comp = self.create_compartment(vehicule)                
-            self.add_order_to_compartment(comp, order, qty_to_hold)
-            qty_holded_for_order += qty_to_hold
-            qty_holded_by_vehicule += qty_to_hold
+            if qty_to_hold > 0:
+                comp = self.create_compartment(vehicule)                
+                self.add_order_to_compartment(comp, order, qty_to_hold)
+                qty_holded_for_order += qty_to_hold
+                qty_holded_by_vehicule += qty_to_hold
+                index += 1
             print(f"Itération {index} : v.nb_comp = {len(crud.vehicule.get_compartiments(vehicule.id))}/{vehicule.nb_compartment}, order_holded = {qty_holded_for_order}/{order.qty_fixed}, total_in_vehicule = {qty_holded_by_vehicule}/{max_vehicule_qty} with_step = {qty_to_hold}/{vehicule.size_compartment} ")
-            index += 1
-
+        # print(f"Résumé: iter={index}, qty_to_hold={qty_to_hold}, qty_holded_by_vehicule={qty_holded_by_vehicule}, qty_holded_for_order={qty_holded_for_order} ")
         return qty_holded_for_order
 
     def add_order_to_compartment(self, compartment: models.Compartiment, order: models.Commande, qty_to_hold: int):
+        if qty_to_hold == 0:
+            print("------------- ERREUR -------------")
         h = models.HoldedOrder(commande_id = order.id, compartiment_id = compartment.id, qty_holded = qty_to_hold)
         db.add(h)
         db.commit()
@@ -96,8 +100,11 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
     def get_commandes_in_compartiment(self, compartiment: models.Compartiment) -> List[models.Commande]:
         return db.query(models.HoldedOrder).filter(models.HoldedOrder.compartiment_id == compartiment.id).all()
 
-    def get_free_space_in_compartment(self, compartiment: models.Compartiment) -> int:
-        size_used = sum([ holded.qty_holded for holded in compartiment.holded_orders ])
+    def get_free_space_in_compartment(self, compartiment: models.Compartiment, produit_1: models.Produit, produit_2: models.Produit) -> int:
+        size_used = sum([ holded.qty_holded for holded in compartiment.holded_orders if holded.is_active == True ])
+        if size_used != 0:
+            if not crud.produit.are_produits_similar(produit_1, produit_2) :
+                return 0
         return compartiment.vehicule.size_compartment - size_used
 
     def get_available_space_for_produit(self, vehicule: models.Vehicule, produit: models.Produit):
@@ -136,7 +143,8 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
         qty_used = 0
         for index, comp in enumerate(vehicule.compartiments):
             for holded_order in comp.holded_orders :
-                qty_used +=  holded_order.qty_holded
+                if holded_order.is_active:
+                    qty_used +=  holded_order.qty_holded
                 # print(f"Compartiment {index} : {holded_order.qty_holded} ")
         return qty_used
 
@@ -156,5 +164,31 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
         print(f"Create compartment {c.id} for V{vehicule.id} ")
         # db.refresh(vehicule)
         return c
+
+    def get_client_holded_orders_in_compartiment(self, compartiment: models.Compartiment, client: models.Client) -> List[models.HoldedOrder]:
+        # for h in compartiment.holded_orders :
+        #     if h.commande.client_id == client.id :
+        #         l.append(comm)
+
+        # Si une holded_order est inactive c'est qu'elle est déjà déchargée chez un client
+        return [ h for h in compartiment.holded_orders if h.commande.client_id == client.id and h.is_active == True ] 
+
+    def get_client_holded_orders_in_vehicule(self, vehicule: models.Vehicule, client: models.Client) -> List[models.HoldedOrder]:
+        orders = []
+        for comp in vehicule.compartiments :
+            orders.extend(self.get_client_holded_orders_in_compartiment(comp, client))
+        return orders
+
+
+    # def get_active_compartments(self, vehicule: models.Vehicule) -> List[models.Compartiment]:
+    #     return [ comp for comp in vehicule.compartiments if comp.is_active == True ]
+
+    def deactivate_holded_order(self, holded_order: models.HoldedOrder) -> models.HoldedOrder:
+        holded_order.is_active = False
+        local_obj = db.merge(holded_order)
+        db.add(local_obj)
+        db.commit()
+        db.refresh(local_obj)
+        return local_obj
 
 vehicule = CRUDItem(Vehicule)
