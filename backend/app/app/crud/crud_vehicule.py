@@ -162,7 +162,7 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
         db.add(c)
         db.commit()
         db.refresh(c)
-        print(f"Create compartment {c.id} for V{vehicule.id} ")
+        print(f"Create compartment {c.id} for V{vehicule.id}, {c.vehicule_id} ")
         return c
 
     def get_client_holded_orders_in_compartiment(self, compartiment: models.Compartiment, client: models.Client) -> List[models.HoldedOrder]:
