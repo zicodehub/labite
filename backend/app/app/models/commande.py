@@ -11,7 +11,7 @@ class Commande(Base):
     id = Column(Integer, primary_key=True, index=True)
     client_id = Column(Integer, ForeignKey('client.id'))
     fournisseur_id = Column(Integer, ForeignKey('fournisseur.id'))
-    produit_id = Column(Integer, ForeignKey('produit.id'))
+    produit_id = Column(Integer, ForeignKey('produit.id'), nullable= False)
     qty = Column(Integer)
     qty_fixed = Column(Integer)
     is_delivered = Column(Boolean())

@@ -15,6 +15,14 @@ db = get_db().send(None)
 class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
     # def get_all(self) -> List[Vehicule]:
     #     return super().get_all(db)
+    def create(self, obj_in: VehiculeCreate, db: Session = SessionLocal()) -> Vehicule:
+        v = super().create(obj_in= obj_in, db= db)
+        v.name = f'V{v.id}'
+        db.add(v)
+        db.commit()
+        db.refresh(v)
+        return v
+
     def can_hold(self, vehicule: models.Vehicule, produit: models.Produit, qty: int) -> int:
         dispo1 = self.get_available_space_in_free_compartments(vehicule)
         dispo2 = self.get_available_space_for_produit(vehicule, produit)
@@ -44,6 +52,7 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
                 raise Exception("Le véhicule a accueillit plus de produits qu'il ne peut supporter")
             
             elif len(comp.holded_orders) != 0 :
+                print(f" {comp.holded_orders[0].commande} à {comp.holded_orders[0].commande.id} ")
                 size_free = self.get_free_space_in_compartment(comp, comp.holded_orders[0].commande.produit, order.produit)
                 # print(f"Le Compart {comp.id} a {size_free} dispo ")
                 qty_to_hold = min(size_free, order.qty )
@@ -75,7 +84,10 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
         crud.commande.decrease_qty(db, order, qty_to_hold)
        
     def add_node_to_route(self, vehicule: models.Vehicule, node: schemas.Node) -> bool:
-        print("node route")
+        # TODO: This function is the problem
+
+        # print("node route")
+        # vehicule = crud.vehicule.get(vehicule.id, db= db)
         current_route = vehicule.trajet
         if node.json() not in current_route :
             # raise Exception(f"Le noeud véhicule {vehicule.id} est déjà passé par le noeud {node}")
@@ -84,7 +96,9 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
             current_route.append(node.json())
             vehicule.trajet = current_route
             local_object = db.merge(vehicule)
+            # local_object.compartiments = vehicule.compartiments
             db.add(local_object)
+            # db.add(vehicule)
             db.commit()
             print("Ajout au trajet")
             return True
@@ -105,6 +119,11 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
     def get_free_space_in_compartment(self, compartiment: models.Compartiment, produit_1: models.Produit, produit_2: models.Produit) -> int:
         size_used = sum([ holded.qty_holded for holded in compartiment.holded_orders if holded.is_active == True ])
         if size_used != 0:
+            if not produit_1:
+                print("\n Prod 1")
+            elif not produit_2:
+                print("\n Prod 2")
+
             if not crud.produit.are_produits_similar(produit_1, produit_2) :
                 return 0
         return compartiment.vehicule.size_compartment - size_used
@@ -157,13 +176,48 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
         return nb_remaining_compartments * vehicule.size_compartment
 
     def create_compartment(self, vehicule: models.Vehicule) -> models.Compartiment:
-        c = models.Compartiment(vehicule_id = vehicule.id)
-        c.vehicule_id = vehicule.id
-        db.add(c)
-        db.commit()
-        db.refresh(c)
-        print(f"Create compartment {c.id} for V{vehicule.id}, {c.vehicule_id} ")
+        # c = models.Compartiment(vehicule_id = vehicule.id)
+        # c.vehicule_id = vehicule.id
+
+        # db2 = get_db().send(None)
+        # db2.add(c)
+        # db2.commit()
+        # db2.refresh(c)
+        # pk = db.query(models.Compartiment).filter(models.Compartiment.id == c.id).first().vehicule_id
+        obj_in = schemas.CompartimentCreate(vehicule_id = vehicule.id)
+        c = crud.compartiment.create(obj_in= obj_in, db = db)
+
+        
+        # # print(c.vehicule)
+        # try:
+        #     c.vehicule = vehicule
+        # except:
+        #     c.vehicule = local_obj
+        #     pass
+        # # finally:
+
+        ########""
+        # local_comp = db.merge(c)
+        # local_vehicule = db.merge(vehicule)
+        # local_vehicule.compartiments.append(local_comp)
+        # db.add(local_vehicule)
+        # db.commit()
+        # db.refresh(local_vehicule)
+        ##########
+
+
+        # c.vehicule = db.merge(vehicule)
+        # c.vehicule_id = vehicule.id
+        # db.add(c)
+        # db.commit()
+        # db.refresh(c)
+
+        # db.execute(f"UPDATE compartiment SET vehicule_id={vehicule.id} WHERE compartiment.id = {c.id} ")
+        
+        # db.refresh(local_comp)
+        # print(f"Create compartment {local_comp.id} for V{local_vehicule.id}, {local_comp.vehicule_id} of {local_comp.vehicule} ")
         return c
+        return local_comp
 
     def get_client_holded_orders_in_compartiment(self, compartiment: models.Compartiment, client: models.Client) -> List[models.HoldedOrder]:
         # for h in compartiment.holded_orders :
@@ -175,8 +229,13 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
 
     def get_client_holded_orders_in_vehicule(self, vehicule: models.Vehicule, client: models.Client) -> List[models.HoldedOrder]:
         orders = []
-        for comp in vehicule.compartiments :
-            orders.extend(self.get_client_holded_orders_in_compartiment(comp, client))
+        print(f"\nGetting comparments in {vehicule.name} ")
+        # db.query(models.Compartiment).filter
+        # for comp in vehicule.compartiments :
+        for comp in crud.compartiment.get_all():
+            # print(f"Compp {comp.id} ")
+            print(f"Compartment {comp.id} of {comp.vehicule_id}  ")
+            # orders.extend(self.get_client_holded_orders_in_compartiment(comp, client))
         return orders
 
 

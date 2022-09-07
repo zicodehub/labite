@@ -1,20 +1,17 @@
 
 import enum
 from typing import Dict, Optional, List, Union
-from app.schemas.commande import Commande
-from app.schemas.client import Client
-from app.schemas.depot import Depot
 from app.schemas.fournisseur import Fournisseur
 from app.core.config import settings
 # from datetime import datetime,date
-from app import models
+from app import models, schemas
 
 from pydantic import BaseModel, Json
 
 class NodeType(enum.Enum):
-    fournisseur = "fournisseur"
-    client = "client"
-    depot = "depot"
+    fournisseur = "Fournisseur"
+    client = "Client"
+    depot = "Depot"
 
 class Node(BaseModel):
     name: Optional[str]
@@ -32,7 +29,16 @@ class HoldedOrder(BaseModel):
     class Config:
         orm_mode = True
 
-class Compartiment(BaseModel):
+class CompartimentBase(BaseModel):
+    vehicule_id: Optional[int]
+
+class CompartimentCreate(CompartimentBase):
+    vehicule_id: int
+
+class CompartimentUpdate(CompartimentBase):
+    pass
+
+class Compartiment(CompartimentBase):
     id: int
     vehicule_id: int
     holded_orders: List[HoldedOrder]
@@ -48,12 +54,14 @@ class VehiculeBase(BaseModel):
     nb_compartment: Optional[int]
     size_compartment: Optional[int]
     cout: Optional[int]
+    depot_id: Optional[int]
     is_active: Optional[bool] = True
 
 class VehiculeCreate(VehiculeBase):
     nb_compartment: int
     size_compartment: int
     cout: int
+    depot_id: int
     
 class VehiculeUpdate(VehiculeBase):
     pass
@@ -64,6 +72,8 @@ class VehiculeInDB(VehiculeBase):
     id: int
     compartiments: List[Compartiment]
     trajet: List
+
+    depot: schemas.Depot
 
     class Config:
         orm_mode = True

@@ -8,6 +8,7 @@ from typing import List
 class Solution:
     def __init__(self, chemin) -> None:
         self.chemin = chemin
+        print(chemin)
         self.cout = self.compute_cout()
     
     def compute_cout(self):
@@ -34,7 +35,7 @@ class Solution:
     
     @classmethod
     def _is_precedence_ok(cls, chemin) -> bool:
-        for index, pt in enumerate(chemin[1:-1]):
+        for index, pt in enumerate(chemin):
             is_ok = False
             if isinstance(pt, models.Client):
                 # print(f"Client {pt.name} à index #{index}/{len(chemin[1:-1])} ")
@@ -42,16 +43,16 @@ class Solution:
                 for f in chemin[:index] :
                     if isinstance(f, models.Fournisseur):
                         is_ok = crud.commande.must_deliver_client(db = SessionLocal(), f = f, client = pt)
-                        # print(f"Test fournisseur {f.name} ({is_ok}) ")
+                        print(f"\n\nTest {pt.name} -> {f.name}/{fournisseurs_associes} ({is_ok}) ")
                         if is_ok: 
-                            # print(f"\n\n--- YES {pt.name} est fourni par {f.name}")
+                            print(f"--- YES {pt.name} est fourni par {f.name}, reste ({fournisseurs_associes})")
                             # break
                             fournisseurs_associes.remove(f.id)
                     # else:
                     #     print(f"Fournisseur {f.name} of type {type(f)} no instance of {models.Fournisseur} ")
 
-                if len(fournisseurs_associes) != 0:
-                    # print(f"\n\n------- DANGER client {pt.name} NON fourni ({fournisseurs_associes}) ---------")
+                if not is_ok and len(fournisseurs_associes) != 0:
+                    print(f"------- DANGER client {pt.name} NON fourni ({fournisseurs_associes}). Parcouru {len(chemin[:index])} ({[i.name for i in chemin[:index]]}) index {index} ---------")
                     return False
                 # print(f"Client {pt.name} est fourni par {f.name} ")
         return True
@@ -93,13 +94,15 @@ class Solution:
     def _muter(cls, chemin: list, k: int):
         mutations: List[cls] = []
         clone = chemin.copy()
-        for i in range(1, min(k, len(chemin)) -1):
+        for i in range(1, min(k, len(chemin))):
             cls._permute(clone, i, i+1)
+            print(f"\n\n Try to mutate {[i.name for i in clone]} ")
             # if cls._is_precedence_ok(clone) : #and cls._is_fenetre_ok(chemin) :
-            if cls._is_precedence_ok(clone) and cls._is_fenetre_ok(clone) :
+            if cls._is_precedence_ok(clone): # and cls._is_fenetre_ok(clone) :
                 mutations.append(cls(clone.copy()))
             # mutations.append(cls(clone))
         if len(mutations) == 0:
-            raise Exception("Aucune mutation trouvée ne respecte les contraintes ")
+            print("Aucune mutation trouvée ne respecte les contraintes ")
+            # raise Exception("Aucune mutation trouvée ne respecte les contraintes ")
         return mutations
 

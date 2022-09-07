@@ -4,8 +4,9 @@ const CarSelectionBox = ({ cars = [] }) => {
     return (
         <Form className="border" >
             {
-                cars.map( car => (
+                cars.map( (car, index) => (
                     <Form.Check 
+                    key={index}
                     type='checkbox'
                     label={car.name}
                 />

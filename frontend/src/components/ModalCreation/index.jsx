@@ -1,18 +1,18 @@
 import { Formik } from 'formik';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { Form, Modal, Row, Col, Button } from 'react-bootstrap';
+import { Form, Modal, Row, Col, Button, Spinner } from 'react-bootstrap';
 import TextInput from '../TextInput';
 import SelectInput from '../SelectInput';
 import { Client, Fournisseur } from '../constants';
 
 
 export default ({open, hide, coords, onCreate}) => {
-    const [ isReady, setIsReady ] = useState(true)
+    const [ isLoading, setIsLoading ] = useState(false)
 
     useEffect(() => {
 
-    }, [setIsReady])
+    }, [setIsLoading])
 
     return (
       <>
@@ -52,7 +52,10 @@ export default ({open, hide, coords, onCreate}) => {
                            <TextInput label="Heure max" name="time_interval_end" type='number' formik={formik} />
                         </Col>
                       </Row>
-                      <Button onClick={formik.handleSubmit}>Enregistrer</Button>
+                      {
+                        isLoading ? <Spinner animation="grow" /> : <Button onClick={formik.handleSubmit}>Enregistrer</Button>  
+                      }
+                      
                     </Form>
                   )
                 }

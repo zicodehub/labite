@@ -14,7 +14,7 @@ class HoldedOrder(Base):
 
 class Compartiment(Base):
     id = Column(Integer, primary_key=True, index=True)
-    vehicule_id = Column(Integer, ForeignKey("vehicule.id"))
+    vehicule_id = Column(Integer, ForeignKey("vehicule.id"), nullable=False)
     holded_orders = relationship("HoldedOrder", back_populates= "compartiment")
     vehicule = relationship("Vehicule", back_populates= "compartiments")
 
@@ -33,5 +33,9 @@ class Vehicule(Base):
     size_compartment = Column(Integer)
     cout = Column(Integer)
 
+    depot_id = Column(Integer, ForeignKey("depot.id"))
+    depot = relationship("Depot", back_populates = "vehicules")
+    
     trajet = Column(JSON, default= [])
     compartiments = relationship("Compartiment")
+    # compartiments = relationship("Compartiment", back_populates = "vehicule")

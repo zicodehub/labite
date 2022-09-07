@@ -15,6 +15,7 @@ class CommandeBase(BaseModel):
 class CommandeCreate(CommandeBase):
     client_id: int
     fournisseur_id: int
+    produit_id: int
     qty: int
 
 class CommandeUpdate(CommandeBase):

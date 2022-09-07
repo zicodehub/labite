@@ -19,7 +19,7 @@ def read_items(
     Retrieve items.
     """
     items = crud.fournisseur.get_multi(skip=skip, limit=limit)
-    print(dir(items[0]))
+    # print(dir(items[0]))
     return items
 
 

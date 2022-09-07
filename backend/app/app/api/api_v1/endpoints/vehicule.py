@@ -64,5 +64,5 @@ def delete_item(
     item = crud.vehicule.get(id=id)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
-    item = crud.depot.remove(id=id)
+    item = crud.vehicule.remove(id=id)
     return item

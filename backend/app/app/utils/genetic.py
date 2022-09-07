@@ -21,23 +21,25 @@ class Genetic:
     MAX_SELECTION_IN_GEN = 5
 
     def __init__(self, list_commandes: List[Union[models.Depot, models.Fournisseur, models.Client]]) -> None:
-
+        print("ZOAMDI")
         self.initial_solution: Solution = self.generate_initial_solution(list_commandes)
         
-        print(f"Initial solution {self.initial_solution} -- Cout {self.initial_solution.cout} -- HMM ({self.initial_solution.is_precedence_ok()}) ")
+        # print(f"Initial solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({self.initial_solution.is_precedence_ok()}) ")
         
     def start(self) -> List:
         dataset = []
 
+        init_precedence = self.initial_solution.is_precedence_ok()
         curent_gen = [self.initial_solution]
-        if not self.initial_solution.is_precedence_ok() :
+        print(f"\n\n\n!! Start solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({init_precedence}) ")
+        if not init_precedence :
             # print("Précedence initiale non respectée ", self.initial_solution.chemin)
-            raise Exception(f"Précedence initiale non respectée {[i.name for i in self.initial_solution.chemin]} ")
+            raise Exception(f"Précedence initiale non respectée -{init_precedence}- {[i.name for i in self.initial_solution.chemin]} ")
         else:
             for g in range(self.NB_GEN):
                 print(f"Going to create a generation  n°{g}")
                 any_sols = self.generation_next(curent_gen)
-                print(f"First generation n°{g} : {len(any_sols)}")
+                print(f"Generation n°{g} created : {len(any_sols)}")
                 curent_gen = self.selection(any_sols)
                 print(f"Meilleurs cout de la generation n°{g} : {[i.cout for i in curent_gen]} ")
                 dataset.append({
@@ -90,13 +92,13 @@ class Genetic:
         vehicules_queue = crud.vehicule.get_all()
 
 
-        print([i.name for i in solution.chemin])
+        print("Test de la solution ", [i.name for i in solution.chemin])
 
         for vehicule in vehicules_queue:
             print("\n")
             for node in solution.chemin :
                 if isinstance(node, models.Fournisseur):
-                    print(f"FOURNISSEUR {node.id}, {node.name} ")
+                    # print(f"FOURNISSEUR {node.id}, {node.name} ")
                     commandes = crud.commande.get_by_fournisseur(f = node)
                     for order in commandes:
                         qty_packed = crud.vehicule.hold(vehicule, order)
@@ -120,7 +122,7 @@ class Genetic:
                     print(f"CLIENT C{node.name} reçu {len(client_holded_orders)} commandes du véhicule V{vehicule.id} ")
                     for h in client_holded_orders:
                         qty_delivered += h.qty_holded
-                        print(h.qty_holded)
+                        # print(h.qty_holded)
                         crud.vehicule.deactivate_holded_order(h)
                     if qty_delivered != 0:
                         node_schema = schemas.Node(

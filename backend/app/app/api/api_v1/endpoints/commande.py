@@ -20,13 +20,14 @@ def read_items(
     """
     f = crud.commande.get_fournisseurs(db = db)
     c = crud.commande.get_clients(db = db)
-    d = crud.depot.get(1, db = db)
+    d = crud.depot.get_first(db = db)
     print(f"Il y a {len(f)} fourn et {len(c)} clients ")
     
     random.shuffle(f)
     random.shuffle(c)
     
-    list_initial = [d] + f + c + [d]
+    # list_initial = [d] + f + c + [d]
+    list_initial = f + c 
     genetic = Genetic(list_initial)
     return genetic.start()
     return "OK"

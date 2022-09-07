@@ -17,5 +17,7 @@ class Depot(Base):
     time_interval_start = Column(Integer)
     time_interval_end = Column(Integer)
 
+    vehicules = relationship("Vehicule", back_populates = "depot")
+
     def __str__(self) -> str:
         return self.name

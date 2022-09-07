@@ -5,3 +5,4 @@ from .crud_fournisseur import fournisseur
 from .crud_produit import produit
 from .crud_type import type_produit
 from .crud_vehicule import vehicule
+from .crud_compartiment import compartiment
