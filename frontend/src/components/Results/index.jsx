@@ -3,7 +3,7 @@ import Flow from "../Flow"
 import Map from "../Map"
 import ModalCreation from "../ModalCreation"
 import { useState } from "react"
-import { Col, Row, Container, Button, Image, Spinner } from "react-bootstrap"
+import { Col, Row, Container, Button, Image, Spinner, Accordion } from "react-bootstrap"
 import MapImage from './map.png'
 import Vis from "../Vis"
 import { Client, Depot, Fournisseur } from "../constants"
@@ -13,25 +13,24 @@ import { listClients, runAlgo, listFournisseurs, listVehicules, createClient, li
 
 const Results = () => {
     const [cars, setCars] = useState([])
-    const [selectedEdges, setSelectedEdges] = useState([])
-    const [selectedCars, setSelectedCars] = useState([])
-    const [trajet_final, setTrajet_final] = useState([])
+    const [selectedEdges, setSelectedEdges] = useState({})
+    const [selectedCars, setSelectedCars] = useState({})
+    const [trajet_final, setTrajet_final] = useState({})
     const [ clients, setClients ] = useState([])
     const [ depots, setDepots ] = useState([])
 
     const [ fournisseurs, setFournisseurs ] = useState([])
     const [ produits, setProduits ] = useState([])
-    const [ edges, setEdges ] = useState([])
+    const [ edges, setEdges ] = useState({})
 
     const [clickCoords, setClickCoords] = useState({ x: 0, y: 0 })
     const [isOpen, setIsOpen] = useState(false)
-    const [details, setDetails] = useState({
-        cout: '',
-        solution: '',
-        cars: []
-    })
+    const [details, setDetails] = useState({})
+    const [algoError, setAlgoError] = useState({})
     const [isReady, setIsReady] = useState(false)
     const [isRunning, setIsRunning] = useState(false)
+    const [idSolution, setIdSolution] = useState(0)
+    const [listIdSolution, setListIdSolution] = useState([])
 
 
     useEffect(() => {
@@ -133,50 +132,66 @@ const Results = () => {
                                 .then( (res) => {
                                     console.log(res)
                                     let data = res.data
-                                    setDetails(prev => ({
-                                        ...prev,
-                                        cout: data.cout,
-                                        solution: data.short.map( d => d + ' - ' )
-                                    }))
-                                    setEdges( prev => {
-                                        // return Object.keys(data.trajet).map( v => ({ name: v, trajet: data.trajet[v] }) )
-                                        let local_edges = []
-                                        console.log("Genetic ", data.trajet)
-                                        setTrajet_final(prev => data.trajet)
-                                        Object.keys(data.trajet).forEach( (key, v_index) => {
-                                            let trajet = data.trajet[key]
-                                            let i = trajet[0]
-                                            let color = [ 10, 39, 11 ]
-
-                                            for (let index = 1; index < trajet.length; index++) {
-                                                const element = trajet[index];
-                                                local_edges.push({
-                                                    from: i.name,
-                                                    to: element.name,
-                                                    v: key,
-                                                    mvt: element.mvt,
-                                                    label: key,
-                                                    title: key,
-                                                    color: {
-                                                        color: `#${color[0]}${color[1]}${color[2]}`,
-                                                        hover: `#${color[0]}${color[1]}${color[2]}`
-                                                    },
-                                                    width: 4
-                                                })
-                                                i = element
-                                                color[v_index%3] += color[v_index%3] + 30
-                                            }
-                                        } )
-                                        console.log(local_edges)
-                                        setSelectedEdges(prev => local_edges)
-                                        return local_edges
-                                    })
+                                    data.forEach(
+                                        (solution, solution_index) => {
+                                            
+                                            setDetails(prev => ({
+                                                ...prev,
+                                                [solution_index]: {
+                                                    distance: solution.distance,
+                                                    cout: solution.cout,
+                                                    nb_vehicules: solution.details.length,
+                                                    solution: solution.short.map( d => d + ' - ' )
+                                                }
+                                            }))
+                                            setEdges( prev => {
+                                                // return Object.keys(data.trajet).map( v => ({ name: v, trajet: data.trajet[v] }) )
+                                                let local_edges = []
+                                                console.log("Genetic ", solution.trajet)
+                                                setTrajet_final(prev => ({...prev, [solution_index]: solution.trajet }))
+                                                Object.keys(solution.trajet).forEach( (key, v_index) => {
+                                                    let trajet = solution.trajet[key]
+                                                    let i = trajet[0]
+                                                    let color = [ 10, 39, 11 ]
+        
+                                                    for (let index = 1; index < trajet.length; index++) {
+                                                        const element = trajet[index];
+                                                        local_edges.push({
+                                                            from: i.name,
+                                                            to: element.name,
+                                                            v: key,
+                                                            mvt: element.mvt,
+                                                            label: key,
+                                                            title: key,
+                                                            color: {
+                                                                color: `#${color[0]}${color[1]}${color[2]}`,
+                                                                hover: `#${color[0]}${color[1]}${color[2]}`
+                                                            },
+                                                            width: 4
+                                                        })
+                                                        i = element
+                                                        color[v_index%3] += color[v_index%3] + 30
+                                                    }
+                                                } )
+                                                console.log(local_edges)
+                                                setSelectedEdges(prev => ({...prev, [solution_index]: local_edges }))
+                                                return {
+                                                    ...prev,
+                                                    [solution_index]: local_edges
+                                                }
+                                            })
+                                        
+                                            setListIdSolution(prev => prev.concat([solution_index]) )
+                                        }
+                                        )
                                     setIsRunning(prev => false)
+                                    setAlgoError(prev => ({
+                                        error: null                                       
+                                    }))
                                 } )
                                 .catch(err => {
-                                    setDetails(prev => ({
-                                        ...prev,
-                                        error: err.message
+                                    setAlgoError(prev => ({
+                                        error: err.message                                        
                                     }))
                                     setIsRunning(prev => false)
                                 } )
@@ -184,14 +199,14 @@ const Results = () => {
                         </Col>
                         <Row>
                             <Col md="1">
-                                <CarSelectionBox cars={cars} edges={edges} selectedCars={selectedCars} setSelectedCars={setSelectedCars} selectedEdges={selectedEdges} setSelectedEdges={setSelectedEdges} />
+                                <CarSelectionBox cars={cars} edges={edges[idSolution]} selectedCars={selectedCars} setSelectedCars={setSelectedCars} selectedEdges={selectedEdges} setSelectedEdges={setSelectedEdges} />
                             </Col>
                             <Col md="8" className="border" style={{ height: '80vh' }} onDoubleClick={({ pageX, pageY })=> {
                                     setClickCoords({ x: pageX, y: pageY })
                                     setIsOpen(true)
                                     // console.log(pageX, pageY)
                                 } } >
-                                <Vis nodes={clients.concat(fournisseurs).concat(depots)} edges={selectedEdges} />
+                                <Vis nodes={clients.concat(fournisseurs).concat(depots)} edges={selectedEdges[idSolution]} />
                                 {/* <Image width="100%" height="100%" src={MapImage}  /> */}
                                 {/* <Flow /> */}
                             </Col>
@@ -199,26 +214,42 @@ const Results = () => {
                                 <p>Détails</p>
                                 {
                                     isRunning ? <Spinner animation="grow" /> : (
-                                        <ul>
-                                            <li>Cout : {details.cout} </li>
-                                            <li>Solution <br/><strong>{details.solution}</strong></li>
-                                            { details.error && <li className="text-danger">Erreur <strong>{details.error}</strong></li> }
-                                            <li>
-                                                Détails des véhicules sélectionnées
-                                                <ul>
-                                                    {
-                                                        selectedCars.map( s => (
-                                                            <li> {s.name}
-                                                               <ul>
-                                                                    <li>Trajet : <strong>{trajet_final[s.name].map( (d, ind) => `${d.name}${d.mvt ? '('+d.mvt+')' : ''} ${ind+1 == trajet_final[s.name].length ? '' : '- '} ` )}</strong></li>
-                                                                </ul> 
-                                                            </li>
-                                                        ) )
-                                                    }
-                                                </ul>
-                                            </li>
-                                        </ul>
-
+                                        <Accordion defaultActiveKey="0" onSelect={(val) => {
+                                            if(val != null) setIdSolution(val) 
+                                            }} >
+                                            {
+                                                algoError.error ? <h3 className="text-danger text-bold">{algoError.error}</h3> : Object.keys(listIdSolution).map( local_solution_index => (
+                                                    <Accordion.Item eventKey={local_solution_index}>
+                                                        <Accordion.Header>
+                                                            Coût : {details[local_solution_index] && details[local_solution_index].cout}
+                                                        </Accordion.Header>
+                                                        <Accordion.Body>
+                                                            <ul>
+                                                                <li>Cout : {details[local_solution_index].cout} </li>
+                                                                <li>Distance : {details[local_solution_index].distance} </li>
+                                                                <li>Véhicules utilisés : {details[local_solution_index].nb_vehicules} </li>
+                                                                <li>Solution <br/><strong>{details[local_solution_index].solution}</strong></li>
+                                                                { details.error && <li className="text-danger">Erreur <strong>{details[local_solution_index].error}</strong></li> }
+                                                                <li>
+                                                                    Détails des véhicules sélectionnées
+                                                                    <ul>
+                                                                        {
+                                                                            cars.map( s => (
+                                                                                <li> {s.name}
+                                                                                <ul>
+                                                                                        <li>Trajet : <strong>{trajet_final[local_solution_index] && trajet_final[local_solution_index][s.name]?.map( (d, ind) => `${d.name}${d.mvt ? '('+d.mvt+')' : ''} ${ind+1 == trajet_final[idSolution][s.name].length ? '' : '- '} ` )}</strong></li>
+                                                                                    </ul> 
+                                                                                </li>
+                                                                            ) )
+                                                                        }
+                                                                    </ul>
+                                                                </li>
+                                                            </ul>
+                                                        </Accordion.Body>
+                                                    </Accordion.Item>
+                                                ) )
+                                            }
+                                        </Accordion>
                                     )
                                 }
                                  

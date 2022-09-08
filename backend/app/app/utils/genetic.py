@@ -21,7 +21,7 @@ class Genetic:
     MAX_GEN_POP_LENGTH = 3
     NB_GEN = 2
     MAX_SELECTION_IN_GEN = 5
-
+    SAMPLE_SOLUTIONS = 3
     def __init__(self, list_commandes: List[Union[models.Depot, models.Fournisseur, models.Client]], db: Session = SessionLocal()) -> None:
         print("ZOAMDI")
         self.initial_solution: Solution = self.generate_initial_solution(list_commandes)
@@ -49,15 +49,37 @@ class Genetic:
                 curent_gen = self.selection(any_sols)
                 print(f"Meilleurs cout de la generation n°{g} : {[i.cout for i in curent_gen]} ")
                 dataset.update({
-                    "cout": curent_gen[0].cout,
                     "short": [depot.name] + [i.name for i in curent_gen[0].chemin] + [depot.name],
                     # "routes": self.test_solution(curent_gen[0]),
-                    "long": curent_gen[0],
+                    # "long": curent_gen[0],
                 })
                 # print(f"Meilleurs cout de la generation n°{g} : {[i for i in curent_gen]} ")
-        trajet = self.test_solution(curent_gen[0])
+        trajet_dict = self.test_solution(curent_gen[0])
         # print(f"Finale : {curent_gen[0].cout} -> {curent_gen[0].is_precedence_ok()} ")
-        dataset["trajet"] = trajet
+        dataset["trajet"] = trajet_dict
+        cout_tous_vehicules = 0 
+        distance_tous_trajet = 0
+        dataset["details"] = []
+        for v_key in trajet_dict :
+            distance_trajet_vehicule = 0 
+            trajet_vehicule = trajet_dict[v_key]
+            if len(trajet_vehicule) > 1:
+                prec_node = trajet_vehicule[0]
+                for node in trajet_vehicule[1:]:
+                    distance_trajet_vehicule += Solution.distance(prec_node, node)
+                    prec_node = node
+                cout = crud.vehicule.get_by_name(v_key).cout
+                cout_vehicule = distance_trajet_vehicule * cout
+                cout_tous_vehicules += cout_vehicule
+                distance_tous_trajet += distance_trajet_vehicule
+                dataset["details"].append({
+                    'distance_trajet_vehicule': distance_trajet_vehicule,
+                    'cout_vehicule': cout
+                })
+                
+
+        dataset["distance"] = distance_tous_trajet
+        dataset["cout"] = cout_tous_vehicules
         return dataset
 
     @staticmethod

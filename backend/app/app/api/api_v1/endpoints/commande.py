@@ -19,28 +19,30 @@ def read_items(
     Retrieve items.
     """
     from app.db import reset_db
-    reset_db.clean(db)
-    f = crud.commande.get_fournisseurs(db = db)
-    c = crud.commande.get_clients(db = db)
-    d = crud.depot.get_first(db = db)
-    print(f"Il y a {len(f)} fourn et {len(c)} clients ")
-    
-    random.shuffle(f)
-    random.shuffle(c)
-    
-    # list_initial = [d] + f + c + [d]
-    list_initial = f + c 
-    try :
-        genetic = Genetic(list_initial, db= db)
-        res = genetic.start()
-        db.close_all()
-        return res
-    except Exception as e:
-        print(e)
-        db.close_all()
-        return HTTPException(status_code=500, detail= e)
+    solutions_finales = []
+    for i in range(Genetic.SAMPLE_SOLUTIONS):
+        reset_db.clean(db)
+        f = crud.commande.get_fournisseurs(db = db)
+        c = crud.commande.get_clients(db = db)
+        d = crud.depot.get_first(db = db)
+        print(f"Il y a {len(f)} fourn et {len(c)} clients ")
+        
+        random.shuffle(f)
+        random.shuffle(c)
+        
+        # list_initial = [d] + f + c + [d]
+        list_initial = f + c 
+        try :
+            genetic = Genetic(list_initial, db= db)
+            res = genetic.start()
+            db.close_all()
+            solutions_finales.append(res)
+        except Exception as e:
+            print(e)
+            db.close_all()
+            return HTTPException(status_code=500, detail= e)
 
-    return "OK"
+    return solutions_finales
 
 @router.get("/", response_model=List[schemas.Commande])
 def read_items(

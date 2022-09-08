@@ -15,6 +15,10 @@ db = get_db().send(None)
 class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
     # def get_all(self) -> List[Vehicule]:
     #     return super().get_all(db)
+
+    def get_by_name(self, name: str, db: Session = SessionLocal()) -> Vehicule:
+        return db.query(self.model).filter(self.model.name == name).first()
+
     def create(self, obj_in: VehiculeCreate, db: Session = SessionLocal()) -> Vehicule:
         v = super().create(obj_in= obj_in, db= db)
         v.name = f'V{v.id}'
