@@ -43,16 +43,16 @@ class Solution:
                 for f in chemin[:index] :
                     if isinstance(f, models.Fournisseur):
                         is_ok = crud.commande.must_deliver_client(db = SessionLocal(), f = f, client = pt)
-                        print(f"\n\nTest {pt.name} -> {f.name}/{fournisseurs_associes} ({is_ok}) ")
+                        # print(f"\n\nTest {pt.name} -> {f.name}/{fournisseurs_associes} ({is_ok}) ")
                         if is_ok: 
-                            print(f"--- YES {pt.name} est fourni par {f.name}, reste ({fournisseurs_associes})")
+                            # print(f"--- YES {pt.name} est fourni par {f.name}, reste ({fournisseurs_associes})")
                             # break
                             fournisseurs_associes.remove(f.id)
                     # else:
                     #     print(f"Fournisseur {f.name} of type {type(f)} no instance of {models.Fournisseur} ")
 
                 if not is_ok and len(fournisseurs_associes) != 0:
-                    print(f"------- DANGER client {pt.name} NON fourni ({fournisseurs_associes}). Parcouru {len(chemin[:index])} ({[i.name for i in chemin[:index]]}) index {index} ---------")
+                    # print(f"------- DANGER client {pt.name} NON fourni ({fournisseurs_associes}). Parcouru {len(chemin[:index])} ({[i.name for i in chemin[:index]]}) index {index} ---------")
                     return False
                 # print(f"Client {pt.name} est fourni par {f.name} ")
         return True

@@ -4,6 +4,8 @@ from app.utils.solution import Solution
 from app import crud, models, schemas
 from sqlalchemy.orm import Session
 
+from app.db.session import SessionLocal
+
 def get_node_type(node: Union[models.Depot, models.Fournisseur, models.Client]) -> schemas.NodeType:
     if isinstance(node, models.Depot):
         return schemas.NodeType.depot
@@ -20,17 +22,21 @@ class Genetic:
     NB_GEN = 2
     MAX_SELECTION_IN_GEN = 5
 
-    def __init__(self, list_commandes: List[Union[models.Depot, models.Fournisseur, models.Client]]) -> None:
+    def __init__(self, list_commandes: List[Union[models.Depot, models.Fournisseur, models.Client]], db: Session = SessionLocal()) -> None:
         print("ZOAMDI")
         self.initial_solution: Solution = self.generate_initial_solution(list_commandes)
-        
+        self.db = db
         # print(f"Initial solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({self.initial_solution.is_precedence_ok()}) ")
-        
+
+    def __del__(self):
+        self.db.close()
+
     def start(self) -> List:
-        dataset = []
+        dataset = {}
 
         init_precedence = self.initial_solution.is_precedence_ok()
         curent_gen = [self.initial_solution]
+        depot = crud.depot.get_first()
         print(f"\n\n\n!! Start solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({init_precedence}) ")
         if not init_precedence :
             # print("Précedence initiale non respectée ", self.initial_solution.chemin)
@@ -42,16 +48,16 @@ class Genetic:
                 print(f"Generation n°{g} created : {len(any_sols)}")
                 curent_gen = self.selection(any_sols)
                 print(f"Meilleurs cout de la generation n°{g} : {[i.cout for i in curent_gen]} ")
-                dataset.append({
+                dataset.update({
                     "cout": curent_gen[0].cout,
-                    "short": [i.name for i in curent_gen[0].chemin],
+                    "short": [depot.name] + [i.name for i in curent_gen[0].chemin] + [depot.name],
                     # "routes": self.test_solution(curent_gen[0]),
                     "long": curent_gen[0],
                 })
                 # print(f"Meilleurs cout de la generation n°{g} : {[i for i in curent_gen]} ")
-        self.test_solution(curent_gen[0])
+        trajet = self.test_solution(curent_gen[0])
         # print(f"Finale : {curent_gen[0].cout} -> {curent_gen[0].is_precedence_ok()} ")
-        
+        dataset["trajet"] = trajet
         return dataset
 
     @staticmethod
@@ -90,15 +96,22 @@ class Genetic:
 
     def test_solution(self, solution: Solution) -> List[models.Vehicule]:
         vehicules_queue = crud.vehicule.get_all()
-
+        trajet_final = {}
 
         print("Test de la solution ", [i.name for i in solution.chemin])
 
         for vehicule in vehicules_queue:
             print("\n")
+            # if vehicule.name not in trajet_final:
+                # trajet_final[vehicule.name] = []
+            trajet_final[vehicule.name] = [ schemas.Node(
+                name = vehicule.depot.name, coords = vehicule.depot.coords, 
+                code = vehicule.depot.code, type = get_node_type(vehicule.depot)
+            ) ]
+
             for node in solution.chemin :
                 if isinstance(node, models.Fournisseur):
-                    # print(f"FOURNISSEUR {node.id}, {node.name} ")
+                    print(f"FOURNISSEUR {node.name} ")
                     commandes = crud.commande.get_by_fournisseur(f = node)
                     for order in commandes:
                         qty_packed = crud.vehicule.hold(vehicule, order)
@@ -113,7 +126,9 @@ class Genetic:
                                 code = node.code, type = get_node_type(node),
                                 mvt = qty_packed 
                             )
-                            crud.vehicule.add_node_to_route(vehicule, node_schema)
+                            if node_schema.name not in [ i.name for i in trajet_final[vehicule.name] ]:
+                                trajet_final[vehicule.name].append(node_schema)
+                            crud.vehicule.add_node_to_route(vehicule, node_schema, db= self.db)
                             # S'il y a encore des produits dans la commande, on passe au véhicule suivant 
                 
                 elif isinstance(node, models.Client):
@@ -130,5 +145,23 @@ class Genetic:
                                     code = node.code, type = get_node_type(node),
                                     mvt = -qty_delivered 
                                 )
-                        crud.vehicule.add_node_to_route(vehicule, node_schema)
+                        if node_schema.name not in [ i.name for i in trajet_final[vehicule.name] ]:
+                            trajet_final[vehicule.name].append(node_schema)
+                        crud.vehicule.add_node_to_route(vehicule, node_schema, db = self.db)
                         print([ f"Commande {h.commande.id}, Qté {h.qty_holded}/{h.commande.qty_fixed} \n" for h in client_holded_orders ])
+
+            print(f"  Le VEHICULE {vehicule.name} avant test {len(trajet_final[vehicule.name])} %%%%%%%%")
+            if len(trajet_final[vehicule.name]) == 1:
+                print(" test == 1")
+                trajet_final[vehicule.name] = []
+                print(f"  Le VEHICULE {vehicule.name} n'a rien  foutu {len(trajet_final[vehicule.name])} £££££££")
+            elif len(trajet_final[vehicule.name]) > 1 : 
+                print(" test > 1")
+                trajet_final[vehicule.name].append(schemas.Node(
+                    name = vehicule.depot.name, coords = vehicule.depot.coords, 
+                    code = vehicule.depot.code, type = get_node_type(vehicule.depot)
+                ))
+                print(f"  Le VEHICULE {vehicule.name} est au dépot {len(trajet_final[vehicule.name])} !!!! ")
+            print(f"Le VEHICULE {vehicule.name} a fait {len(trajet_final[vehicule.name])} nodes ")
+        print(trajet_final)
+        return trajet_final

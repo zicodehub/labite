@@ -7,7 +7,7 @@ import SelectInput from '../SelectInput';
 import { Client, Fournisseur } from '../constants';
 
 
-export default ({open, hide, coords, onCreate}) => {
+export default ({open, hide, coords, produits, onCreate, fournisseurs}) => {
     const [ isLoading, setIsLoading ] = useState(false)
 
     useEffect(() => {
@@ -27,7 +27,10 @@ export default ({open, hide, coords, onCreate}) => {
                 node_type: Client,
                 time_service: 0,
                 time_interval_start: 0,
-                time_interval_end: 0
+                time_interval_end: 0,
+                orders: [{
+                  
+                }]
               }}
               onSubmit={(values, { setSubmitting , resetForm, ...theremaining}) => {
                 if (onCreate) {
@@ -42,7 +45,7 @@ export default ({open, hide, coords, onCreate}) => {
                           <option value={Client} >Client</option>
                           <option value={Fournisseur}>Fournisseur</option>
                       </SelectInput>
-
+                      {/* {console.log(formik.values)} */}
                       <TextInput label="Temps de service" name="time_service" type='number' formik={formik} />
                       <Row>
                         <Col>
@@ -52,6 +55,46 @@ export default ({open, hide, coords, onCreate}) => {
                            <TextInput label="Heure max" name="time_interval_end" type='number' formik={formik} />
                         </Col>
                       </Row>
+                     {
+                      (formik.values.node_type === Fournisseur) ? (
+                        <Row>
+                        {/* {
+                          produits.map( p => <TextInput label={p.name} name={"produit."+p.id} type='number' formik={formik} /> )
+                        } */}
+                      </Row>
+                      ) : (
+                        <Col>
+                          {
+                            formik.values.orders.map( (order, index) => (
+                              <Row>
+                                <Col md="3">
+                                  <SelectInput required name={`orders[${index}].fournisseur`} label= "Commander chez" formik={formik} >
+                                    <option >Sélection...</option> 
+                                      {
+                                        fournisseurs.map( f => <option value={f.id} >{f.name}</option> )
+                                      }
+                                  </SelectInput>
+                                </Col>
+                                <Col md="4">
+                                  <SelectInput required name={`orders[${index}].produit`} label= "Sélection du produit" formik={formik} >
+                                      <option >Sélection...</option> 
+                                      {
+                                        produits.map( p => <option value={p.id} >{p.name}</option> )
+                                      }
+                                  </SelectInput>
+                                </Col>
+                                <Col md="3">
+                                    <TextInput required label="Quantité" name={`orders[${index}].qty`} type='number' formik={formik} />
+                                </Col>
+                            </Row>
+                            ) )
+                          }
+                          <Col md="3">
+                            <Button onClick={()=> { formik.values.orders.push({}) ; formik.setFieldValue('orders', formik.values.orders); console.log(formik.values.orders)} } >Autre commande</Button>
+                          </Col>
+                        </Col>
+                      )
+                     }
                       {
                         isLoading ? <Spinner animation="grow" /> : <Button onClick={formik.handleSubmit}>Enregistrer</Button>  
                       }

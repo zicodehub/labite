@@ -18,6 +18,8 @@ def read_items(
     """
     Retrieve items.
     """
+    from app.db import reset_db
+    reset_db.clean(db)
     f = crud.commande.get_fournisseurs(db = db)
     c = crud.commande.get_clients(db = db)
     d = crud.depot.get_first(db = db)
@@ -28,8 +30,16 @@ def read_items(
     
     # list_initial = [d] + f + c + [d]
     list_initial = f + c 
-    genetic = Genetic(list_initial)
-    return genetic.start()
+    try :
+        genetic = Genetic(list_initial, db= db)
+        res = genetic.start()
+        db.close_all()
+        return res
+    except Exception as e:
+        print(e)
+        db.close_all()
+        return HTTPException(status_code=500, detail= e)
+
     return "OK"
 
 @router.get("/", response_model=List[schemas.Commande])
@@ -47,14 +57,14 @@ def read_items(
 @router.post("/", response_model=schemas.Commande)
 def create_item(
     *,
-    # db: Session = Depends(deps.get_db),
+    db: Session = Depends(deps.get_db),
     item_in: schemas.CommandeCreate,
     # current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create new item.
     """
-    item = crud.commande.create(obj_in=item_in)
+    item = crud.commande.create(obj_in=item_in, db= db)
     return item
 
 

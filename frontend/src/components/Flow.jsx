@@ -24,14 +24,15 @@ function Graphical({ nodes, edges, onNodesChange, onEdgesChange, onConnect }) {
       ];
       
       const initialEdges = [
-        { id: 'e1-2', source: '1', target: '2' },
-        { id: 'e2-3', source: '2', target: '3', animated: true },
+        {  id: 1, source: '1', target: '2' },
+        {  id: 2, source: '2', target: '3', animated: true },
+        {  id: 3, source: '2', target: '3', animated: false },
       ];
       
   return (
     <ReactFlow
-      nodes={nodes}
-      edges={edges}
+      nodes={initialNodes}
+      edges={initialEdges}
     //   onNodesChange={onNodesChange}
     //   onEdgesChange={onEdgesChange}
     //   onConnect={onConnect}

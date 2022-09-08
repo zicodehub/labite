@@ -22,7 +22,6 @@ def read_items(
     # print(dir(items[0]))
     return items
 
-
 @router.post("/", response_model=schemas.Fournisseur)
 def create_item(
     *,
@@ -52,6 +51,23 @@ def read_item(
         raise HTTPException(status_code=404, detail="Item not found")
     return item
 
+@router.get("/{fournisseur_id}/add-produit/{produit_id}", response_model=schemas.Fournisseur)
+def add_produit(
+    fournisseur_id: int,
+    produit_id: int,
+    db: Session = Depends(deps.get_db),
+    ) -> Any:
+    """
+    Retrieve items.
+    """
+    item = crud.fournisseur.get(fournisseur_id, db= db)
+    prod = crud.produit.get(produit_id, db = db)
+    item.produits.append(prod)
+    db.add(item)
+    db.commit()
+    db.refresh(item)
+    # print(dir(items[0]))
+    return item
 
 @router.delete("/{id}", response_model=schemas.Fournisseur)
 def delete_item(

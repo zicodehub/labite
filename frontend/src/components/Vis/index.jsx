@@ -2,11 +2,11 @@ import React, { useMemo } from "react";
 import ReactDOM from "react-dom";
 import Graph from "react-graph-vis";
 import "./styles.css";
-import { Client, Fournisseur } from "../constants";
+import { Client, Depot, Fournisseur } from "../constants";
 // need to import the vis network css in order to show tooltip
 // import "./network.css";
 
-function Vis({ nodes = [] }) {
+function Vis({ nodes = [], edges = [] }) {
   const graph = {
     // nodes: useMemo(() => nodes, [nodes]),
     nodes: nodes.map( (n, index) => {
@@ -22,7 +22,7 @@ function Vis({ nodes = [] }) {
         y: index,
         shape: n.node_type == Client ? 'circle' : 'box',
         color: {
-            background: n.node_type == Client ? 'yellow' : 'red',
+            background: n.node_type == Client ? 'yellow' : n.node_type == Depot ? 'green' : 'red',
             hover: {
                 border: 'white',
                 background: 'gray'
@@ -34,9 +34,7 @@ function Vis({ nodes = [] }) {
         borderWidth: 0
       }
     } ),
-    edges: [
-      {from: 'C10', to: 'F7'}
-    ]
+    edges: edges
   };
 
   const options = {
@@ -44,13 +42,14 @@ function Vis({ nodes = [] }) {
       hierarchical: false
     },
     edges: {
-      color: "#000000"
+      color: "#000000",
+      width: 4
     },
     height: "100%",
     interaction: {
       dragNodes: false,// do not allow dragging nodes
-      zoomView: false, // do not allow zooming
-      dragView: false,  // do not allow dragging
+      zoomView: true, // do not allow zooming
+      dragView: true,  // do not allow dragging
       navigationButtons: true,
       hover: true
     },
@@ -59,7 +58,7 @@ function Vis({ nodes = [] }) {
     }
   };
 
-  console.log("new nodes", graph.nodes)
+  // console.log("new nodes", graph.nodes)
   
   const events = {
     select: function(event) {

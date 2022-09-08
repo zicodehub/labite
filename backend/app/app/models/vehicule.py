@@ -14,7 +14,7 @@ class HoldedOrder(Base):
 
 class Compartiment(Base):
     id = Column(Integer, primary_key=True, index=True)
-    vehicule_id = Column(Integer, ForeignKey("vehicule.id"), nullable=False)
+    vehicule_id = Column(Integer, ForeignKey("vehicule.id"), nullable= False)
     holded_orders = relationship("HoldedOrder", back_populates= "compartiment")
     vehicule = relationship("Vehicule", back_populates= "compartiments")
 

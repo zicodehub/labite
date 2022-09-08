@@ -18,7 +18,7 @@ class Node(BaseModel):
     code: Optional[str]
     coords: str
     type: NodeType
-    mvt: int
+    mvt: Optional[int]
 
 class HoldedOrder(BaseModel):
     commande_id: int

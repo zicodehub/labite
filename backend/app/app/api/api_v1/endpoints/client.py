@@ -24,14 +24,14 @@ def read_items(
 @router.post("/", response_model=schemas.Client)
 def create_item(
     *,
-    # db: Session = Depends(deps.get_db),
+    db: Session = Depends(deps.get_db),
     item_in: schemas.ClientCreate,
     # current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Create new item.
     """
-    item = crud.client.create(obj_in=item_in)
+    item = crud.client.create(obj_in=item_in, db = db )
     return item
 
 

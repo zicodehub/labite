@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: '/api/v1'
+    baseURL: 'http://localhost:8888/api/v1'
 })
 
 export const listClients = () => api.get('/clients')
@@ -22,3 +22,5 @@ export const createClient = (data) => api.post(`/clients`, data)
 export const createFournisseur = (data) => api.post(`/fournisseurs`, data)
 export const createCommande = (data) => api.post(`/commandes`, data)
 export const createProduit = (data) => api.post(`/produits`, data)
+
+export const runAlgo = () => api.get(`/commandes/genetic`)
