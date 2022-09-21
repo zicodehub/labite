@@ -6,6 +6,7 @@ const api = axios.create({
 
 export const listClients = () => api.get('/clients')
 export const listFournisseurs = () => api.get('/fournisseurs')
+export const listTypesProduits = () => api.get('/types')
 export const listProduits = () => api.get('/produits')
 export const listDepots = () => api.get('/depots')
 export const listVehicules = () => api.get('/vehicules')

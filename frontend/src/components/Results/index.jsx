@@ -9,8 +9,9 @@ import Vis from "../Vis"
 import { Client, Depot, Fournisseur } from "../constants"
 import { useEffect } from "react"
 
-import { listClients, runAlgo, listFournisseurs, listVehicules, createClient, listProduits, createFournisseur, createCommande, listDepots, createVehicule } from "../api"
+import { listClients, runAlgo, listFournisseurs, listVehicules, createClient, listProduits, createFournisseur, createCommande, listDepots, createVehicule, listTypesProduits, createProduit } from "../api"
 import ModalCreateVehicule from "components/ModalCreateVehicule"
+import ModalCreateProduit from "components/ModalCreateProduit"
 
 const Results = () => {
     const [cars, setCars] = useState([])
@@ -19,6 +20,7 @@ const Results = () => {
     const [trajet_final, setTrajet_final] = useState({})
     const [ clients, setClients ] = useState([])
     const [ depots, setDepots ] = useState([])
+    const [ types, setTypes ] = useState([])
 
     const [ fournisseurs, setFournisseurs ] = useState([])
     const [ produits, setProduits ] = useState([])
@@ -27,6 +29,7 @@ const Results = () => {
     const [clickCoords, setClickCoords] = useState({ x: 0, y: 0 })
     const [isModalNodeOpen, setModalNode] = useState(false)
     const [isModalVehiculeOpen, setModalVehicule] = useState(false)
+    const [isModalProduitOpen, setModalProduit] = useState(false)
     const [details, setDetails] = useState({})
     const [algoError, setAlgoError] = useState({})
     const [isReady, setIsReady] = useState(false)
@@ -52,6 +55,10 @@ const Results = () => {
                     f.y = parseInt(y)
                     return f
                 } ))
+
+                let typesResponse = await listTypesProduits()
+                await setTypes(prev => typesResponse.data)
+                
                 let produitsResponse = await listProduits()
                 await setProduits(prev => produitsResponse.data)
                 
@@ -79,84 +86,118 @@ const Results = () => {
                 !isReady ? <Spinner  animation="grow" /> : (
                     <>
 
-                        <ModalCreation 
-                            open={isModalNodeOpen} hide={setModalNode} 
-                            onCreate={(values) => {
-                                let create_node = undefined;
-                                let node_setter = undefined;
-                                if(values.node_type == Client){
-                                    create_node = createClient
-                                    node_setter = setClients
-                                    createClient({
-                                        time_service: values.time_service,
-                                        time_interval_start: values.time_interval_start,
-                                        time_interval_end: values.time_interval_end,
-                                        coords: `${clickCoords.x};${clickCoords.y}`
-                                    }).then(res => {
-                                        if(values.orders.length > 0) {
-                                            values.orders.forEach( order => {
-                                                createCommande({
-                                                    client_id: res.data.id,
-                                                    fournisseur_id: parseInt(order.fournisseur),
-                                                    produit_id: parseInt(order.produit),
-                                                    qty: parseInt(order.qty),
+                        {
+                            isModalNodeOpen && (
+                                <ModalCreation 
+                                    open={isModalNodeOpen} hide={setModalNode} 
+                                    onCreate={(values) => {
+                                        let create_node = undefined;
+                                        let node_setter = undefined;
+                                        if(values.node_type == Client){
+                                            create_node = createClient
+                                            node_setter = setClients
+                                            createClient({
+                                                time_service: values.time_service,
+                                                time_interval_start: values.time_interval_start,
+                                                time_interval_end: values.time_interval_end,
+                                                coords: `${clickCoords.x};${clickCoords.y}`
+                                            }).then(res => {
+                                                if(values.orders.length > 0) {
+                                                    values.orders.forEach( order => {
+                                                        createCommande({
+                                                            client_id: res.data.id,
+                                                            fournisseur_id: parseInt(order.fournisseur),
+                                                            produit_id: parseInt(order.produit),
+                                                            qty: parseInt(order.qty),
+                                                        })
+                                                    })
+                                                }
+                                                setClients(prev => {
+                                                    prev.push({
+                                                        ...res.data,
+                                                        node_type: values.node_type
+                                                    })
+                                                    return prev
                                                 })
-                                            })
+                                                setModalNode(false)
+                                            } )
+                                        } else if(values.node_type == Fournisseur) {
+                                            create_node = createFournisseur
+                                            node_setter = setFournisseurs
+                                            createFournisseur({
+                                                time_service: values.time_service,
+                                                time_interval_start: values.time_interval_start,
+                                                time_interval_end: values.time_interval_end,
+                                                coords: `${clickCoords.x};${clickCoords.y}`
+                                            }).then(res => {
+                                                setFournisseurs(prev => {
+                                                    prev.push({
+                                                        ...res.data,
+                                                        node_type: values.node_type
+                                                    })
+                                                    return prev
+                                                })
+                                                setModalNode(false)
+                                            } )
                                         }
-                                        setClients(prev => {
-                                            prev.push({
-                                                ...res.data,
-                                                node_type: values.node_type
-                                            })
-                                            return prev
-                                        })
-                                        setModalNode(false)
-                                    } )
-                                } else if(values.node_type == Fournisseur) {
-                                    create_node = createFournisseur
-                                    node_setter = setFournisseurs
-                                    createFournisseur({
-                                        time_service: values.time_service,
-                                        time_interval_start: values.time_interval_start,
-                                        time_interval_end: values.time_interval_end,
-                                        coords: `${clickCoords.x};${clickCoords.y}`
-                                    }).then(res => {
-                                        setFournisseurs(prev => {
-                                            prev.push({
-                                                ...res.data,
-                                                node_type: values.node_type
-                                            })
-                                            return prev
-                                        })
-                                        setModalNode(false)
-                                    } )
-                                }
-                                
-                            }}
-                            produits={produits}
-                            fournisseurs={fournisseurs}
-                            />
-                        <ModalCreateVehicule 
-                            open={isModalVehiculeOpen} hide={setModalVehicule} 
-                            onCreate={(values) => {
-                                createVehicule(values)
-                                .then(
-                                    res => {
-                                        setCars(prev =>{
-                                            return prev.concat(res.data)
-                                        } )
-                                        setModalVehicule(false)
-                                    }
-                                )
-                            }}
-                            list_depots={depots}
-                            list_vehicules={cars}
-                            />
+                                        
+                                    }}
+                                    produits={produits}
+                                    fournisseurs={fournisseurs}
+                                    />
+                            )
+                        }
+                        {
+                            isModalVehiculeOpen && (
+                                <ModalCreateVehicule 
+                                    open={isModalVehiculeOpen} hide={setModalVehicule} 
+                                    onCreate={(values) => {
+                                        createVehicule(values)
+                                        .then(
+                                            res => {
+                                                setCars(prev =>{
+                                                    return prev.concat(res.data)
+                                                } )
+                                                setModalVehicule(false)
+                                            }
+                                        )
+                                    }}
+                                    list_depots={depots}
+                                    list_vehicules={cars}
+                                    />
+                            )
+                        }
+                        {
+                            isModalProduitOpen && (
+                                <ModalCreateProduit 
+                                    open={isModalProduitOpen} hide={setModalProduit} 
+                                    onCreate={(values) => {
+                                        createProduit(values)
+                                        .then(
+                                            res => {
+                                                setProduits(prev =>{
+                                                    return prev.concat(res.data)
+                                                } )
+                                                setModalProduit(false)
+                                            }
+                                        )
+                                    }}
+                                    list_depots={depots}
+                                    list_types={types}
+                                    list_produits={produits}
+                                    />
+                            )
+                        }
                         <Row>
                             <Col>
                                 <Button className="text-white"
                                     onClick={() => setModalVehicule(true) }
                                     >Ajouter un véhcule</Button>
+                            </Col>
+                            <Col>
+                                <Button className="text-white"
+                                    onClick={() => setModalProduit(true) }
+                                    >Ajouter un produit</Button>
                             </Col>
                             <Col className="offset-6">
                                 <Button className="text-white" onClick={()=> {

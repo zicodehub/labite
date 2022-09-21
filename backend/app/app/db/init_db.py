@@ -18,3 +18,9 @@ def init_db(db: Session) -> None:
     first_depot = crud.depot.get_first()
     if not first_depot:
         first_depot = crud.depot.create(schemas.DepotCreate(coords = "0;0", time_interval_start = 1, time_interval_end = 23))
+    
+    first_type_produit = crud.type_produit.get_first()
+    if not first_type_produit:
+        first_type_produit = crud.type_produit.create(
+            schemas.TypeCreate(name= "Type de base")
+        )
