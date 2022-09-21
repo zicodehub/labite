@@ -18,8 +18,15 @@ function Vis({ nodes = [], edges = [] }) {
         // label: `${ n.node_type == Client ? 'C' : 'F' }${n.id}`,
         label: n.name,
         title: n.name,
-        x: index,
-        y: index,
+
+
+        // x: index,
+        // y: index,
+        
+        x: n.x,
+        y: n.y,
+        
+        
         shape: n.node_type == Client ? 'circle' : 'box',
         color: {
             background: n.node_type == Client ? 'yellow' : n.node_type == Depot ? 'green' : 'red',
@@ -54,7 +61,11 @@ function Vis({ nodes = [], edges = [] }) {
       hover: true
     },
     physics: {
-
+      stabilization: false,
+      repulsion: {
+        nodeDistance: 0
+      },
+      maxVelocity: 10
     }
   };
 
@@ -63,7 +74,17 @@ function Vis({ nodes = [], edges = [] }) {
   const events = {
     select: function(event) {
       var { nodes, edges } = event;
-      console.log("click", nodes)
+      nodes.forEach(
+        node_id => {
+          const selected_node = graph.nodes.find( n_ => n_.id == node_id )
+          console.log("select ", selected_node.name, {x: selected_node.x, y: selected_node.y} )
+          
+        }
+      )
+    },
+    dragEnd: function(event) {
+      var { nodes, edges } = event;
+      console.log("dragEnd", event)
     }
   };
   

@@ -9,7 +9,8 @@ import Vis from "../Vis"
 import { Client, Depot, Fournisseur } from "../constants"
 import { useEffect } from "react"
 
-import { listClients, runAlgo, listFournisseurs, listVehicules, createClient, listProduits, createFournisseur, createCommande, listDepots } from "../api"
+import { listClients, runAlgo, listFournisseurs, listVehicules, createClient, listProduits, createFournisseur, createCommande, listDepots, createVehicule } from "../api"
+import ModalCreateVehicule from "components/ModalCreateVehicule"
 
 const Results = () => {
     const [cars, setCars] = useState([])
@@ -24,7 +25,8 @@ const Results = () => {
     const [ edges, setEdges ] = useState({})
 
     const [clickCoords, setClickCoords] = useState({ x: 0, y: 0 })
-    const [isOpen, setIsOpen] = useState(false)
+    const [isModalNodeOpen, setModalNode] = useState(false)
+    const [isModalVehiculeOpen, setModalVehicule] = useState(false)
     const [details, setDetails] = useState({})
     const [algoError, setAlgoError] = useState({})
     const [isReady, setIsReady] = useState(false)
@@ -37,12 +39,18 @@ const Results = () => {
         listClients().then(res => {
             setClients(prev => res.data.map( c => {
                 c.node_type = Client
+                const [x, y] = c.coords.split(';')
+                c.x = parseInt(x)
+                c.y = parseInt(y)
                 return c
             } ))
             listFournisseurs().then( async (res) => {
-                await setFournisseurs(prev => res.data.map( c => {
-                    c.node_type = Fournisseur
-                    return c
+                await setFournisseurs(prev => res.data.map( f => {
+                    f.node_type = Fournisseur
+                    const [x, y] = f.coords.split(';')
+                    f.x = parseInt(x)
+                    f.y = parseInt(y)
+                    return f
                 } ))
                 let produitsResponse = await listProduits()
                 await setProduits(prev => produitsResponse.data)
@@ -50,6 +58,9 @@ const Results = () => {
                 let depotResponse = await listDepots()
                 await setDepots(prev => depotResponse.data.map( d => {
                     d.node_type = Depot;
+                    const [x, y] = d.coords.split(';')
+                    d.x = parseInt(x)
+                    d.y = parseInt(y)
                     return d
                 } ))
                 
@@ -69,7 +80,7 @@ const Results = () => {
                     <>
 
                         <ModalCreation 
-                            open={isOpen} hide={setIsOpen} 
+                            open={isModalNodeOpen} hide={setModalNode} 
                             onCreate={(values) => {
                                 let create_node = undefined;
                                 let node_setter = undefined;
@@ -99,7 +110,7 @@ const Results = () => {
                                             })
                                             return prev
                                         })
-                                        setIsOpen(false)
+                                        setModalNode(false)
                                     } )
                                 } else if(values.node_type == Fournisseur) {
                                     create_node = createFournisseur
@@ -117,7 +128,7 @@ const Results = () => {
                                             })
                                             return prev
                                         })
-                                        setIsOpen(false)
+                                        setModalNode(false)
                                     } )
                                 }
                                 
@@ -125,87 +136,116 @@ const Results = () => {
                             produits={produits}
                             fournisseurs={fournisseurs}
                             />
-                        <Col className="offset-8">
-                            <Button className="text-white" onClick={()=> {
-                                setIsRunning(prev => true)
-                                runAlgo()
-                                .then( (res) => {
-                                    console.log(res)
-                                    let data = res.data
-                                    data.forEach(
-                                        (solution, solution_index) => {
-                                            
-                                            setDetails(prev => ({
-                                                ...prev,
-                                                [solution_index]: {
-                                                    distance: solution.distance,
-                                                    cout: solution.cout,
-                                                    nb_vehicules: solution.details.length,
-                                                    solution: solution.short.map( d => d + ' - ' )
-                                                }
-                                            }))
-                                            setEdges( prev => {
-                                                // return Object.keys(data.trajet).map( v => ({ name: v, trajet: data.trajet[v] }) )
-                                                let local_edges = []
-                                                console.log("Genetic ", solution.trajet)
-                                                setTrajet_final(prev => ({...prev, [solution_index]: solution.trajet }))
-                                                Object.keys(solution.trajet).forEach( (key, v_index) => {
-                                                    let trajet = solution.trajet[key]
-                                                    let i = trajet[0]
-                                                    let color = [ 10, 39, 11 ]
-        
-                                                    for (let index = 1; index < trajet.length; index++) {
-                                                        const element = trajet[index];
-                                                        local_edges.push({
-                                                            from: i.name,
-                                                            to: element.name,
-                                                            v: key,
-                                                            mvt: element.mvt,
-                                                            label: key,
-                                                            title: key,
-                                                            color: {
-                                                                color: `#${color[0]}${color[1]}${color[2]}`,
-                                                                hover: `#${color[0]}${color[1]}${color[2]}`
-                                                            },
-                                                            width: 4
-                                                        })
-                                                        i = element
-                                                        color[v_index%3] += color[v_index%3] + 30
-                                                    }
-                                                } )
-                                                console.log(local_edges)
-                                                setSelectedEdges(prev => ({...prev, [solution_index]: local_edges }))
-                                                return {
+                        <ModalCreateVehicule 
+                            open={isModalVehiculeOpen} hide={setModalVehicule} 
+                            onCreate={(values) => {
+                                createVehicule(values)
+                                .then(
+                                    res => {
+                                        setCars(prev =>{
+                                            return prev.concat(res.data)
+                                        } )
+                                        setModalVehicule(false)
+                                    }
+                                )
+                            }}
+                            list_depots={depots}
+                            list_vehicules={cars}
+                            />
+                        <Row>
+                            <Col>
+                                <Button className="text-white"
+                                    onClick={() => setModalVehicule(true) }
+                                    >Ajouter un véhcule</Button>
+                            </Col>
+                            <Col className="offset-6">
+                                <Button className="text-white" onClick={()=> {
+                                    setIsRunning(prev => true)
+                                    runAlgo()
+                                    .then( (res) => {
+                                        console.log(res)
+                                        let data = res.data
+                                        data.forEach(
+                                            (solution, solution_index) => {
+                                                
+                                                setDetails(prev => ({
                                                     ...prev,
-                                                    [solution_index]: local_edges
-                                                }
-                                            })
-                                        
-                                            setListIdSolution(prev => prev.concat([solution_index]) )
-                                        }
-                                        )
-                                    setIsRunning(prev => false)
-                                    setAlgoError(prev => ({
-                                        error: null                                       
-                                    }))
-                                } )
-                                .catch(err => {
-                                    setAlgoError(prev => ({
-                                        error: err.message                                        
-                                    }))
-                                    setIsRunning(prev => false)
-                                } )
-                            }} >Lancer l'algorithme</Button>
-                        </Col>
+                                                    [solution_index]: {
+                                                        distance: solution.distance,
+                                                        cout: solution.cout,
+                                                        nb_vehicules: solution.details.length,
+                                                        solution: solution.short.map( d => d + ' - ' )
+                                                    }
+                                                }))
+                                                setEdges( prev => {
+                                                    // return Object.keys(data.trajet).map( v => ({ name: v, trajet: data.trajet[v] }) )
+                                                    let local_edges = []
+                                                    console.log("Genetic ", solution.trajet)
+                                                    setTrajet_final(prev => ({...prev, [solution_index]: solution.trajet }))
+                                                    Object.keys(solution.trajet).forEach( (key, v_index) => {
+                                                        let trajet = solution.trajet[key]
+                                                        let i = trajet[0]
+                                                        let color = [ 10, 39, 11 ]
+            
+                                                        for (let index = 1; index < trajet.length; index++) {
+                                                            const element = trajet[index];
+                                                            local_edges.push({
+                                                                from: i.name,
+                                                                to: element.name,
+                                                                v: key,
+                                                                mvt: element.mvt,
+                                                                label: key,
+                                                                title: key,
+                                                                color: {
+                                                                    color: `#${color[0]}${color[1]}${color[2]}`,
+                                                                    hover: `#${color[0]}${color[1]}${color[2]}`
+                                                                },
+                                                                width: 4
+                                                            })
+                                                            i = element
+                                                            color[v_index%3] += color[v_index%3] + 30
+                                                        }
+                                                    } )
+                                                    console.log(local_edges)
+                                                    setSelectedEdges(prev => ({...prev, [solution_index]: local_edges }))
+                                                    return {
+                                                        ...prev,
+                                                        [solution_index]: local_edges
+                                                    }
+                                                })
+                                            
+                                                setListIdSolution(prev => prev.concat([solution_index]) )
+                                            }
+                                            )
+                                        setIsRunning(prev => false)
+                                        setAlgoError(prev => ({
+                                            error: null                                       
+                                        }))
+                                    } )
+                                    .catch(err => {
+                                        setAlgoError(prev => ({
+                                            error: err.message                                        
+                                        }))
+                                        setIsRunning(prev => false)
+                                    } )
+                                }} >Lancer l'algorithme</Button>
+                            </Col>
+                        </Row>
                         <Row>
                             <Col md="1">
                                 <CarSelectionBox cars={cars} edges={edges[idSolution]} selectedCars={selectedCars} setSelectedCars={setSelectedCars} selectedEdges={selectedEdges} setSelectedEdges={setSelectedEdges} />
                             </Col>
-                            <Col md="8" className="border" style={{ height: '80vh' }} onDoubleClick={({ pageX, pageY })=> {
+                            <Col md="8" className="border" style={{ height: '80vh' }} 
+                                onDoubleClick={({ pageX, pageY })=> {
+                                    console.log({x: pageX, y: pageY})
                                     setClickCoords({ x: pageX, y: pageY })
-                                    setIsOpen(true)
+                                    setModalNode(true)
                                     // console.log(pageX, pageY)
-                                } } >
+                                } } 
+                                onClick={({ pageX, pageY })=> {
+                                    console.log("layout ", {x: pageX, y: pageY})
+                                } } 
+                                >
                                 <Vis nodes={clients.concat(fournisseurs).concat(depots)} edges={selectedEdges[idSolution]} />
                                 {/* <Image width="100%" height="100%" src={MapImage}  /> */}
                                 {/* <Flow /> */}

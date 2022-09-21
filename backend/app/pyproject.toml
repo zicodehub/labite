@@ -27,7 +27,6 @@ python-jose = {extras = ["cryptography"], version = "^3.1.0"}
 SQLAlchemy-Searchable = "^1.4.1"
 SQLAlchemy-Utils = "^0.38.2"
 aiofiles = "^0.8.0"
-google-cloud-translate = "^3.7.2"
 sendgrid = "^6.9.7"
 pdfkit = "^1.0.0"
 wkhtmltopdf = "^0.2"

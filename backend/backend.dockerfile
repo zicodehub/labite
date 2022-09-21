@@ -14,7 +14,6 @@ COPY ./app/pyproject.toml ./app/poetry.lock* /app/
 
 RUN apt-get update -y 
 RUN apt-get install -y python3-tk
-RUN apt-get install -y wkhtmltopdf
 
 # Allow installing dev dependencies to run tests
 ARG INSTALL_DEV=false

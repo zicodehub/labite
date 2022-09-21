@@ -22,5 +22,6 @@ export const createClient = (data) => api.post(`/clients`, data)
 export const createFournisseur = (data) => api.post(`/fournisseurs`, data)
 export const createCommande = (data) => api.post(`/commandes`, data)
 export const createProduit = (data) => api.post(`/produits`, data)
+export const createVehicule = (data) => api.post(`/vehicules`, data)
 
 export const runAlgo = () => api.get(`/commandes/genetic`)
