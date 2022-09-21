@@ -22,7 +22,7 @@ const CheckInput = ({ children,label, ...props }) => {
 
         <BForm.Group className="" >
         <BForm.Check  {
-            ...{...field, validate: validateCheckbox}
+            ...{...field}
             } 
             {...props} label={label}  />
         {children}

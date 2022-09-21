@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import ReactDOM from "react-dom";
 import Graph from "react-graph-vis";
 import "./styles.css";
-import { Client, Depot, Fournisseur } from "../constants";
+import { Client, Depot, Fournisseur, OFFSET_X, OFFSET_Y } from "../constants";
 // need to import the vis network css in order to show tooltip
 // import "./network.css";
 
@@ -23,8 +23,8 @@ function Vis({ nodes = [], edges = [] }) {
         // x: index,
         // y: index,
         
-        x: n.x,
-        y: n.y,
+        x: n.x - OFFSET_X,
+        y: n.y - OFFSET_Y,
         
         
         shape: n.node_type == Client ? 'circle' : 'box',
@@ -55,7 +55,7 @@ function Vis({ nodes = [], edges = [] }) {
     height: "100%",
     interaction: {
       dragNodes: false,// do not allow dragging nodes
-      zoomView: true, // do not allow zooming
+      zoomView: false, // do not allow zooming
       dragView: true,  // do not allow dragging
       navigationButtons: true,
       hover: true

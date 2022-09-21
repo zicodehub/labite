@@ -26,6 +26,7 @@ const CarSelectionBox = ({ edges = [{v: "V10"}], cars = [], selectedEdges = [], 
     }
 return (
         <Form className="border" >
+            <h4>Véhicules</h4>
              <Formik initialValues={{
                 cars: edges.map(e => cars.find( car => e.v == car.name ))
               }} >
