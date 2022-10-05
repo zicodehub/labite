@@ -28,3 +28,6 @@ export const createVehicule = (data) => api.post(`/vehicules`, data)
 export const runGenetic = () => api.get(`/commandes/genetic`)
 
 export const runRecuit = () => api.get(`/commandes/recuit`)
+
+
+export const resetDB = () => api.get(`/commandes/reset-db`)

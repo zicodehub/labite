@@ -9,7 +9,7 @@ import Vis from "../Vis"
 import { Client, Depot, Fournisseur, OFFSET_X, OFFSET_Y } from "../constants"
 import { useEffect } from "react"
 
-import { listClients, runGenetic, listFournisseurs, listVehicules, createClient, listProduits, createFournisseur, createCommande, listDepots, createVehicule, listTypesProduits, createProduit, runRecuit } from "../api"
+import { listClients, runGenetic, listFournisseurs, listVehicules, createClient, listProduits, createFournisseur, createCommande, listDepots, createVehicule, listTypesProduits, createProduit, runRecuit, resetDB } from "../api"
 import ModalCreateVehicule from "components/ModalCreateVehicule"
 import ModalCreateProduit from "components/ModalCreateProduit"
 
@@ -100,7 +100,7 @@ const Results = () => {
         }))
     } 
 
-    useEffect(() => {
+    const refresh = () => {
         listClients().then(res => {
             setClients(prev => res.data.map( c => {
                 c.node_type = Client
@@ -138,6 +138,10 @@ const Results = () => {
                 await setIsReady(prev => true)
             })
         })
+    }
+
+    useEffect(() => {
+        refresh()
         
         // listProduits().then(res => setProduits(res.data))
     }, [setCars, setClients, setFournisseurs, setIsReady])
@@ -294,7 +298,7 @@ const Results = () => {
                                             onClick={() => setModalVehicule(true) }
                                             >Ajouter un véhcule</Button>
                                 
-                                        <Button className="text-white mb-1"
+                                        <Button className="text-white mb-3"
                                             onClick={() => setModalProduit(true) }
                                             >Ajouter un produit</Button>
                                 
@@ -308,7 +312,7 @@ const Results = () => {
                                                 }))
                                                 setIsRunning(prev => false)
                                             } )
-                                        }} >Lancer l'algo Génétic</Button>
+                                        }} >Génétique</Button>
                                         <Button className="text-white btn-info mb-1" onClick={()=> {
                                             setIsRunning(prev => true)
                                             runRecuit()
@@ -319,7 +323,31 @@ const Results = () => {
                                                 }))
                                                 setIsRunning(prev => false)
                                             } )
-                                        }} >Lancer le Recuit simulé</Button>
+                                        }} >Recuit simulé</Button>
+                                        <Button className="text-white mt-3 btn-success mb-1"
+                                            onClick={() => {
+                                                refresh()
+                                                setDetails({})
+                                                selectedEdges[idSolution] = []
+                                            } }
+                                            >Rafraichir la page</Button>
+                                            <Button className="text-white btn-danger mb-1"
+                                            onClick={() => {
+                                                setIsRunning(prev => true)
+                                                resetDB().then(() => {
+                                                    refresh()
+                                                    setDetails({})
+                                                    selectedEdges[idSolution] = []
+                                                    setIsRunning(prev => false)
+                                                })
+                                                .catch(err => {
+                                                    setAlgoError(prev => ({
+                                                        error: err.message                                        
+                                                    }))
+                                                    setIsRunning(prev => false)
+                                                } )
+                                            } }
+                                            >Libérer la mémoire</Button>
                                     </Col>
                                     <Col>
                                         <CarSelectionBox cars={cars} edges={edges[idSolution]} selectedCars={selectedCars} setSelectedCars={setSelectedCars} selectedEdges={selectedEdges} setSelectedEdges={setSelectedEdges} />

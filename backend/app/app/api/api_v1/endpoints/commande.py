@@ -9,6 +9,18 @@ from app.api import deps
 
 router = APIRouter()
 
+
+@router.get("/reset-db")
+def reset_the_db(
+    # current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Get item by ID.
+    """
+    from app.db import reset_db
+    reset_db.clean()
+    return True
+    
 @router.get("/recuit")
 def read_recuit(
     db: Session = Depends(deps.get_db),
