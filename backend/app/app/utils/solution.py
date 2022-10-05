@@ -2,9 +2,22 @@ from math import sqrt
 from app.models.client import Client
 from app.models.fournisseur import Fournisseur
 from app.core.config import settings
-from app import crud, models
+from app import crud, models, schemas
 from app.db.session import SessionLocal
-from typing import List
+from sqlalchemy.orm import Session
+from typing import List, Union
+
+def get_node_type(node: Union[models.Depot, models.Fournisseur, models.Client]) -> schemas.NodeType:
+    if isinstance(node, models.Depot):
+        return schemas.NodeType.depot
+    if isinstance(node, models.Fournisseur):
+        return schemas.NodeType.fournisseur
+    if isinstance(node, models.Client):
+        return schemas.NodeType.client
+    else:
+        raise Exception("Node type not recognized: Supported are Depot, Fournisseur, Client ")
+
+
 class Solution:
     def __init__(self, chemin) -> None:
         self.chemin = chemin
@@ -105,4 +118,156 @@ class Solution:
             print("Aucune mutation trouvée ne respecte les contraintes ")
             # raise Exception("Aucune mutation trouvée ne respecte les contraintes ")
         return mutations
+
+    def test_solution_by_vehicules(self, db: Session = SessionLocal()) -> List[models.Vehicule]:
+        solution = self
+        vehicules_queue = crud.vehicule.get_all()
+        trajet_final = {}
+
+        print("Test de la solution ", [i.name for i in solution.chemin])
+
+        for vehicule in vehicules_queue:
+            print("\n")
+            # if vehicule.name not in trajet_final:
+                # trajet_final[vehicule.name] = []
+            trajet_final[vehicule.name] = [ schemas.Node(
+                name = vehicule.depot.name, coords = vehicule.depot.coords, 
+                code = vehicule.depot.code, type = get_node_type(vehicule.depot)
+            ) ]
+
+            for node in solution.chemin :
+                if isinstance(node, models.Fournisseur):
+                    print(f"FOURNISSEUR {node.name} ")
+                    commandes = crud.commande.get_by_fournisseur(f = node)
+                    for order in commandes:
+                        qty_packed = crud.vehicule.hold(vehicule, order)
+                        print(f"V{vehicule.id}, Order {order.id}, Packed {qty_packed}/{order.qty_fixed} in V{vehicule.id} à {node.name} ")
+                        qty_remaining = order.qty_fixed - qty_packed
+                        if qty_remaining < 0 :
+                            # print(f" {order.qty} / {qty_packed} ")
+                            raise Exception(f"Trop de produits ont été chagés dans le véhicule {vehicule.id}. Commande {order.id}, Restant {qty_packed}/{order.qty_fixed} ")
+                        if qty_packed > 0 :
+                            node_schema = schemas.Node(
+                                name = node.name, coords = node.coords, 
+                                code = node.code, type = get_node_type(node),
+                                mvt = qty_packed 
+                            )
+                            if node_schema.name not in [ i.name for i in trajet_final[vehicule.name] ]:
+                                trajet_final[vehicule.name].append(node_schema)
+                            crud.vehicule.add_node_to_route(vehicule, node_schema, db= db)
+                            # S'il y a encore des produits dans la commande, on passe au véhicule suivant 
+                
+                elif isinstance(node, models.Client):
+                    client_holded_orders = crud.vehicule.get_client_holded_orders_in_vehicule(vehicule, node)
+                    qty_delivered = 0
+                    print(f"CLIENT C{node.name} reçu {len(client_holded_orders)} commandes du véhicule V{vehicule.id} ")
+                    for h in client_holded_orders:
+                        qty_delivered += h.qty_holded
+                        # print(h.qty_holded)
+                        crud.vehicule.deactivate_holded_order(h)
+                    if qty_delivered != 0:
+                        node_schema = schemas.Node(
+                                    name = node.name, coords = node.coords, 
+                                    code = node.code, type = get_node_type(node),
+                                    mvt = -qty_delivered 
+                                )
+                        if node_schema.name not in [ i.name for i in trajet_final[vehicule.name] ]:
+                            trajet_final[vehicule.name].append(node_schema)
+                        crud.vehicule.add_node_to_route(vehicule, node_schema, db = self.db)
+                        print([ f"Commande {h.commande.id}, Qté {h.qty_holded}/{h.commande.qty_fixed} \n" for h in client_holded_orders ])
+
+            print(f"  Le VEHICULE {vehicule.name} avant test {len(trajet_final[vehicule.name])} %%%%%%%%")
+            if len(trajet_final[vehicule.name]) == 1:
+                print(" test == 1")
+                trajet_final[vehicule.name] = []
+                print(f"  Le VEHICULE {vehicule.name} n'a rien  foutu {len(trajet_final[vehicule.name])} £££££££")
+            elif len(trajet_final[vehicule.name]) > 1 : 
+                print(" test > 1")
+                trajet_final[vehicule.name].append(schemas.Node(
+                    name = vehicule.depot.name, coords = vehicule.depot.coords, 
+                    code = vehicule.depot.code, type = get_node_type(vehicule.depot)
+                ))
+                print(f"  Le VEHICULE {vehicule.name} est au dépot {len(trajet_final[vehicule.name])} !!!! ")
+            print(f"Le VEHICULE {vehicule.name} a fait {len(trajet_final[vehicule.name])} nodes ")
+        print(trajet_final)
+        return trajet_final
+
+
+    def test_solution_by_orders(self, db: Session = SessionLocal()) -> List[models.Vehicule]:
+        solution = self
+        vehicules_queue = crud.vehicule.get_all()
+        trajet_final = {}
+
+        print("Test de la solution par commandes ", [i.name for i in solution.chemin])
+        
+        clients_in_solution = [ node for node in solution.chemin if isinstance(node, models.Client) ]
+        for client in clients_in_solution:
+            list_commandes = crud.commande.get_by_client(client= client)
+            are_client_orders_satisfied = False
+            last_vehicule = None
+            total_picked_qty = 0
+            for vehicule in vehicules_queue:
+                if are_client_orders_satisfied:
+                    break
+                total_ordered_qty = 0
+                vehicule_available_space = 0
+                
+                for commande in list_commandes:
+                    total_ordered_qty += commande.qty_fixed
+                    vehicule_available_space += crud.vehicule.get_available_space_in_free_compartments(vehicule= vehicule)
+                
+                if vehicule_available_space < total_ordered_qty:
+                    print(f"Le V{vehicule.id} ne peut pas récup toutes les commandes du {client.name}: {vehicule_available_space}/{total_ordered_qty} ")
+
+                    continue
+                else:
+                    if trajet_final.get(vehicule.name, None) == None:
+                        print(f"Création du TRAJET pour {vehicule.name} ")
+                        trajet_final[vehicule.name] = []
+                    print(f" TREJT actuel du {vehicule.name} : ", trajet_final.get(vehicule.name, None))
+                    for commande in list_commandes:
+                        fournisseur = crud.fournisseur.get(id = commande.fournisseur_id)
+                        qty_packed = crud.vehicule.hold(vehicule, commande)
+                        print(f"V{vehicule.id}, Order {commande.id}, Packed {qty_packed}/{commande.qty_fixed} in V{vehicule.id} à {fournisseur.name} ")
+                        qty_remaining = commande.qty_fixed - qty_packed
+                        if qty_remaining < 0 :
+                            # print(f" {order.qty} / {qty_packed} ")
+                            raise Exception(f"Le véhicule {vehicule.id}. n'a quasiment pas chargé toutes les commandes du client {client.name}")
+                        if qty_packed > 0 :
+                            total_picked_qty += qty_packed
+                            node_schema = schemas.Node(
+                                name = fournisseur.name, coords = fournisseur.coords, 
+                                code = fournisseur.code, type = get_node_type(fournisseur),
+                                mvt = qty_packed 
+                            )
+                            # if node_schema.name not in [ i.name for i in trajet_final[vehicule.name] ]:
+                            trajet_final[vehicule.name].append(node_schema)
+                            crud.vehicule.add_node_to_route(vehicule, node_schema, db= db) 
+                    are_client_orders_satisfied = True
+                    last_vehicule = vehicule
+                    
+
+            if are_client_orders_satisfied:
+                node_schema = schemas.Node(
+                    name = client.name, coords = client.coords, 
+                    code = client.code, type = get_node_type(client),
+                    mvt = -total_picked_qty 
+                )
+                if last_vehicule:
+                    trajet_final[last_vehicule.name].append(node_schema)
+                  
+            else:
+                raise Exception(f"Error: Client {client.name} NON SATISFATIT")
+        for key in trajet_final:
+            v_id = key.split('V')[1]
+            v = crud.vehicule.get(id= v_id)
+            depot_schemas = schemas.Node(
+                    name = v.depot.name, coords = v.depot.coords, 
+                    code = v.depot.code, type = get_node_type(v.depot),
+                    mvt = 0
+                )
+            trajet_final[key].append(depot_schemas)
+            trajet_final[key].insert(0, depot_schemas)
+        print("Trajet finale ", trajet_final)
+        return trajet_final
 

@@ -23,7 +23,7 @@ def clean(db= db):
         v.trajet = []
         db.add(v)
         db.commit()
+    print("\n\n Database reset \n\n")
 clean()
-print("\n\n Database reset \n\n")
 # db.add(hold)
 # db.commit()

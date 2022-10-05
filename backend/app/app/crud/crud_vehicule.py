@@ -176,7 +176,7 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
                 # print(f"Compartiment {index} : {holded_order.qty_holded} ")
         return qty_used
 
-    def get_available_space_in_free_compartments(self, vehicule: models.Vehicule):
+    def get_available_space_in_free_compartments(self, vehicule: models.Vehicule) -> int:
         nb_remaining_compartments = vehicule.nb_compartment - len(vehicule.compartiments)
         # print(f"Space in free comps : (holded_comp = {len(vehicule.compartiments)}, total_comp = {vehicule.nb_compartment} ) ")
         # print([i for i in vehicule.compartiments])

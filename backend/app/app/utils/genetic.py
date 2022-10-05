@@ -54,8 +54,10 @@ class Genetic:
                     # "long": curent_gen[0],
                 })
                 # print(f"Meilleurs cout de la generation n°{g} : {[i for i in curent_gen]} ")
-        trajet_dict = self.test_solution(curent_gen[0])
+        # trajet_dict = self.test_solution(curent_gen[0])
         # print(f"Finale : {curent_gen[0].cout} -> {curent_gen[0].is_precedence_ok()} ")
+        # trajet_dict = curent_gen[0].test_solution_by_vehicules(db= self.db)
+        trajet_dict = curent_gen[0].test_solution_by_orders(db= self.db)
         dataset["trajet"] = trajet_dict
         cout_tous_vehicules = 0 
         distance_tous_trajet = 0
@@ -116,74 +118,76 @@ class Genetic:
         return [best]
         # sorted(generation, lambda sol:  sol.cout)
 
-    def test_solution(self, solution: Solution) -> List[models.Vehicule]:
-        vehicules_queue = crud.vehicule.get_all()
-        trajet_final = {}
+    # def test_solution(self, solution: Solution) -> List[models.Vehicule]:
+    #     vehicules_queue = crud.vehicule.get_all()
+    #     trajet_final = {}
 
-        print("Test de la solution ", [i.name for i in solution.chemin])
+    #     print("Test de la solution ", [i.name for i in solution.chemin])
 
-        for vehicule in vehicules_queue:
-            print("\n")
-            # if vehicule.name not in trajet_final:
-                # trajet_final[vehicule.name] = []
-            trajet_final[vehicule.name] = [ schemas.Node(
-                name = vehicule.depot.name, coords = vehicule.depot.coords, 
-                code = vehicule.depot.code, type = get_node_type(vehicule.depot)
-            ) ]
+    #     for vehicule in vehicules_queue:
+    #         print("\n")
+    #         # if vehicule.name not in trajet_final:
+    #             # trajet_final[vehicule.name] = []
+    #         trajet_final[vehicule.name] = [ schemas.Node(
+    #             name = vehicule.depot.name, coords = vehicule.depot.coords, 
+    #             code = vehicule.depot.code, type = get_node_type(vehicule.depot)
+    #         ) ]
 
-            for node in solution.chemin :
-                if isinstance(node, models.Fournisseur):
-                    print(f"FOURNISSEUR {node.name} ")
-                    commandes = crud.commande.get_by_fournisseur(f = node)
-                    for order in commandes:
-                        qty_packed = crud.vehicule.hold(vehicule, order)
-                        print(f"V{vehicule.id}, Order {order.id}, Packed {qty_packed}/{order.qty_fixed} in V{vehicule.id} à {node.name} ")
-                        qty_remaining = order.qty_fixed - qty_packed
-                        if qty_remaining < 0 :
-                            # print(f" {order.qty} / {qty_packed} ")
-                            raise Exception(f"Trop de produits ont été chagés dans le véhicule {vehicule.id}. Commande {order.id}, Restant {qty_packed}/{order.qty_fixed} ")
-                        if qty_packed > 0 :
-                            node_schema = schemas.Node(
-                                name = node.name, coords = node.coords, 
-                                code = node.code, type = get_node_type(node),
-                                mvt = qty_packed 
-                            )
-                            if node_schema.name not in [ i.name for i in trajet_final[vehicule.name] ]:
-                                trajet_final[vehicule.name].append(node_schema)
-                            crud.vehicule.add_node_to_route(vehicule, node_schema, db= self.db)
-                            # S'il y a encore des produits dans la commande, on passe au véhicule suivant 
+    #         for node in solution.chemin :
+    #             if isinstance(node, models.Fournisseur):
+    #                 print(f"FOURNISSEUR {node.name} ")
+    #                 commandes = crud.commande.get_by_fournisseur(f = node)
+    #                 for order in commandes:
+    #                     qty_packed = crud.vehicule.hold(vehicule, order)
+    #                     print(f"V{vehicule.id}, Order {order.id}, Packed {qty_packed}/{order.qty_fixed} in V{vehicule.id} à {node.name} ")
+    #                     qty_remaining = order.qty_fixed - qty_packed
+    #                     if qty_remaining < 0 :
+    #                         # print(f" {order.qty} / {qty_packed} ")
+    #                         raise Exception(f"Trop de produits ont été chagés dans le véhicule {vehicule.id}. Commande {order.id}, Restant {qty_packed}/{order.qty_fixed} ")
+    #                     if qty_packed > 0 :
+    #                         node_schema = schemas.Node(
+    #                             name = node.name, coords = node.coords, 
+    #                             code = node.code, type = get_node_type(node),
+    #                             mvt = qty_packed 
+    #                         )
+    #                         if node_schema.name not in [ i.name for i in trajet_final[vehicule.name] ]:
+    #                             trajet_final[vehicule.name].append(node_schema)
+    #                         crud.vehicule.add_node_to_route(vehicule, node_schema, db= self.db)
+    #                         # S'il y a encore des produits dans la commande, on passe au véhicule suivant 
                 
-                elif isinstance(node, models.Client):
-                    client_holded_orders = crud.vehicule.get_client_holded_orders_in_vehicule(vehicule, node)
-                    qty_delivered = 0
-                    print(f"CLIENT C{node.name} reçu {len(client_holded_orders)} commandes du véhicule V{vehicule.id} ")
-                    for h in client_holded_orders:
-                        qty_delivered += h.qty_holded
-                        # print(h.qty_holded)
-                        crud.vehicule.deactivate_holded_order(h)
-                    if qty_delivered != 0:
-                        node_schema = schemas.Node(
-                                    name = node.name, coords = node.coords, 
-                                    code = node.code, type = get_node_type(node),
-                                    mvt = -qty_delivered 
-                                )
-                        if node_schema.name not in [ i.name for i in trajet_final[vehicule.name] ]:
-                            trajet_final[vehicule.name].append(node_schema)
-                        crud.vehicule.add_node_to_route(vehicule, node_schema, db = self.db)
-                        print([ f"Commande {h.commande.id}, Qté {h.qty_holded}/{h.commande.qty_fixed} \n" for h in client_holded_orders ])
+    #             elif isinstance(node, models.Client):
+    #                 client_holded_orders = crud.vehicule.get_client_holded_orders_in_vehicule(vehicule, node)
+    #                 qty_delivered = 0
+    #                 print(f"CLIENT C{node.name} reçu {len(client_holded_orders)} commandes du véhicule V{vehicule.id} ")
+    #                 for h in client_holded_orders:
+    #                     qty_delivered += h.qty_holded
+    #                     # print(h.qty_holded)
+    #                     crud.vehicule.deactivate_holded_order(h)
+    #                 if qty_delivered != 0:
+    #                     node_schema = schemas.Node(
+    #                                 name = node.name, coords = node.coords, 
+    #                                 code = node.code, type = get_node_type(node),
+    #                                 mvt = -qty_delivered 
+    #                             )
+    #                     if node_schema.name not in [ i.name for i in trajet_final[vehicule.name] ]:
+    #                         trajet_final[vehicule.name].append(node_schema)
+    #                     crud.vehicule.add_node_to_route(vehicule, node_schema, db = self.db)
+    #                     print([ f"Commande {h.commande.id}, Qté {h.qty_holded}/{h.commande.qty_fixed} \n" for h in client_holded_orders ])
 
-            print(f"  Le VEHICULE {vehicule.name} avant test {len(trajet_final[vehicule.name])} %%%%%%%%")
-            if len(trajet_final[vehicule.name]) == 1:
-                print(" test == 1")
-                trajet_final[vehicule.name] = []
-                print(f"  Le VEHICULE {vehicule.name} n'a rien  foutu {len(trajet_final[vehicule.name])} £££££££")
-            elif len(trajet_final[vehicule.name]) > 1 : 
-                print(" test > 1")
-                trajet_final[vehicule.name].append(schemas.Node(
-                    name = vehicule.depot.name, coords = vehicule.depot.coords, 
-                    code = vehicule.depot.code, type = get_node_type(vehicule.depot)
-                ))
-                print(f"  Le VEHICULE {vehicule.name} est au dépot {len(trajet_final[vehicule.name])} !!!! ")
-            print(f"Le VEHICULE {vehicule.name} a fait {len(trajet_final[vehicule.name])} nodes ")
-        print(trajet_final)
-        return trajet_final
+    #         print(f"  Le VEHICULE {vehicule.name} avant test {len(trajet_final[vehicule.name])} %%%%%%%%")
+    #         if len(trajet_final[vehicule.name]) == 1:
+    #             print(" test == 1")
+    #             trajet_final[vehicule.name] = []
+    #             print(f"  Le VEHICULE {vehicule.name} n'a rien  foutu {len(trajet_final[vehicule.name])} £££££££")
+    #         elif len(trajet_final[vehicule.name]) > 1 : 
+    #             print(" test > 1")
+    #             trajet_final[vehicule.name].append(schemas.Node(
+    #                 name = vehicule.depot.name, coords = vehicule.depot.coords, 
+    #                 code = vehicule.depot.code, type = get_node_type(vehicule.depot)
+    #             ))
+    #             print(f"  Le VEHICULE {vehicule.name} est au dépot {len(trajet_final[vehicule.name])} !!!! ")
+    #         print(f"Le VEHICULE {vehicule.name} a fait {len(trajet_final[vehicule.name])} nodes ")
+    #     print(trajet_final)
+    #     return trajet_final
+
+

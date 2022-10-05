@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get("/genetic")
-def read_items(
+def read_genetic(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100) -> Any:
@@ -38,8 +38,9 @@ def read_items(
             db.close_all()
             solutions_finales.append(res)
         except Exception as e:
-            print(e)
+            print("Exception API::: ", e)
             db.close_all()
+            raise e
             return HTTPException(status_code=500, detail= e)
 
     return solutions_finales
