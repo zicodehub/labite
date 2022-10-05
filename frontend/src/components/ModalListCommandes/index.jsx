@@ -5,11 +5,12 @@ import { Form, Modal, Row, Col, Button, Spinner, Table } from 'react-bootstrap';
 import TextInput from '../TextInput';
 import SelectInput from '../SelectInput';
 import { Client, Fournisseur } from '../constants';
+import { deleteCommande } from 'components/api';
 
 
-export default ({open, hide, onCreate, list_commandes}) => {
+export default ({open, hide, onCreate, list_commandes, setCommandes}) => {
     const [ isLoading, setIsLoading ] = useState(false)
-
+  const handleDelete = (id) => deleteCommande(id).then(() => setCommandes( prev => prev.filter( c => c.id != id)))
     useEffect(() => {
 
     }, [setIsLoading])
@@ -46,6 +47,7 @@ export default ({open, hide, onCreate, list_commandes}) => {
                           <td>F{order.fournisseur_id}</td>
                           <td>{order.qty_fixed}</td>
                           <td>{order.qty_fixed - order.qty}</td>
+                          <td > <Button onClick={() => handleDelete(order.id)} className='btn btn-xs btn-danger' >Supprimer</Button></td>
                         </tr>
                       )
                     )

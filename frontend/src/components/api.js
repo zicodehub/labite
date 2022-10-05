@@ -25,6 +25,9 @@ export const createCommande = (data) => api.post(`/commandes`, data)
 export const createProduit = (data) => api.post(`/produits`, data)
 export const createVehicule = (data) => api.post(`/vehicules`, data)
 
+
+export const deleteCommande = (id) => api.delete(`/commandes/${id}`)
+
 export const runGenetic = () => api.get(`/commandes/genetic`)
 
 export const runRecuit = () => api.get(`/commandes/recuit`)
