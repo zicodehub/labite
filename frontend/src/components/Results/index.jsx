@@ -9,7 +9,7 @@ import Vis from "../Vis"
 import { Client, Depot, Fournisseur, OFFSET_X, OFFSET_Y } from "../constants"
 import { useEffect } from "react"
 
-import { listClients, runAlgo, listFournisseurs, listVehicules, createClient, listProduits, createFournisseur, createCommande, listDepots, createVehicule, listTypesProduits, createProduit } from "../api"
+import { listClients, runGenetic, listFournisseurs, listVehicules, createClient, listProduits, createFournisseur, createCommande, listDepots, createVehicule, listTypesProduits, createProduit, runRecuit } from "../api"
 import ModalCreateVehicule from "components/ModalCreateVehicule"
 import ModalCreateProduit from "components/ModalCreateProduit"
 
@@ -29,6 +29,7 @@ const Results = () => {
 
     const [clickCoords, setClickCoords] = useState({ x: 0, y: 0 })
     const [isModalNodeOpen, setModalNode] = useState(false)
+    const [isModalAlgoOpen, setModalAlgo] = useState(false)
     const [isModalVehiculeOpen, setModalVehicule] = useState(false)
     const [isModalProduitOpen, setModalProduit] = useState(false)
     const [details, setDetails] = useState({})
@@ -38,6 +39,66 @@ const Results = () => {
     const [idSolution, setIdSolution] = useState(0)
     const [listIdSolution, setListIdSolution] = useState([])
 
+    const handleAlgoResponse = (res) => {
+        console.log(res)
+        let data = res.data
+        data.forEach(
+            (solution, solution_index) => {
+                
+                setDetails(prev => ({
+                    ...prev,
+                    [solution_index]: {
+                        distance: solution.distance,
+                        cout: solution.cout,
+                        nb_vehicules: solution.details.length,
+                        solution: solution.short.map( d => d + ' - ' )
+                    }
+                }))
+                setEdges( prev => {
+                    // return Object.keys(data.trajet).map( v => ({ name: v, trajet: data.trajet[v] }) )
+                    let local_edges = []
+                    console.log("Genetic ", solution.trajet)
+                    setTrajet_final(prev => ({...prev, [solution_index]: solution.trajet }))
+                    Object.keys(solution.trajet).forEach( (key, v_index) => {
+                        let trajet = solution.trajet[key]
+                        let i = trajet[0]
+                        let color = [ 10, 39, 11 ]
+
+                        for (let index = 1; index < trajet.length; index++) {
+                            const element = trajet[index];
+                            local_edges.push({
+                                from: i.name,
+                                to: element.name,
+                                v: key,
+                                mvt: element.mvt,
+                                label: key,
+                                title: key,
+                                color: {
+                                    color: `#${color[0]}${color[1]}${color[2]}`,
+                                    hover: `#${color[0]}${color[1]}${color[2]}`
+                                },
+                                width: 4
+                            })
+                            i = element
+                            color[v_index%3] += color[v_index%3] + 30
+                        }
+                    } )
+                    console.log(local_edges)
+                    setSelectedEdges(prev => ({...prev, [solution_index]: local_edges }))
+                    return {
+                        ...prev,
+                        [solution_index]: local_edges
+                    }
+                })
+            
+                setListIdSolution(prev => prev.concat([solution_index]) )
+            }
+            )
+        setIsRunning(prev => false)
+        setAlgoError(prev => ({
+            error: null                                       
+        }))
+    } 
 
     useEffect(() => {
         listClients().then(res => {
@@ -237,76 +298,28 @@ const Results = () => {
                                             onClick={() => setModalProduit(true) }
                                             >Ajouter un produit</Button>
                                 
-                                        <Button className="text-white mb-1" onClick={()=> {
+                                        <Button className="text-white  btn-info mb-1" onClick={()=> {
                                             setIsRunning(prev => true)
-                                            runAlgo()
-                                            .then( (res) => {
-                                                console.log(res)
-                                                let data = res.data
-                                                data.forEach(
-                                                    (solution, solution_index) => {
-                                                        
-                                                        setDetails(prev => ({
-                                                            ...prev,
-                                                            [solution_index]: {
-                                                                distance: solution.distance,
-                                                                cout: solution.cout,
-                                                                nb_vehicules: solution.details.length,
-                                                                solution: solution.short.map( d => d + ' - ' )
-                                                            }
-                                                        }))
-                                                        setEdges( prev => {
-                                                            // return Object.keys(data.trajet).map( v => ({ name: v, trajet: data.trajet[v] }) )
-                                                            let local_edges = []
-                                                            console.log("Genetic ", solution.trajet)
-                                                            setTrajet_final(prev => ({...prev, [solution_index]: solution.trajet }))
-                                                            Object.keys(solution.trajet).forEach( (key, v_index) => {
-                                                                let trajet = solution.trajet[key]
-                                                                let i = trajet[0]
-                                                                let color = [ 10, 39, 11 ]
-                    
-                                                                for (let index = 1; index < trajet.length; index++) {
-                                                                    const element = trajet[index];
-                                                                    local_edges.push({
-                                                                        from: i.name,
-                                                                        to: element.name,
-                                                                        v: key,
-                                                                        mvt: element.mvt,
-                                                                        label: key,
-                                                                        title: key,
-                                                                        color: {
-                                                                            color: `#${color[0]}${color[1]}${color[2]}`,
-                                                                            hover: `#${color[0]}${color[1]}${color[2]}`
-                                                                        },
-                                                                        width: 4
-                                                                    })
-                                                                    i = element
-                                                                    color[v_index%3] += color[v_index%3] + 30
-                                                                }
-                                                            } )
-                                                            console.log(local_edges)
-                                                            setSelectedEdges(prev => ({...prev, [solution_index]: local_edges }))
-                                                            return {
-                                                                ...prev,
-                                                                [solution_index]: local_edges
-                                                            }
-                                                        })
-                                                    
-                                                        setListIdSolution(prev => prev.concat([solution_index]) )
-                                                    }
-                                                    )
-                                                setIsRunning(prev => false)
-                                                setAlgoError(prev => ({
-                                                    error: null                                       
-                                                }))
-                                            } )
+                                            runGenetic()
+                                            .then(handleAlgoResponse)
                                             .catch(err => {
                                                 setAlgoError(prev => ({
                                                     error: err.message                                        
                                                 }))
                                                 setIsRunning(prev => false)
                                             } )
-                                        }} >Lancer l'algorithme</Button>
+                                        }} >Lancer l'algo Génétic</Button>
+                                        <Button className="text-white btn-info mb-1" onClick={()=> {
+                                            setIsRunning(prev => true)
+                                            runRecuit()
+                                            .then(handleAlgoResponse)
+                                            .catch(err => {
+                                                setAlgoError(prev => ({
+                                                    error: err.message                                        
+                                                }))
+                                                setIsRunning(prev => false)
+                                            } )
+                                        }} >Lancer le Recuit simulé</Button>
                                     </Col>
                                     <Col>
                                         <CarSelectionBox cars={cars} edges={edges[idSolution]} selectedCars={selectedCars} setSelectedCars={setSelectedCars} selectedEdges={selectedEdges} setSelectedEdges={setSelectedEdges} />

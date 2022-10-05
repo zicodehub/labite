@@ -1,5 +1,5 @@
 from typing import Any, List
-from app.utils import Genetic
+from app.utils import Genetic, RecuitSimule
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -8,6 +8,41 @@ from app import crud, models, schemas
 from app.api import deps
 
 router = APIRouter()
+
+@router.get("/recuit")
+def read_recuit(
+    db: Session = Depends(deps.get_db),
+   ) -> Any:
+    """
+    Retrieve items.
+    """
+    from app.db import reset_db
+    solutions_finales = []
+    reset_db.clean(db)
+    
+    f = crud.commande.get_fournisseurs(db = db)
+    c = crud.commande.get_clients(db = db)
+    d = crud.depot.get_first(db = db)
+    print(f"Il y a {len(f)} fourn et {len(c)} clients ")
+    
+    random.shuffle(f)
+    random.shuffle(c)
+    
+    # list_initial = [d] + f + c + [d]
+    list_initial = f + c 
+    try :
+        recuit = RecuitSimule(list_initial, db= db)
+        res = recuit.start()
+        solutions_finales.append(res)
+        db.close_all()
+    except Exception as e:
+        print("Exception API::: ", e)
+        db.close_all()
+        raise e
+        return HTTPException(status_code=500, detail= e)
+
+    return solutions_finales
+
 
 
 @router.get("/genetic")
