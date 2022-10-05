@@ -9,9 +9,10 @@ import Vis from "../Vis"
 import { Client, Depot, Fournisseur, OFFSET_X, OFFSET_Y } from "../constants"
 import { useEffect } from "react"
 
-import { listClients, runGenetic, listFournisseurs, listVehicules, createClient, listProduits, createFournisseur, createCommande, listDepots, createVehicule, listTypesProduits, createProduit, runRecuit, resetDB } from "../api"
+import { listClients, runGenetic, listFournisseurs, listVehicules, createClient, listProduits, createFournisseur, createCommande, listDepots, createVehicule, listTypesProduits, createProduit, runRecuit, resetDB, listCommandes } from "../api"
 import ModalCreateVehicule from "components/ModalCreateVehicule"
 import ModalCreateProduit from "components/ModalCreateProduit"
+import ModalListCommandes from "components/ModalListCommandes"
 
 
 const Results = () => {
@@ -23,6 +24,7 @@ const Results = () => {
     const [ depots, setDepots ] = useState([])
     const [ types, setTypes ] = useState([])
 
+    const [ commandes, setCommandes ] = useState([])
     const [ fournisseurs, setFournisseurs ] = useState([])
     const [ produits, setProduits ] = useState([])
     const [ edges, setEdges ] = useState({})
@@ -30,6 +32,7 @@ const Results = () => {
     const [clickCoords, setClickCoords] = useState({ x: 0, y: 0 })
     const [isModalNodeOpen, setModalNode] = useState(false)
     const [isModalAlgoOpen, setModalAlgo] = useState(false)
+    const [isModalListCommandesOpen, setModalListCommandes] = useState(false)
     const [isModalVehiculeOpen, setModalVehicule] = useState(false)
     const [isModalProduitOpen, setModalProduit] = useState(false)
     const [details, setDetails] = useState({})
@@ -135,6 +138,9 @@ const Results = () => {
                 
                 let carsResponse = await listVehicules()
                 await setCars(prev => carsResponse.data)
+
+                let commandesResponse = await listCommandes()
+                await setCommandes(prev => commandesResponse.data)
                 await setIsReady(prev => true)
             })
         })
@@ -175,7 +181,10 @@ const Results = () => {
                                                             fournisseur_id: parseInt(order.fournisseur),
                                                             produit_id: parseInt(order.produit),
                                                             qty: parseInt(order.qty),
-                                                        })
+                                                        }).then(
+                                                            res => setCommandes(prev => prev.concat(res.data))
+
+                                                        )
                                                     })
                                                 }
                                                 setClients(prev => {
@@ -262,7 +271,18 @@ const Results = () => {
                                     />
                             )
                         }
-                        
+                        {
+                            isModalListCommandesOpen && (
+                                <ModalListCommandes 
+                                    open={isModalListCommandesOpen} hide={setModalListCommandes} 
+                                    onCreate={(values) => {
+                                        
+                                    }}
+                                    list_commandes={commandes}
+                                    list_produits={produits}
+                                    />
+                            )
+                        }
          
                             
                             <Col md="8" className="border" style={{ 
@@ -294,6 +314,10 @@ const Results = () => {
                             <Col className='offset-9'>
                                 <Row>
                                     <Col>
+                                    <Button className="text-white mb-1 btn-xs"
+                                            onClick={() => setModalListCommandes(true) }
+                                            >List des commandes</Button>
+
                                         <Button className="text-white mb-1"
                                             onClick={() => setModalVehicule(true) }
                                             >Ajouter un véhcule</Button>

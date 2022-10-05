@@ -28,6 +28,7 @@ class CommandeInDB(CommandeBase):
     produit_id: Optional[int]
     client_id: Optional[int]
     fournisseur_id: Optional[int]
+    qty_fixed: Optional[int] = 0
     
     class Config:
         orm_mode = True
