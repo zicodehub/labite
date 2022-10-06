@@ -8,10 +8,10 @@ from app.db.session import SessionLocal
 from fastapi import APIRouter, Depends, HTTPException
 
 class Genetic:
-    MAX_GEN_POP_LENGTH = 3
-    NB_GEN = 2
-    MAX_SELECTION_IN_GEN = 5
-    SAMPLE_SOLUTIONS = 3
+    MAX_GEN_POP_LENGTH = 10
+    NB_GEN = 10
+    MAX_SELECTION_IN_GEN = 15
+    SAMPLE_SOLUTIONS = 10
     def __init__(self, list_commandes: List[Union[models.Depot, models.Fournisseur, models.Client]], db: Session = SessionLocal()) -> None:
         print("ZOAMDI")
         self.initial_solution: Solution = self.generate_initial_solution(list_commandes)

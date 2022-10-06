@@ -279,7 +279,7 @@ const Results = () => {
                                         
                                     }}
                                     list_commandes={commandes}
-                                    list_produits={produits}
+                                    setCommandes={setCommandes}
                                     />
                             )
                         }
