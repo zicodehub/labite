@@ -19,7 +19,7 @@ def read_items(
     Retrieve items.
     """
     items = crud.fournisseur.get_multi(skip=skip, limit=limit)
-    # print(dir(items[0]))
+    # #printdir(items[0]))
     return items
 
 @router.post("/", response_model=schemas.Fournisseur)
@@ -66,7 +66,7 @@ def add_produit(
     db.add(item)
     db.commit()
     db.refresh(item)
-    # print(dir(items[0]))
+    # #printdir(items[0]))
     return item
 
 @router.delete("/{id}", response_model=schemas.Fournisseur)

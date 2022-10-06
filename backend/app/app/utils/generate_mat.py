@@ -28,4 +28,4 @@ def generator(n: int):
             file.write('\n')
     return matrice
 
-print(generator(11))
+#printgenerator(11))

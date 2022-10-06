@@ -15,7 +15,7 @@ def test_send_email():
         environment={"project_name":"amap", "email":"aleksnougbele@gmail.com"}
     )
 def test_send_reset_password_email():
-    print(settings.EMAIL_TEST_USER)
+    #printsettings.EMAIL_TEST_USER)
     # assert False
     password_reset_token = generate_password_reset_token(email=settings.EMAIL_TEST_USER,)
 
