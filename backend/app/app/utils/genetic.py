@@ -13,10 +13,10 @@ class Genetic:
     MAX_SELECTION_IN_GEN = 15
     SAMPLE_SOLUTIONS = 10
     def __init__(self, list_commandes: List[Union[models.Depot, models.Fournisseur, models.Client]], db: Session = SessionLocal()) -> None:
-        print("ZOAMDI")
+        #print"ZOAMDI")
         self.initial_solution: Solution = self.generate_initial_solution(list_commandes)
         self.db = db
-        # print(f"Initial solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({self.initial_solution.is_precedence_ok()}) ")
+        # #printf"Initial solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({self.initial_solution.is_precedence_ok()}) ")
 
     def __del__(self):
         self.db.close()
@@ -28,7 +28,7 @@ class Genetic:
             f = crud.commande.get_fournisseurs(db = db)
             c = crud.commande.get_clients(db = db)
             d = crud.depot.get_first(db = db)
-            print(f"Il y a {len(f)} fourn et {len(c)} clients ")
+            #printf"Il y a {len(f)} fourn et {len(c)} clients ")
             
             random.shuffle(f)
             random.shuffle(c)
@@ -48,25 +48,25 @@ class Genetic:
         init_precedence = self.initial_solution.is_precedence_ok()
         curent_gen = [self.initial_solution]
         depot = crud.depot.get_first()
-        print(f"\n\n\n!! Start solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({init_precedence}) ")
+        #printf"\n\n\n!! Start solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({init_precedence}) ")
         if not init_precedence :
-            # print("Précedence initiale non respectée ", self.initial_solution.chemin)
+            # #print"Précedence initiale non respectée ", self.initial_solution.chemin)
             raise Exception(f"Précedence initiale non respectée -{init_precedence}- {[i.name for i in self.initial_solution.chemin]} ")
         else:
             for g in range(self.NB_GEN):
-                print(f"Going to create a generation  n°{g}")
+                #printf"Going to create a generation  n°{g}")
                 any_sols = self.generation_next(curent_gen)
-                print(f"Generation n°{g} created : {len(any_sols)}")
+                #printf"Generation n°{g} created : {len(any_sols)}")
                 curent_gen = self.selection(any_sols)
-                print(f"Meilleurs cout de la generation n°{g} : {[i.cout for i in curent_gen]} ")
+                #printf"Meilleurs cout de la generation n°{g} : {[i.cout for i in curent_gen]} ")
                 dataset.update({
                     "short": [depot.name] + [i.name for i in curent_gen[0].chemin] + [depot.name],
                     # "routes": self.test_solution(curent_gen[0]),
                     # "long": curent_gen[0],
                 })
-                # print(f"Meilleurs cout de la generation n°{g} : {[i for i in curent_gen]} ")
+                # #printf"Meilleurs cout de la generation n°{g} : {[i for i in curent_gen]} ")
         # trajet_dict = self.test_solution(curent_gen[0])
-        # print(f"Finale : {curent_gen[0].cout} -> {curent_gen[0].is_precedence_ok()} ")
+        # #printf"Finale : {curent_gen[0].cout} -> {curent_gen[0].is_precedence_ok()} ")
         # trajet_dict = curent_gen[0].test_solution_by_vehicules(db= self.db)
         trajet_dict = curent_gen[0].test_solution_by_orders(db= self.db)
         dataset["trajet"] = trajet_dict
@@ -105,7 +105,7 @@ class Genetic:
         for p in population :
             for i in range(self.MAX_GEN_POP_LENGTH):
                 muted_sols = p.muter()
-                print(len(muted_sols))
+                #printlen(muted_sols))
                 new_generation.extend(muted_sols)
 
         return new_generation if len(new_generation) else [self.initial_solution]

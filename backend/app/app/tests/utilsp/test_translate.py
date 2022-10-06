@@ -100,7 +100,7 @@ def test_translate_field_question_create(
 
 
     question= crud.question.create(db=db, obj_in=question)
-    # print(question.label_fr)
+    # #printquestion.label_fr)
     assert question.label_fr!=''
     question= schemas.QuestionCreate(
     label_eng='What is the best club on earth',
@@ -160,7 +160,7 @@ def test_translate_field_answer_create(db:Session):
         no_translate=False
         )
     ans=crud.answer.create(db=db,obj_in=answer)
-    print(ans.value_string_fr)
+    #printans.value_string_fr)
     assert ans.value_string_fr!=''
     #text
     # answer=schemas.AnswerCreate(
@@ -170,7 +170,7 @@ def test_translate_field_answer_create(db:Session):
     #     no_translate=False
     #     )
     # ans=crud.answer.create(db=db,obj_in=answer)
-    # print(ans.value_text_fr)
+    # #printans.value_text_fr)
     # assert ans.value_text_fr!=''
     #choice
     answer=schemas.AnswerCreate(
@@ -180,7 +180,7 @@ def test_translate_field_answer_create(db:Session):
         no_translate=False
         )
     ans=crud.answer.create(db=db,obj_in=answer)
-    print(ans.value_choices_fr)
+    #printans.value_choices_fr)
     assert ans.value_choices_fr!=''
     #table
     answer=schemas.AnswerCreate(
@@ -190,7 +190,7 @@ def test_translate_field_answer_create(db:Session):
         no_translate=False
         )
     ans=crud.answer.create(db=db,obj_in=answer)
-    print(ans.value_tab_fr)
+    #printans.value_tab_fr)
     assert ans.value_tab_fr!=''
     #subquestion
 

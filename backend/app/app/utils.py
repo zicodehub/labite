@@ -25,7 +25,7 @@ def send_email(
     environment: Dict[str, Any] = {},
     template_id:str='test'
 ) -> None:
-    print(settings.EMAILS_ENABLED)
+    #printsettings.EMAILS_ENABLED)
     assert settings.EMAILS_ENABLED, "no provided configuration for email variables"
 
     message = Mail(
@@ -38,12 +38,12 @@ def send_email(
     try:
         sg = SendGridAPIClient(settings.SMTP_KEY)
         response = sg.send(message)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
+        #printresponse.status_code)
+        #printresponse.body)
+        #printresponse.headers)
     except Exception as e:
         response='error'
-        print(e)
+        #printe)
         assert False
 
 

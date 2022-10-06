@@ -10,5 +10,5 @@ def test_save_upload():
     f=NamedTemporaryFile()
     f.close()
     ret=save_upload_file(f)
-    print(ret)
+    #printret)
     assert False
