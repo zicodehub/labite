@@ -257,10 +257,15 @@ class Solution:
                     trajet_final[last_vehicule.name].append(node_schema)
                   
             else:
-                raise Exception(f"Error: Client {client.name} NON SATISFATIT")
+                # raise Exception(f"Error: Client {client.name} NON SATISFATIT")
+                pass
         for key in trajet_final:
             v_id = key.split('V')[1]
             v = crud.vehicule.get(id= v_id)
+
+            # for node in trajet_final[key]:
+
+
             depot_schemas = schemas.Node(
                     name = v.depot.name, coords = v.depot.coords, 
                     code = v.depot.code, type = get_node_type(v.depot),
