@@ -18,8 +18,8 @@ class DepotBase(BaseModel):
 
 class DepotCreate(DepotBase):
     coords: str
-    time_interval_start: int
-    time_interval_end: int
+    # time_interval_start: int
+    # time_interval_end: int
 
 class DepotUpdate(DepotBase):
     pass

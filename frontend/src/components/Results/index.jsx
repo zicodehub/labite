@@ -9,10 +9,12 @@ import Vis from "../Vis"
 import { Client, Depot, Fournisseur, OFFSET_X, OFFSET_Y } from "../constants"
 import { useEffect } from "react"
 
-import { listClients, runGenetic, listFournisseurs, listVehicules, createClient, listProduits, createFournisseur, createCommande, listDepots, createVehicule, listTypesProduits, createProduit, runRecuit, resetDB, listCommandes } from "../api"
+import { listClients, runGenetic, listFournisseurs, listVehicules, createClient, listProduits, createFournisseur, createCommande, listDepots, createVehicule, listTypesProduits, createProduit, runRecuit, resetDB, listCommandes, createTypeProduit, createDepot } from "../api"
 import ModalCreateVehicule from "components/ModalCreateVehicule"
 import ModalCreateProduit from "components/ModalCreateProduit"
 import ModalListCommandes from "components/ModalListCommandes"
+import ModalCreateTypeProduit from "components/ModalCreateTypeProduit"
+import ModalCreateDepot from "components/ModalCreateDepot"
 
 
 const Results = () => {
@@ -35,6 +37,8 @@ const Results = () => {
     const [isModalListCommandesOpen, setModalListCommandes] = useState(false)
     const [isModalVehiculeOpen, setModalVehicule] = useState(false)
     const [isModalProduitOpen, setModalProduit] = useState(false)
+    const [isModalCreateDepot, setModalCreateDepot] = useState(false)
+    const [isModalTypeProduitOpen, setModalTypeProduit] = useState(false)
     const [details, setDetails] = useState({})
     const [algoError, setAlgoError] = useState({})
     const [isReady, setIsReady] = useState(false)
@@ -272,6 +276,50 @@ const Results = () => {
                             )
                         }
                         {
+                            isModalTypeProduitOpen && (
+                                <ModalCreateTypeProduit 
+                                    open={isModalTypeProduitOpen} hide={setModalTypeProduit} 
+                                    onCreate={(values) => {
+                                        createTypeProduit(values)
+                                        .then(
+                                            res => {
+                                                setTypes(prev =>{
+                                                    return prev.concat(res.data)
+                                                } )
+                                                setModalTypeProduit(false)
+                                            }
+                                        )
+                                    }}
+                                    list_types={types}
+                                    
+                                    />
+                            )
+                        }
+                        {
+                            isModalCreateDepot && (
+                                <ModalCreateDepot
+                                    open={isModalCreateDepot} hide={setModalCreateDepot} 
+                                    onCreate={(values) => {
+                                        const data = {
+                                            name: values.name,
+                                            coords: values.x+ ';' + values.y
+                                        }
+                                        createDepot(data)
+                                        .then(
+                                            res => {
+                                                setDepots(prev =>{
+                                                    return prev.concat(res.data)
+                                                } )
+                                                setModalCreateDepot(false)
+                                            }
+                                        )
+                                    }}
+                                    list_depots={depots}
+                                    
+                                    />
+                            )
+                        }
+                        {
                             isModalListCommandesOpen && (
                                 <ModalListCommandes 
                                     open={isModalListCommandesOpen} hide={setModalListCommandes} 
@@ -314,18 +362,27 @@ const Results = () => {
                             <Col className='offset-9'>
                                 <Row>
                                     <Col>
-                                    <Button className="text-white mb-1 btn-xs"
+                                    <Button className="text-white mb-1 btn-xs btn-secondary"
                                             onClick={() => setModalListCommandes(true) }
                                             >List des commandes</Button>
 
                                         <Button className="text-white mb-1"
                                             onClick={() => setModalVehicule(true) }
                                             >Ajouter un véhcule</Button>
+
+                                        <Button className="text-white mb-1"
+                                            onClick={() => setModalCreateDepot(true) }
+                                            >Ajouter un dépot</Button>
                                 
                                         <Button className="text-white mb-3"
                                             onClick={() => setModalProduit(true) }
                                             >Ajouter un produit</Button>
                                 
+                                        <Button className="text-white mb-3"
+                                            onClick={() => setModalTypeProduit(true) }
+                                            >Ajouter un type de produit</Button>
+                                
+
                                         <Button className="text-white  btn-info mb-1" onClick={()=> {
                                             setIsRunning(prev => true)
                                             runGenetic()

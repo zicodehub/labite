@@ -24,7 +24,8 @@ export const createFournisseur = (data) => api.post(`/fournisseurs`, data)
 export const createCommande = (data) => api.post(`/commandes`, data)
 export const createProduit = (data) => api.post(`/produits`, data)
 export const createVehicule = (data) => api.post(`/vehicules`, data)
-
+export const createTypeProduit = (data) => api.post(`/types`, data)
+export const createDepot = (data) => api.post(`/depots`, data)
 
 export const deleteCommande = (id) => api.delete(`/commandes/${id}`)
 
