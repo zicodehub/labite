@@ -266,11 +266,13 @@ class Solution:
 
             for index, node in enumerate( trajet_final[key]):
                 found_once = False
-                for next_node in trajet_final[key][index+1:]:
+                for next_node in trajet_final[key][index:]:
                     if node.name == next_node.name:
                         node.mvt += next_node.mvt
                         if found_once :
+                            trajet_final[key].reverse()
                             trajet_final[key].remove(next_node)
+                            trajet_final[key].reverse()
                         found_once = True
 
             depot_schemas = schemas.Node(
