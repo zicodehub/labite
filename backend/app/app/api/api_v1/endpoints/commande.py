@@ -28,6 +28,7 @@ def read_recuit(
     """
     Retrieve items.
     """
+    print("Running Recuit Simulé")
     from app.db import reset_db
     solutions_finales = []
     reset_db.clean(db)
@@ -65,6 +66,7 @@ def read_genetic(
     """
     Retrieve items.
     """
+    print("Running Génétic")
     from app.db import reset_db
     solutions_finales = []
     for i in range(Genetic.SAMPLE_SOLUTIONS):
