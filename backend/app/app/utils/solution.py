@@ -266,7 +266,7 @@ class Solution:
 
             for index, node in enumerate( trajet_final[key]):
                 found_once = False
-                for next_node in trajet_final[key][index:]:
+                for next_node in trajet_final[key][index+1:]:
                     if node.name == next_node.name:
                         node.mvt += next_node.mvt
                         if found_once :
