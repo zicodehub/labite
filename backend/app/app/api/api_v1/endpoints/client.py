@@ -35,20 +35,18 @@ def create_item(
     return item
 
 
-@router.get("/{id}", response_model=schemas.Client)
-def read_item(
-    *,
-    # db: Session = Depends(deps.get_db),
+@router.put("/{id}", response_model=schemas.Client)
+def update(
     id: int,
-    # current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
+    obj_in: schemas.ClientUpdate,
+    db: Session = Depends(deps.get_db),
+):
     """
-    Get item by ID.
+    Update a mark
     """
-    item = crud.client.get(id=id)
-    if not item:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return item
+    db_obj = crud.client.get(db= db, id= id)
+    db_obj = crud.client.update(db= db, db_obj = db_obj, obj_in = obj_in)
+    return db_obj
 
 
 @router.delete("/{id}", response_model=schemas.Client)

@@ -15,6 +15,7 @@ import ModalCreateProduit from "components/ModalCreateProduit"
 import ModalListCommandes from "components/ModalListCommandes"
 import ModalCreateTypeProduit from "components/ModalCreateTypeProduit"
 import ModalCreateDepot from "components/ModalCreateDepot"
+import ZoMap from "components/ZoMap"
 
 
 const Results = () => {
@@ -150,6 +151,8 @@ const Results = () => {
         })
     }
 
+    const fusion_nodes = clients.concat(fournisseurs).concat(depots)
+
     useEffect(() => {
         refresh()
         
@@ -176,7 +179,7 @@ const Results = () => {
                                                 time_service: values.time_service,
                                                 time_interval_start: values.time_interval_start,
                                                 time_interval_end: values.time_interval_end,
-                                                coords: `${clickCoords.x};${clickCoords.y}`
+                                                coords: `${clickCoords.x-OFFSET_X};${clickCoords.y-OFFSET_Y}`
                                             }).then(res => {
                                                 if(values.orders.length > 0) {
                                                     values.orders.forEach( order => {
@@ -336,8 +339,8 @@ const Results = () => {
                             <Col md="8" className="border" style={{ 
                                 height: "80vh" ,
                                 position: 'absolute',
-                                top: OFFSET_X,
-                                left: OFFSET_Y
+                                top: OFFSET_Y,
+                                left: OFFSET_X
                             }} 
                                 
                                     onDoubleClick={({ pageX, pageY })=> {
@@ -351,8 +354,11 @@ const Results = () => {
                                     } } 
                                     >
                                     {/* <Map  /> */}
-                                    <Vis nodes={clients.concat(fournisseurs).concat(depots)} edges={selectedEdges[idSolution]} />
+                                    
+                                    {/* <Vis nodes={clients.concat(fournisseurs).concat(depots)} edges={selectedEdges[idSolution]} /> */}
+                                    <ZoMap key={new Date()} nodes={fusion_nodes} refresh={refresh} edges={selectedEdges[idSolution]} />
                                     {/* <Image width="100%" height="100%" src={MapImage}  /> */}
+                                    
                                     {/* <Flow /> */}
                                 
                             </Col>

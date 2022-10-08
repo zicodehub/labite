@@ -4,13 +4,13 @@ const api = axios.create({
     baseURL: 'http://localhost:8888/api/v1'
 })
 
-export const listClients = () => api.get('/clients')
-export const listFournisseurs = () => api.get('/fournisseurs')
-export const listTypesProduits = () => api.get('/types')
-export const listProduits = () => api.get('/produits')
-export const listDepots = () => api.get('/depots')
-export const listVehicules = () => api.get('/vehicules')
-export const listCommandes = () => api.get('/commandes')
+export const listClients = () => api.get('/clients/')
+export const listFournisseurs = () => api.get('/fournisseurs/')
+export const listTypesProduits = () => api.get('/types/')
+export const listProduits = () => api.get('/produits/')
+export const listDepots = () => api.get('/depots/')
+export const listVehicules = () => api.get('/vehicules/')
+export const listCommandes = () => api.get('/commandes/')
 
 
 export const getClient = (id) => api.get(`/clients/${id}`)
@@ -26,6 +26,10 @@ export const createProduit = (data) => api.post(`/produits`, data)
 export const createVehicule = (data) => api.post(`/vehicules`, data)
 export const createTypeProduit = (data) => api.post(`/types`, data)
 export const createDepot = (data) => api.post(`/depots`, data)
+
+export const updateClient = (id, data) => api.put(`/clients/${id}`, data)
+export const updateFournisseur = (id, data) => api.put(`/fournisseurs/${id}`, data)
+export const updateDepot = (id, data) => api.put(`/depots/${id}`, data)
 
 export const deleteCommande = (id) => api.delete(`/commandes/${id}`)
 
