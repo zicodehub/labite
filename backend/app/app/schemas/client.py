@@ -28,7 +28,7 @@ class ClientUpdate(ClientBase):
 # Properties shared by models stored in DB
 class ClientInDB(ClientBase):
     id: int
-    commandes: List[Commande]
+    commandes: List
     class Config:
         orm_mode = True
 

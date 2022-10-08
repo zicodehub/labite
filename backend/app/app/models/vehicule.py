@@ -5,8 +5,8 @@ from sqlalchemy.orm import relationship
 from app.db.base_class import Base
 
 class HoldedOrder(Base):
-    commande_id = Column(Integer, ForeignKey('commande.id'), primary_key=True)
-    compartiment_id = Column(Integer, ForeignKey('compartiment.id'), primary_key=True)
+    commande_id = Column(Integer, ForeignKey('commande.id', ondelete= 'CASCADE'), primary_key=True)
+    compartiment_id = Column(Integer, ForeignKey('compartiment.id', ondelete= 'CASCADE'), primary_key=True)
     qty_holded = Column(Integer)
 
     commande = relationship("Commande", back_populates = "holdings")
@@ -14,7 +14,7 @@ class HoldedOrder(Base):
 
 class Compartiment(Base):
     id = Column(Integer, primary_key=True, index=True)
-    vehicule_id = Column(Integer, ForeignKey("vehicule.id"), nullable= False)
+    vehicule_id = Column(Integer, ForeignKey("vehicule.id", ondelete= 'CASCADE'), nullable= True)
     holded_orders = relationship("HoldedOrder", back_populates= "compartiment")
     vehicule = relationship("Vehicule", back_populates= "compartiments")
 
@@ -33,7 +33,7 @@ class Vehicule(Base):
     size_compartment = Column(Integer)
     cout = Column(Integer)
 
-    depot_id = Column(Integer, ForeignKey("depot.id"))
+    depot_id = Column(Integer, ForeignKey("depot.id", ondelete= 'CASCADE'))
     depot = relationship("Depot", back_populates = "vehicules")
     
     trajet = Column(JSON, default= [])

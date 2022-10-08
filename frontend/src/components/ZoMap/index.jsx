@@ -8,7 +8,7 @@ import Node from "./node";
 // need to import the vis network css in order to show tooltip
 // import "./network.css";
 
-export default ({ nodes = [], edges = [], refresh }) => {
+export default ({ nodes = [], edges = [], refresh, setDisplayNode }) => {
   const graph = {
     // nodes: useMemo(() => nodes, [nodes]),
     nodes: nodes.map( (n, index) => {
@@ -102,7 +102,12 @@ export default ({ nodes = [], edges = [], refresh }) => {
     >
       {
         graph.nodes.map(
-          (node, index) => <Node key={node.id} index={index} node={node} refresh={refresh} original_nodes={nodes} /> 
+          (node, index) => <Node key={node.id} index={index} 
+                node={node} 
+                refresh={refresh} 
+                original_nodes={nodes}
+                setDisplayNode={setDisplayNode}
+                /> 
         )
       }
       

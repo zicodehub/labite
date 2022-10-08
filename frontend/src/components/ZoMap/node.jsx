@@ -3,12 +3,13 @@ import { Client, Depot, Fournisseur, NODE_RADIUS, OFFSET_X, OFFSET_Y, ZO_MAP_HEI
 import { useRef, useState } from "react"
 import { Overlay, Spinner } from 'react-bootstrap';
 
-export default ({ updateNode, index, original_nodes, refresh, node: props}) => {
+export default ({ updateNode, index, setDisplayNode, original_nodes, refresh, node: props}) => {
     // console.log("rendering node", props.label)
 
     const [state, setState] = useState({
         ...props,
-        isSubmitting: false
+        isSubmitting: false,
+        show: false,
     })
     const ref= useRef()
     
@@ -20,6 +21,16 @@ export default ({ updateNode, index, original_nodes, refresh, node: props}) => {
                 background: 'black'
             }
         }))
+    }
+
+    const handleClick = () => {
+        // setState(prev => ({...prev, show: !prev.show}))
+        if(props.node_type == Client || props.node_type == Fournisseur ){
+            setDisplayNode({
+                isOpen: true,
+                selectedNode: props
+            })
+        }
     }
 
     const handleDragEnd = (event) => {
@@ -139,7 +150,7 @@ export default ({ updateNode, index, original_nodes, refresh, node: props}) => {
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
                 onMouseEnter={() => setState(prev => ({...prev, show: true}))}
-                onClick={() => setState(prev => ({...prev, show: !prev.show}))}
+                onClick={handleClick}
                 onMouseLeave={() => setState(prev => ({...prev, show: false}))}
                 // onDragEnter={handleDragStart}
 

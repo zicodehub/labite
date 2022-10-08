@@ -32,6 +32,9 @@ export const updateFournisseur = (id, data) => api.put(`/fournisseurs/${id}`, da
 export const updateDepot = (id, data) => api.put(`/depots/${id}`, data)
 
 export const deleteCommande = (id) => api.delete(`/commandes/${id}`)
+export const deleteClient = (id) => api.delete(`/clients/${id}`)
+export const deleteDepot = (id) => api.delete(`/depots/${id}`)
+export const deleteFournisseur = (id) => api.delete(`/fournisseurs/${id}`)
 
 export const runGenetic = () => api.get(`/commandes/genetic`)
 

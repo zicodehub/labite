@@ -17,7 +17,7 @@ class Client(Base):
     time_interval_start = Column(Integer)
     time_interval_end = Column(Integer)
 
-    commandes = relationship("Commande")
+    commandes = relationship("Commande", back_populates= 'client')
 
     # ma_id = Column(Integer, ForeignKey('ma.id'))
 
