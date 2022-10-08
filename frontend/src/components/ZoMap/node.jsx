@@ -1,5 +1,5 @@
 import { updateClient, updateDepot, updateFournisseur } from "components/api";
-import { Client, Depot, Fournisseur, NODE_RADIUS, OFFSET_X, OFFSET_Y } from "components/constants"
+import { Client, Depot, Fournisseur, NODE_RADIUS, OFFSET_X, OFFSET_Y, ZO_MAP_HEIGHT, ZO_MAP_WIDTH } from "components/constants"
 import { useRef, useState } from "react"
 import { Overlay, Spinner } from 'react-bootstrap';
 
@@ -27,89 +27,90 @@ export default ({ updateNode, index, original_nodes, refresh, node: props}) => {
             x: event.pageX - OFFSET_X ,
             y: event.pageY - OFFSET_Y
         }
-
-        const prev_coords = {
-            x: state.x,
-            y: state.y
+        if(event.pageX + OFFSET_X <= ZO_MAP_WIDTH && event.pageY+OFFSET_Y <= ZO_MAP_HEIGHT) {
+            const prev_coords = {
+                x: state.x,
+                y: state.y
+            }
+    
+            const data = {
+                coords: `${new_coords.x};${new_coords.y}`
+            }
+    
+            
+            setState(prev => ({
+                ...prev,
+                color: {
+                    ...prev.color,
+                    background: props.color.background
+                },
+                x: new_coords.x,
+                y: new_coords.y,
+                isSubmitting: true,
+                show: false
+            }))
+    
+            if(state.node_type == Client) {
+                updateClient(state.pk, data)
+                .then(
+                    () => setState(prev => ({
+                        ...prev,
+                        isSubmitting: false
+                    }))
+                    // () => setTimeout(refresh, 700)
+                )
+                .catch(err => {
+                    console.log(err)
+                    // setState(prev => ({
+                    //     ...prev,
+                    //     x: prev_coords.x,
+                    //     y: prev_coords.y,
+                    //     isSubmitting: false
+                    // }))
+                })
+                // console.log("update client ", state.pk, data)
+            } else if(state.node_type == Fournisseur) {
+                updateFournisseur(state.pk, data).then(
+                    () => setState(prev => ({
+                        ...prev,
+                        isSubmitting: false
+                    }))
+                    // () => null
+                    // () => setTimeout(refresh, 700)
+                )
+                .catch(err => {
+                    console.log(err)
+                    // setState(prev => ({
+                    //     ...prev,
+                    //     x: prev_coords.x,
+                    //     y: prev_coords.y,
+                    //     isSubmitting: false
+                    // }))
+                })
+                // console.log("update fournisseur ", state.pk, new_coords)
+            } else if(state.node_type == Depot) {
+                updateDepot(state.pk, data).then(
+                    () => setState(prev => ({
+                        ...prev,
+                        isSubmitting: false
+                    }))
+                    // () => null
+                    // () => setTimeout(refresh, 700)
+                )
+                .catch(err => {
+                    console.log(err)
+                    // setState(prev => ({
+                    //     ...prev,
+                    //     x: prev_coords.x,
+                    //     y: prev_coords.y,
+                    //     isSubmitting: false
+                    // }))
+                })
+            }
+    
+            // refresh()
+            
         }
-
-        const data = {
-            coords: `${new_coords.x};${new_coords.y}`
-        }
-
-        
-        setState(prev => ({
-            ...prev,
-            color: {
-                ...prev.color,
-                background: props.color.background
-            },
-            x: new_coords.x,
-            y: new_coords.y,
-            isSubmitting: true,
-            show: false
-        }))
-
-        if(state.node_type == Client) {
-            updateClient(state.pk, data)
-            .then(
-                () => setState(prev => ({
-                    ...prev,
-                    isSubmitting: false
-                }))
-                // () => setTimeout(refresh, 700)
-            )
-            .catch(err => {
-                console.log(err)
-                // setState(prev => ({
-                //     ...prev,
-                //     x: prev_coords.x,
-                //     y: prev_coords.y,
-                //     isSubmitting: false
-                // }))
-            })
-            // console.log("update client ", state.pk, data)
-        } else if(state.node_type == Fournisseur) {
-            updateFournisseur(state.pk, data).then(
-                () => setState(prev => ({
-                    ...prev,
-                    isSubmitting: false
-                }))
-                // () => null
-                // () => setTimeout(refresh, 700)
-            )
-            .catch(err => {
-                console.log(err)
-                // setState(prev => ({
-                //     ...prev,
-                //     x: prev_coords.x,
-                //     y: prev_coords.y,
-                //     isSubmitting: false
-                // }))
-            })
-            // console.log("update fournisseur ", state.pk, new_coords)
-        } else if(state.node_type == Depot) {
-            updateDepot(state.pk, data).then(
-                () => setState(prev => ({
-                    ...prev,
-                    isSubmitting: false
-                }))
-                // () => null
-                // () => setTimeout(refresh, 700)
-            )
-            .catch(err => {
-                console.log(err)
-                // setState(prev => ({
-                //     ...prev,
-                //     x: prev_coords.x,
-                //     y: prev_coords.y,
-                //     isSubmitting: false
-                // }))
-            })
-        }
-
-        // refresh()
-        
     }
 
     return (
