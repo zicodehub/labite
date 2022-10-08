@@ -264,22 +264,24 @@ class Solution:
             v_id = key.split('V')[1]
             v = crud.vehicule.get(id= v_id)
 
-            for index, node in enumerate( trajet_final[key]):
-                found_once = False
-                for next_node in trajet_final[key][index:]:
-                    if node.name == next_node.name:
-                        node.mvt += next_node.mvt
-                        if found_once :
-                            trajet_final[key].reverse()
-                            trajet_final[key].remove(next_node)
-                            trajet_final[key].reverse()
-                        found_once = True
-
             depot_schemas = schemas.Node(
                     name = v.depot.name, coords = v.depot.coords, 
                     code = v.depot.code, type = get_node_type(v.depot),
                     mvt = 0
                 )
+
+            vehicule_route = [depot_schemas]
+            for index, node in enumerate(trajet_final[key]):
+                already_found = False
+                vehicule_route.append(node)
+                for next_node in vehicule_route:
+                    if node.name == next_node.name :
+                        if not already_found :
+                            node.mvt += next_node.mvt
+                            # trajet_final = trajet_final[key][:index] + trajet_final[key][index+1:]
+                            found_once = True
+
+            
             trajet_final[key].append(depot_schemas)
             trajet_final[key].insert(0, depot_schemas)
         #print"Trajet finale ", trajet_final)

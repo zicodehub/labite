@@ -3,10 +3,12 @@ import ReactDOM from "react-dom";
 import Graph from "react-graph-vis";
 import "./styles.css";
 import { Client, Depot, Fournisseur, OFFSET_X, OFFSET_Y } from "../constants";
+import { Col } from "react-bootstrap";
+import Node from "./node";
 // need to import the vis network css in order to show tooltip
 // import "./network.css";
 
-function Vis({ nodes = [], edges = [] }) {
+export default ({ nodes = [], edges = [], refresh }) => {
   const graph = {
     // nodes: useMemo(() => nodes, [nodes]),
     nodes: nodes.map( (n, index) => {
@@ -14,6 +16,7 @@ function Vis({ nodes = [], edges = [] }) {
       return {
         ...n,
         // id: index,
+        pk: n.id,
         id: n.name,
         // label: `${ n.node_type == Client ? 'C' : 'F' }${n.id}`,
         label: n.name,
@@ -23,13 +26,16 @@ function Vis({ nodes = [], edges = [] }) {
         // x: index,
         // y: index,
         
-        x: n.x - OFFSET_X,
-        y: n.y - OFFSET_Y,
+        x: n.x,
+        y: n.y,
         
+        
+        // x: n.x + OFFSET_X,
+        // y: n.y + OFFSET_Y,
         
         shape: n.node_type == Client ? 'circle' : 'box',
         color: {
-            background: n.node_type == Client ? 'yellow' : n.node_type == Depot ? 'green' : 'red',
+            background: n.node_type == Client ? 'blue' : n.node_type == Depot ? 'green' : 'red',
             hover: {
                 border: 'white',
                 background: 'gray'
@@ -89,20 +95,17 @@ function Vis({ nodes = [], edges = [] }) {
       console.log("dragEnd", event)
     }
   };
-  
+  console.log("render parent ", graph.nodes)
   return (
-    <Graph
-      key={new Date()}
-      graph={graph}
-      options={options}
-      events={events}
-      // getNetwork={network => {
-      //   //  if you want access to vis.js network api you can set the state in a parent component using this property
-      //   console.log(network)
-      // }}
+    <Col id="zomap" className="bg-warning w-100 h-100" style={{zIndex: 5}} 
+     
+    >
+      {
+        graph.nodes.map(
+          (node, index) => <Node key={node.id} index={index} node={node} refresh={refresh} original_nodes={nodes} /> 
+        )
+      }
       
-    />
+    </Col>
   );
 }
-
-export default Vis
