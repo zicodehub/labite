@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import ReactDOM from "react-dom";
 import Graph from "react-graph-vis";
 import "./styles.css";
-import { Client, Depot, Fournisseur, OFFSET_X, OFFSET_Y } from "../constants";
+import { Client, Depot, Fournisseur, OFFSET_X, OFFSET_Y, ZO_MAP_HEIGHT, ZO_MAP_WIDTH } from "../constants";
 import { Col } from "react-bootstrap";
 import Node from "./node";
 // need to import the vis network css in order to show tooltip
@@ -97,7 +97,7 @@ export default ({ nodes = [], edges = [], refresh }) => {
   };
   console.log("render parent ", graph.nodes)
   return (
-    <Col id="zomap" className="bg-warning w-100 h-100" style={{zIndex: 5}} 
+    <Col id="zomap" className="bg-warning" style={{zIndex: 5, width: ZO_MAP_WIDTH, height: ZO_MAP_HEIGHT}} 
      
     >
       {

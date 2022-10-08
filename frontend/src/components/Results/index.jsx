@@ -17,6 +17,11 @@ import ModalCreateTypeProduit from "components/ModalCreateTypeProduit"
 import ModalCreateDepot from "components/ModalCreateDepot"
 import ZoMap from "components/ZoMap"
 
+Button.defaultProps = {
+    style: {
+        fontSize: 12
+    }
+}
 
 const Results = () => {
     const [cars, setCars] = useState([])
@@ -364,81 +369,94 @@ const Results = () => {
                             </Col>
                            
                
-                        <Row>
-                            <Col className='offset-9'>
+                        <Row className="" >
+                            <Col className='offset-10'  >
                                 <Row>
-                                    <Col>
-                                    <Button className="text-white mb-1 btn-xs btn-secondary"
-                                            onClick={() => setModalListCommandes(true) }
-                                            >List des commandes</Button>
+                                    <Accordion style={{zIndex: 200}}>
+                                        <Accordion.Item eventKey='1'>
+                                            <Accordion.Header>Véhicules utilisés</Accordion.Header>
+                                            <Accordion.Body>
+                                                <Col>
+                                                    <CarSelectionBox cars={cars} edges={edges[idSolution]} selectedCars={selectedCars} setSelectedCars={setSelectedCars} selectedEdges={selectedEdges} setSelectedEdges={setSelectedEdges} />
+                                                </Col>
+                                            </Accordion.Body>
+                                        </Accordion.Item>
+                                        <Accordion.Item eventKey='0' >
+                                            <Accordion.Header>Boutons de control</Accordion.Header>
+                                            <Accordion.Body>
+                                                <Col >
+                                                <Button className="text-white mb-3 btn-xs btn-secondary"
+                                                        onClick={() => setModalListCommandes(true) }
+                                                        >List des commandes</Button>
 
-                                        <Button className="text-white mb-1"
-                                            onClick={() => setModalVehicule(true) }
-                                            >Ajouter un véhcule</Button>
+                                                    <Button className="text-white btn-primary mb-1 btn-xs"
+                                                        onClick={() => setModalVehicule(true) }
+                                                        >Ajouter un véhcule</Button>
 
-                                        <Button className="text-white mb-1"
-                                            onClick={() => setModalCreateDepot(true) }
-                                            >Ajouter un dépot</Button>
-                                
-                                        <Button className="text-white mb-3"
-                                            onClick={() => setModalProduit(true) }
-                                            >Ajouter un produit</Button>
-                                
-                                        <Button className="text-white mb-3"
-                                            onClick={() => setModalTypeProduit(true) }
-                                            >Ajouter un type de produit</Button>
-                                
+                                                    <Button className="text-white btn-primary mb-1"
+                                                        onClick={() => setModalCreateDepot(true) }
+                                                        >Ajouter un dépot</Button>
+                                            
+                                                    <Button className="text-white btn-primary mb-1"
+                                                        onClick={() => setModalProduit(true) }
+                                                        >Ajouter un produit</Button>
+                                            
+                                                    <Button className="text-white btn-primary w-100 mb-3"
+                                                        onClick={() => setModalTypeProduit(true) }
+                                                        >Ajouter un type de produit</Button>
+                                            
 
-                                        <Button className="text-white  btn-info mb-1" onClick={()=> {
-                                            setIsRunning(prev => true)
-                                            runGenetic()
-                                            .then(handleAlgoResponse)
-                                            .catch(err => {
-                                                setAlgoError(prev => ({
-                                                    error: err.message                                        
-                                                }))
-                                                setIsRunning(prev => false)
-                                            } )
-                                        }} >Génétique</Button>
-                                        <Button className="text-white btn-info mb-1" onClick={()=> {
-                                            setIsRunning(prev => true)
-                                            runRecuit()
-                                            .then(handleAlgoResponse)
-                                            .catch(err => {
-                                                setAlgoError(prev => ({
-                                                    error: err.message                                        
-                                                }))
-                                                setIsRunning(prev => false)
-                                            } )
-                                        }} >Recuit simulé</Button>
-                                        <Button className="text-white mt-3 btn-success mb-1"
-                                            onClick={() => {
-                                                refresh()
-                                                setDetails({})
-                                                selectedEdges[idSolution] = []
-                                            } }
-                                            >Rafraichir la page</Button>
-                                            <Button className="text-white btn-danger mb-1"
-                                            onClick={() => {
-                                                setIsRunning(prev => true)
-                                                resetDB().then(() => {
-                                                    refresh()
-                                                    setDetails({})
-                                                    selectedEdges[idSolution] = []
-                                                    setIsRunning(prev => false)
-                                                })
-                                                .catch(err => {
-                                                    setAlgoError(prev => ({
-                                                        error: err.message                                        
-                                                    }))
-                                                    setIsRunning(prev => false)
-                                                } )
-                                            } }
-                                            >Libérer la mémoire</Button>
-                                    </Col>
-                                    <Col>
-                                        <CarSelectionBox cars={cars} edges={edges[idSolution]} selectedCars={selectedCars} setSelectedCars={setSelectedCars} selectedEdges={selectedEdges} setSelectedEdges={setSelectedEdges} />
-                                    </Col>
+                                                    <Button className="text-white w-100 btn-info mb-1" onClick={()=> {
+                                                        setIsRunning(prev => true)
+                                                        runGenetic()
+                                                        .then(handleAlgoResponse)
+                                                        .catch(err => {
+                                                            setAlgoError(prev => ({
+                                                                error: err.message                                        
+                                                            }))
+                                                            setIsRunning(prev => false)
+                                                        } )
+                                                    }} >Génétique</Button>
+                                                    <Button className="text-white w-100 btn-info mb-1" onClick={()=> {
+                                                        setIsRunning(prev => true)
+                                                        runRecuit()
+                                                        .then(handleAlgoResponse)
+                                                        .catch(err => {
+                                                            setAlgoError(prev => ({
+                                                                error: err.message                                        
+                                                            }))
+                                                            setIsRunning(prev => false)
+                                                        } )
+                                                    }} >Recuit simulé</Button>
+                                                    <Button className="text-white mt-3 btn-success mb-1"
+                                                        onClick={() => {
+                                                            refresh()
+                                                            setDetails({})
+                                                            selectedEdges[idSolution] = []
+                                                        } }
+                                                        >Rafraichir la page</Button>
+                                                        <Button className="text-white btn-danger mb-1"
+                                                        onClick={() => {
+                                                            setIsRunning(prev => true)
+                                                            resetDB().then(() => {
+                                                                refresh()
+                                                                setDetails({})
+                                                                selectedEdges[idSolution] = []
+                                                                setIsRunning(prev => false)
+                                                            })
+                                                            .catch(err => {
+                                                                setAlgoError(prev => ({
+                                                                    error: err.message                                        
+                                                                }))
+                                                                setIsRunning(prev => false)
+                                                            } )
+                                                        } }
+                                                        >Libérer la mémoire</Button>
+                                                </Col>
+                                            </Accordion.Body>
+                                        </Accordion.Item>
+                                        
+                                    </Accordion>
 
                                 
                                 </Row>         
