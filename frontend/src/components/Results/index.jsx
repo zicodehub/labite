@@ -16,6 +16,8 @@ import ModalListCommandes from "components/ModalListCommandes"
 import ModalCreateTypeProduit from "components/ModalCreateTypeProduit"
 import ModalCreateDepot from "components/ModalCreateDepot"
 import ZoMap from "components/ZoMap"
+import ModalListNodeCommandes from "components/ModalListNodeCommandes "
+import node from "components/ZoMap/node"
 
 Button.defaultProps = {
     style: {
@@ -45,6 +47,10 @@ const Results = () => {
     const [isModalProduitOpen, setModalProduit] = useState(false)
     const [isModalCreateDepot, setModalCreateDepot] = useState(false)
     const [isModalTypeProduitOpen, setModalTypeProduit] = useState(false)
+    const [wanna_display_node, setDisplayNode] = useState({
+        isOpen: false,
+        selectedNode: {}
+    })
     const [details, setDetails] = useState({})
     const [algoError, setAlgoError] = useState({})
     const [isReady, setIsReady] = useState(false)
@@ -339,6 +345,29 @@ const Results = () => {
                                     />
                             )
                         }
+                        {
+                            wanna_display_node.isOpen && (
+                                <ModalListNodeCommandes
+                                    open={() => setDisplayNode(prev => ({...prev, isOpen: true}))} 
+                                    hide={() => setDisplayNode(prev => ({...prev, isOpen: false}))} 
+                                    onCreate={(values) => {
+                                        
+                                    }}
+                                    node={wanna_display_node.selectedNode}
+                                    list_commandes={commandes.filter(com => {
+                                        // console.log("wanna ", wanna_display_node.selectedNode.pk == com.client_id)
+                                        if(wanna_display_node.selectedNode.node_type == Client) return wanna_display_node.selectedNode.pk == com.client_id
+                                        if(wanna_display_node.selectedNode.node_type == Fournisseur) return wanna_display_node.selectedNode.pk == com.fournisseur_id
+                                    } )}
+                                    setCommandes={setCommandes}
+                                    setClients={setClients}
+                                    setFournisseurs={setFournisseurs}
+                                    setDepots={setDepots}
+                                    
+                                    refresh={refresh}
+                                    />
+                            )
+                        }
          
                             
                             <Col md="8" className="border" style={{ 
@@ -361,10 +390,65 @@ const Results = () => {
                                     {/* <Map  /> */}
                                     
                                     {/* <Vis nodes={clients.concat(fournisseurs).concat(depots)} edges={selectedEdges[idSolution]} /> */}
-                                    <ZoMap key={new Date()} nodes={fusion_nodes} refresh={refresh} edges={selectedEdges[idSolution]} />
+                                    <ZoMap key={new Date()} 
+                                        nodes={fusion_nodes} 
+                                        refresh={refresh} 
+                                        edges={selectedEdges[idSolution]}
+                                        setDisplayNode={setDisplayNode}
+                                        />
                                     {/* <Image width="100%" height="100%" src={MapImage}  /> */}
                                     
                                     {/* <Flow /> */}
+                                    <Col style={{ width: '90vw'}} >
+                                    <h1>Résultats</h1>
+                                    {
+                                        isRunning ? <Spinner animation="grow" /> : (
+                                            <Accordion defaultActiveKey="0" onSelect={(val) => {
+                                                if(val != null) setIdSolution(val) 
+                                                }} >
+                                                {
+                                                    algoError.error ? <h3 className="text-danger text-bold">{algoError.error}</h3> : Object.keys(listIdSolution).map( local_solution_index => (
+                                                        <Accordion.Item eventKey={local_solution_index}>
+                                                            {
+                                                                details[local_solution_index] && (
+                                                                    <>
+                                                                        <Accordion.Header>
+                                                                            Coût : {details[local_solution_index] && details[local_solution_index].cout}
+                                                                        </Accordion.Header>
+                                                                        <Accordion.Body>
+                                                                            <ul>
+                                                                                <li>Cout : {details[local_solution_index].cout} </li>
+                                                                                <li>Distance : {details[local_solution_index].distance} </li>
+                                                                                <li>Véhicules utilisés : {details[local_solution_index].nb_vehicules} </li>
+                                                                                <li>Solution <br/><strong>{details[local_solution_index].solution}</strong></li>
+                                                                                { details.error && <li className="text-danger">Erreur <strong>{details[local_solution_index].error}</strong></li> }
+                                                                                <li>
+                                                                                    Détails des véhicules sélectionnées
+                                                                                    <ul>
+                                                                                        {
+                                                                                            cars.map( s => (
+                                                                                                <li> {s.name}
+                                                                                                <ul>
+                                                                                                        <li>Trajet : <strong>{trajet_final[local_solution_index] && trajet_final[local_solution_index][s.name]?.map( (d, ind) => `${d.name}${d.mvt ? '('+d.mvt+')' : ''} ${ind+1 == trajet_final[idSolution][s.name].length ? '' : '- '} ` )}</strong></li>
+                                                                                                    </ul> 
+                                                                                                </li>
+                                                                                            ) )
+                                                                                        }
+                                                                                    </ul>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </Accordion.Body>
+                                                                    </>
+                                                                )
+                                                            }
+                                                        </Accordion.Item>
+                                                    ) )
+                                                }
+                                            </Accordion>
+                                        )
+                                    }
+                                    
+                        </Col>
                                 
                             </Col>
                            
@@ -462,59 +546,6 @@ const Results = () => {
                                 </Row>         
                             </Col>
                         </Row>
-
-                         {/* <Row  > */}
-                         <Col style={{position: 'absolute', top: '80vh', width: '90vw'}} >
-                                    <p>Détails</p>
-                                    {
-                                        isRunning ? <Spinner animation="grow" /> : (
-                                            <Accordion defaultActiveKey="0" onSelect={(val) => {
-                                                if(val != null) setIdSolution(val) 
-                                                }} >
-                                                {
-                                                    algoError.error ? <h3 className="text-danger text-bold">{algoError.error}</h3> : Object.keys(listIdSolution).map( local_solution_index => (
-                                                        <Accordion.Item eventKey={local_solution_index}>
-                                                            {
-                                                                details[local_solution_index] && (
-                                                                    <>
-                                                                        <Accordion.Header>
-                                                                            Coût : {details[local_solution_index] && details[local_solution_index].cout}
-                                                                        </Accordion.Header>
-                                                                        <Accordion.Body>
-                                                                            <ul>
-                                                                                <li>Cout : {details[local_solution_index].cout} </li>
-                                                                                <li>Distance : {details[local_solution_index].distance} </li>
-                                                                                <li>Véhicules utilisés : {details[local_solution_index].nb_vehicules} </li>
-                                                                                <li>Solution <br/><strong>{details[local_solution_index].solution}</strong></li>
-                                                                                { details.error && <li className="text-danger">Erreur <strong>{details[local_solution_index].error}</strong></li> }
-                                                                                <li>
-                                                                                    Détails des véhicules sélectionnées
-                                                                                    <ul>
-                                                                                        {
-                                                                                            cars.map( s => (
-                                                                                                <li> {s.name}
-                                                                                                <ul>
-                                                                                                        <li>Trajet : <strong>{trajet_final[local_solution_index] && trajet_final[local_solution_index][s.name]?.map( (d, ind) => `${d.name}${d.mvt ? '('+d.mvt+')' : ''} ${ind+1 == trajet_final[idSolution][s.name].length ? '' : '- '} ` )}</strong></li>
-                                                                                                    </ul> 
-                                                                                                </li>
-                                                                                            ) )
-                                                                                        }
-                                                                                    </ul>
-                                                                                </li>
-                                                                            </ul>
-                                                                        </Accordion.Body>
-                                                                    </>
-                                                                )
-                                                            }
-                                                        </Accordion.Item>
-                                                    ) )
-                                                }
-                                            </Accordion>
-                                        )
-                                    }
-                                    
-                        </Col>
-                         {/* </Row> */}
                     </>
             )
         }

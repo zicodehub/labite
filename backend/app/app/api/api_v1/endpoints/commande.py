@@ -149,5 +149,9 @@ def delete_item(
     item = crud.commande.get(id=id)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
+
+    for h in item.holdings:
+        crud.vehicule.remove_holded_order(h)
+        
     item = crud.commande.remove(id=id)
     return item

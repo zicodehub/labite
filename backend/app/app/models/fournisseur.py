@@ -22,7 +22,8 @@ class Fournisseur(Base):
     time_interval_start = Column(Integer)
     time_interval_end = Column(Integer)
 
-    commandes = relationship("Commande")
+    
+    commandes = relationship("Commande", back_populates= 'fournisseur')
     produits = relationship("Produit", secondary = association_fournisseur_produit)
 
 

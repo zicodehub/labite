@@ -257,4 +257,10 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
         db.refresh(local_obj)
         return local_obj
 
+    def remove_holded_order(self, holded_order: models.HoldedOrder) -> models.HoldedOrder:
+        db.delete(holded_order)
+        db.commit()
+        
+        return holded_order
+
 vehicule = CRUDItem(Vehicule)
