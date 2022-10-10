@@ -70,6 +70,7 @@ def read_genetic(
     from app.db import reset_db
     solutions_finales = []
     for i in range(Genetic.SAMPLE_SOLUTIONS):
+        print(f" Running version {i}")
         reset_db.clean(db)
         f = crud.commande.get_fournisseurs(db = db)
         c = crud.commande.get_clients(db = db)
@@ -83,7 +84,9 @@ def read_genetic(
         list_initial = f + c 
         try :
             genetic = Genetic(list_initial, db= db)
+            print(f" Start")
             res = genetic.start()
+            print(f" end")
             db.close_all()
             solutions_finales.append(res)
         except Exception as e:
