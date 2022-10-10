@@ -213,9 +213,14 @@ class Solution:
                 total_ordered_qty = 0
                 vehicule_available_space = 0
                 
+
+                ### Revoir cette technque.
+                # EN fait, on doit charger le véhicule avec autant de produits restant dans les commande du client. 
+                # Si toutes les commandes sont parcourues et livrées (commande.qty == 0), c'est bien
+                # SInon, décharger complétemlent le vehicule puis passer au suivant
                 for commande in list_commandes:
                     total_ordered_qty += commande.qty_fixed
-                vehicule_available_space = crud.vehicule.get_available_space_in_free_compartments(vehicule= vehicule)
+                vehicule_available_space += crud.vehicule.get_available_space_in_free_compartments(vehicule= vehicule)
                 
                 if vehicule_available_space < total_ordered_qty: 
                     # Si le véhicule ne peut pas prendre toutes le commandes de ce client, on passe au vehicule suivant
@@ -240,6 +245,7 @@ class Solution:
                             raise Exception(f"Le véhicule {vehicule.id}. n'a quasiment pas chargé toutes les commandes du client {client.name}")
                         if qty_packed > 0 :
                             total_picked_qty += qty_packed
+                            print(f" {client.name} total_picked_qty = {total_picked_qty} ")
                             node_schema = schemas.Node(
                                 name = fournisseur.name, coords = fournisseur.coords, 
                                 code = fournisseur.code, type = get_node_type(fournisseur),
@@ -253,6 +259,7 @@ class Solution:
                     
 
             if are_client_orders_satisfied:
+                print(f"Client {client.name} is satisfied ", total_picked_qty)
                 node_schema = schemas.Node(
                     name = client.name, coords = client.coords, 
                     code = client.code, type = get_node_type(client),
@@ -276,14 +283,15 @@ class Solution:
 
             vehicule_route = [depot_schemas]
             for index, node in enumerate(trajet_final[key]):
-                already_found = False
+                founds = set()
                 vehicule_route.append(node)
                 for next_node in vehicule_route:
-                    if node.name == next_node.name :
-                        if not already_found :
+                    if node.name == next_node.name  :
+                        if next_node.name not in founds :
                             node.mvt += next_node.mvt
-                            # trajet_final = trajet_final[key][:index] + trajet_final[key][index+1:]
-                            found_once = True
+                            founds.add(next_node.name)
+                        else:
+                            trajet_final[key] = trajet_final[key][:index] + trajet_final[key][index+1:]
 
             
             trajet_final[key].append(depot_schemas)
