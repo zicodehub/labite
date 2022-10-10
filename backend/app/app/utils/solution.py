@@ -223,7 +223,7 @@ class Solution:
 
                     continue
                 else:
-                    print(f"\n  Le {vehicule.name} va charger {total_ordered_qty} / {vehicule_available_space} ")
+                    print(f"\n  Le {vehicule.name} va charger {total_ordered_qty} / {vehicule_available_space}. Dispo in vehicule {crud.vehicule.get_available_space_in_free_compartments(vehicule)} ")
                     if trajet_final.get(vehicule.name, None) == None:
                         #printf"Création du TRAJET pour {vehicule.name} ")
                         trajet_final[vehicule.name] = []
