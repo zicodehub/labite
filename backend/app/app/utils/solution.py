@@ -215,7 +215,7 @@ class Solution:
                 
                 for commande in list_commandes:
                     total_ordered_qty += commande.qty_fixed
-                    vehicule_available_space += crud.vehicule.get_available_space_in_free_compartments(vehicule= vehicule)
+                vehicule_available_space = crud.vehicule.get_available_space_in_free_compartments(vehicule= vehicule)
                 
                 if vehicule_available_space < total_ordered_qty: 
                     # Si le véhicule ne peut pas prendre toutes le commandes de ce client, on passe au vehicule suivant
@@ -223,7 +223,7 @@ class Solution:
 
                     continue
                 else:
-                    print(f"\n  Le {vehicule.name} va charger {total_ordered_qty} / {vehicule_available_space}. Dispo in vehicule {crud.vehicule.get_available_space_in_free_compartments(vehicule)} ")
+                    print(f"\n  Avant chargement, Le {vehicule.name} va charger {total_ordered_qty} / {vehicule_available_space}. Dispo in vehicule {crud.vehicule.get_available_space_in_free_compartments(vehicule)} ")
                     if trajet_final.get(vehicule.name, None) == None:
                         #printf"Création du TRAJET pour {vehicule.name} ")
                         trajet_final[vehicule.name] = []
@@ -231,6 +231,8 @@ class Solution:
                     for commande in list_commandes:
                         fournisseur = crud.fournisseur.get(id = commande.fournisseur_id)
                         qty_packed = crud.vehicule.hold(vehicule, commande)
+                        print(f"\n Après chargement,  Le {vehicule.name} va charger {total_ordered_qty} / {vehicule_available_space}. Dispo in vehicule {crud.vehicule.get_available_space_in_free_compartments(vehicule)} ")
+                    
                         print(f"V{vehicule.id}, Order {commande.id}, Packed {qty_packed}/{commande.qty_fixed} in V{vehicule.id} à {fournisseur.name} ")
                         qty_remaining = commande.qty_fixed - qty_packed
                         if qty_remaining < 0 :
