@@ -217,11 +217,13 @@ class Solution:
                     total_ordered_qty += commande.qty_fixed
                     vehicule_available_space += crud.vehicule.get_available_space_in_free_compartments(vehicule= vehicule)
                 
-                if vehicule_available_space < total_ordered_qty:
-                    #printf"Le V{vehicule.id} ne peut pas récup toutes les commandes du {client.name}: {vehicule_available_space}/{total_ordered_qty} ")
+                if vehicule_available_space < total_ordered_qty: 
+                    # Si le véhicule ne peut pas prendre toutes le commandes de ce client, on passe au vehicule suivant
+                    print(f"Le V{vehicule.id} ne peut pas récup toutes les commandes du {client.name}: {vehicule_available_space}/{total_ordered_qty} ")
 
                     continue
                 else:
+                    print(f"\n  Le {vehicule.name} va charger {total_ordered_qty} / {vehicule_available_space} ")
                     if trajet_final.get(vehicule.name, None) == None:
                         #printf"Création du TRAJET pour {vehicule.name} ")
                         trajet_final[vehicule.name] = []
@@ -229,7 +231,7 @@ class Solution:
                     for commande in list_commandes:
                         fournisseur = crud.fournisseur.get(id = commande.fournisseur_id)
                         qty_packed = crud.vehicule.hold(vehicule, commande)
-                        #printf"V{vehicule.id}, Order {commande.id}, Packed {qty_packed}/{commande.qty_fixed} in V{vehicule.id} à {fournisseur.name} ")
+                        print(f"V{vehicule.id}, Order {commande.id}, Packed {qty_packed}/{commande.qty_fixed} in V{vehicule.id} à {fournisseur.name} ")
                         qty_remaining = commande.qty_fixed - qty_packed
                         if qty_remaining < 0 :
                             # #printf" {order.qty} / {qty_packed} ")

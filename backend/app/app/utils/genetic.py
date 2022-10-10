@@ -11,7 +11,7 @@ class Genetic:
     MAX_GEN_POP_LENGTH = 10
     NB_GEN = 10
     MAX_SELECTION_IN_GEN = 15
-    SAMPLE_SOLUTIONS = 10
+    SAMPLE_SOLUTIONS = 1
     def __init__(self, list_commandes: List[Union[models.Depot, models.Fournisseur, models.Client]], db: Session = SessionLocal()) -> None:
         #print"ZOAMDI")
         self.initial_solution: Solution = self.generate_initial_solution(list_commandes)
