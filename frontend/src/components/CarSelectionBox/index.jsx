@@ -44,7 +44,7 @@ return (
                                     key={index}
                                     disabled={!edges.find( e => e.v == car.name )}
                                     name={`cars.${index}`}
-                                    label={car.name}
+                                    label={`${car.name} (${car.size_compartment * car.nb_compartment})`}
                                     formik={formik}
                                     onChange={async () => {
                                         let val = formik.values.cars
