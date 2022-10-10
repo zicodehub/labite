@@ -142,19 +142,19 @@ def read_item(
 @router.delete("/{id}", response_model=schemas.Commande)
 def delete_item(
     *,
-    # db: Session = Depends(deps.get_db),
+    db: Session = Depends(deps.get_db),
     id: int,
     # current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Delete an item.
     """
-    item = crud.commande.get(id=id)
+    item = crud.commande.get(db= db, id=id)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
 
     for h in item.holdings:
-        crud.vehicule.remove_holded_order(h)
+        crud.vehicule.remove_holded_order(h, db= db)
         
     item = crud.commande.remove(id=id)
     return item
