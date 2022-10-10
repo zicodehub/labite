@@ -168,8 +168,9 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
         """
         Espace disponible dans les compartiments où il y déjà un --MÊME-- popduit similaire TODO: même poduit ou du même type
         """
+        _v = crud.vehicule.get(id= vehicule.id)
         qty_used = 0
-        for index, comp in enumerate(vehicule.compartiments):
+        for index, comp in enumerate(_v.compartiments):
             for holded_order in comp.holded_orders :
                 if holded_order.is_active:
                     qty_used +=  holded_order.qty_holded
@@ -177,6 +178,7 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
         return qty_used
 
     def get_available_space_in_free_compartments(self, vehicule: models.Vehicule) -> int:
+        # Ne prend pas en compte les restangoglos dans les compartements à moitié plein
         _v = crud.vehicule.get(vehicule.id)
         nb_remaining_compartments = _v.nb_compartment - len(_v.compartiments)
         # #printf"Space in free comps : (holded_comp = {len(vehicule.compartiments)}, total_comp = {vehicule.nb_compartment} ) ")
