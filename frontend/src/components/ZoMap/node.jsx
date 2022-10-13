@@ -1,5 +1,5 @@
 import { updateClient, updateDepot, updateFournisseur } from "components/api";
-import { Client, Depot, Fournisseur, NODE_RADIUS, OFFSET_X, OFFSET_Y, ZO_MAP_HEIGHT, ZO_MAP_WIDTH } from "components/constants"
+import { Client, Depot, Fournisseur, NODE_RADIUS, NODE_TEXT_SIZE, OFFSET_X, OFFSET_Y, ZO_MAP_HEIGHT, ZO_MAP_WIDTH } from "components/constants"
 import { useRef, useState } from "react"
 import { Overlay, Spinner } from 'react-bootstrap';
 
@@ -141,7 +141,7 @@ export default ({ updateNode, index, setDisplayNode, original_nodes, refresh, no
 
                     display: 'flex',
                     // cursor: 'move',
-                    fontSize: 14,
+                    fontSize: NODE_TEXT_SIZE,
                     alignContent: 'center',
                     justifyContent: 'center',
                     userSelect: 'none',
@@ -161,7 +161,9 @@ export default ({ updateNode, index, setDisplayNode, original_nodes, refresh, no
                         <span className="bg-white p-1" style={{fontSize: 20}}>y: {state.y}</span>
                     </div>
                 )}
-                {state.isSubmitting ? <Spinner animation="border" role="status" className='' /> :  <span className="text-white mt-1" style={{fontWeight: 'bold'}} >{state.label}</span>}
+                {state.isSubmitting ? 
+                    <Spinner animation="border" role="status" className='' /> :  
+                    <span className="text-white mt-1" style={{fontWeight: 'bold', fontSize: NODE_TEXT_SIZE}} >{state.label}</span>}
             </div>
             
         </>
