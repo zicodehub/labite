@@ -76,11 +76,12 @@ services:
       - 5432:5432
     volumes:
       - app-db-data:/var/lib/postgresql/data/pgdata
+      - ./db:/db
     env_file:
       - .env
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
-    command: postgres -c max_connections=202140 -c shared_buffers=202140
+    command: postgres -c max_connections=51140 -c shared_buffers=50140
      
     deploy:
       placement:
