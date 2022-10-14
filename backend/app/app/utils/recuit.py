@@ -44,7 +44,7 @@ class RecuitSimule:
                     )
                     if proba > 0.6:
                         current_solution = neighbor
-                    temp *= reducteur
+                temp *= reducteur
                 # #printf"Meilleurs cout de la generation n°{g} : {[i.cout for i in curent_gen]} ")
                 
                 # #printf"Meilleurs cout de la generation n°{g} : {[i for i in curent_gen]} ")
