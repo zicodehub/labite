@@ -16,10 +16,10 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
     # def get_all(self) -> List[Vehicule]:
     #     return super().get_all(db)
 
-    def get_by_name(self, name: str, db: Session = SessionLocal()) -> Vehicule:
+    def get_by_name(self, name: str, db: Session = db) -> Vehicule:
         return db.query(self.model).filter(self.model.name == name).first()
 
-    def create(self, obj_in: VehiculeCreate, db: Session = SessionLocal()) -> Vehicule:
+    def create(self, obj_in: VehiculeCreate, db: Session = db) -> Vehicule:
         v = super().create(obj_in= obj_in, db= db)
         v.name = f'V{v.id}'
         db.add(v)
@@ -87,7 +87,7 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
         db.commit()
         crud.commande.decrease_qty(db, order, qty_to_hold)
        
-    def add_node_to_route(self, vehicule: models.Vehicule, node: schemas.Node, db: Session = SessionLocal() ) -> bool:
+    def add_node_to_route(self, vehicule: models.Vehicule, node: schemas.Node, db: Session = db ) -> bool:
         # TODO: This function is the problem
 
         #printf"AJOUT de {vehicule.name} au noeud {node.name} ")
@@ -189,7 +189,7 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
         # c = models.Compartiment(vehicule_id = vehicule.id)
         # c.vehicule_id = vehicule.id
 
-        # db2 = get_db().send(None)
+        # db2 = db
         # db2.add(c)
         # db2.commit()
         # db2.refresh(c)

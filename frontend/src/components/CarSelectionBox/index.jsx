@@ -43,8 +43,11 @@ return (
                                 <CheckInput
                                     key={index}
                                     disabled={!edges.find( e => e.v == car.name )}
+                                    style={{
+                                        fontSize: 12
+                                    }}
                                     name={`cars.${index}`}
-                                    label={`${car.name} (${car.size_compartment * car.nb_compartment})`}
+                                    label={`${car.name} (taille = ${car.size_compartment * car.nb_compartment}, cout = ${car.cout}/M)`}
                                     formik={formik}
                                     onChange={async () => {
                                         let val = formik.values.cars

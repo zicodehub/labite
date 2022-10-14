@@ -1,5 +1,7 @@
 from math import exp
 import queue, random
+from time import time
+from datetime import time as Time, datetime as DateTime
 from typing import List, Union
 from app.utils.solution import Solution
 from app import crud, models, schemas
@@ -12,6 +14,7 @@ class RecuitSimule:
         #print"RECUIT")
         self.initial_solution: Solution = self.generate_initial_solution(list_commandes)
         self.db = db
+        self.start_at = DateTime.now()
         # #printf"Initial solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({self.initial_solution.is_precedence_ok()}) ")
 
     def __del__(self):
@@ -26,15 +29,17 @@ class RecuitSimule:
 
         current_solution = self.initial_solution
         temp = 1000
-        reducteur = 0.1
+        reducteur = 0.99999
         #printf"\n\n\n!! Start solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({init_precedence}) ")
         if not init_precedence :
             # #print"Précedence initiale non respectée ", self.initial_solution.chemin)
             raise Exception(f"Précedence initiale non respectée -{init_precedence}- {[i.name for i in self.initial_solution.chemin]} ")
         else:
             while temp > 1:
+                print(temp)
                 # #printf"Going to create a generation  n°{g}")
                 neighbor = self.generate_neighbord(current_solution)
+                # return "yes"
                 # #printf"Generation n°{g} created : {len(any_sols)}")
                 if neighbor.cout > current_solution.cout:
                     current_solution = neighbor
@@ -42,17 +47,17 @@ class RecuitSimule:
                     proba = exp(
                         -(abs(neighbor.cout - current_solution.cout)) / temp
                     )
-                    if proba > 0.6:
+                    if proba > 0.51:
                         current_solution = neighbor
-                temp *= reducteur
+                    temp *= reducteur
+                # temp -= 1
                 # #printf"Meilleurs cout de la generation n°{g} : {[i.cout for i in curent_gen]} ")
                 
-                # #printf"Meilleurs cout de la generation n°{g} : {[i for i in curent_gen]} ")
-        # trajet_dict = self.test_solution(curent_gen[0])
-        # #printf"Finale : {curent_gen[0].cout} -> {curent_gen[0].is_precedence_ok()} ")
-        # trajet_dict = curent_gen[0].test_solution_by_vehicules(db= self.db)
+                #printf"Meilleurs cout de la generation n°{g} : {[i for i in curent_gen]} ")
+        
         dataset.update({
             "short": [depot.name] + [i.name for i in current_solution.chemin] + [depot.name],
+            "duration": str(DateTime.now() - self.start_at)
             # "routes": self.test_solution(curent_gen[0]),
             # "long": curent_gen[0],
         })
@@ -81,6 +86,7 @@ class RecuitSimule:
 
         dataset["distance"] = distance_tous_trajet
         dataset["cout"] = cout_tous_vehicules
+
         return dataset
 
     @staticmethod
@@ -90,12 +96,12 @@ class RecuitSimule:
 
     def generate_neighbord(self, s: Solution) -> Solution:
         muted_sol = s        
-        for i in range(random.randint(10, 100)):
+        for i in range(random.randint(2, 10)):
             try:
                 muted_sol = muted_sol.muter()[0]
             except:
                 pass
-            if random.random() > 0.65:
+            if random.random() > 0.45:
                 ##printlen(muted_sols))
                 return muted_sol
 

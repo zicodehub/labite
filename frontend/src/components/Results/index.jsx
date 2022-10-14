@@ -67,6 +67,7 @@ const Results = () => {
                 setDetails(prev => ({
                     ...prev,
                     [solution_index]: {
+                        ...solution,
                         distance: solution.distance,
                         cout: solution.cout,
                         nb_vehicules: solution.details.length,
@@ -413,12 +414,13 @@ const Results = () => {
                                                                 details[local_solution_index] && (
                                                                     <>
                                                                         <Accordion.Header>
-                                                                            Coût : {details[local_solution_index] && details[local_solution_index].cout}
+                                                                            Coût : {details[local_solution_index] && details[local_solution_index].cout.toLocaleString()} KM
                                                                         </Accordion.Header>
                                                                         <Accordion.Body>
                                                                             <ul>
-                                                                                <li>Cout : {details[local_solution_index].cout} </li>
-                                                                                <li>Distance : {details[local_solution_index].distance} </li>
+                                                                                <li>Cout : {details[local_solution_index].cout.toLocaleString()} </li>
+                                                                                <li>Durée : {details[local_solution_index].duration} </li>
+                                                                                <li>Distance : {details[local_solution_index].distance/1000} KM </li>
                                                                                 <li>Véhicules utilisés : {details[local_solution_index].nb_vehicules} </li>
                                                                                 <li>Solution <br/><strong>{details[local_solution_index].solution}</strong></li>
                                                                                 { details.error && <li className="text-danger">Erreur <strong>{details[local_solution_index].error}</strong></li> }
@@ -455,7 +457,7 @@ const Results = () => {
                            
                
                         <Row className="" >
-                            <Col className='offset-10'  >
+                            <Col className='offset-10 col-3'  >
                                 <Row>
                                     <Accordion style={{zIndex: 200}}>
                                         <Accordion.Item eventKey='1'>
@@ -491,7 +493,7 @@ const Results = () => {
                                                         >Ajouter un type de produit</Button>
                                             
 
-                                                    <Button className="text-white w-100 btn-info mb-1" onClick={()=> {
+                                                    <Button className="text-dark w-100 btn-warning mb-1" onClick={()=> {
                                                         setIsRunning(prev => true)
                                                         runGenetic()
                                                         .then(handleAlgoResponse)
@@ -502,7 +504,7 @@ const Results = () => {
                                                             setIsRunning(prev => false)
                                                         } )
                                                     }} >Génétique</Button>
-                                                    <Button className="text-white w-100 btn-info mb-1" onClick={()=> {
+                                                    <Button className="text-dark w-100 btn-warning mb-1" onClick={()=> {
                                                         setIsRunning(prev => true)
                                                         runRecuit()
                                                         .then(handleAlgoResponse)
