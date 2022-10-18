@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 import random
 from app import crud, models, schemas
 from app.api import deps
+from app.db.session import get_db
 
 router = APIRouter()
 
@@ -22,7 +23,7 @@ def reset_the_db(
     return True
     
 @router.get("/recuit")
-def read_recuit(
+async def read_recuit(
     db: Session = Depends(deps.get_db),
    ) -> Any:
     """
@@ -30,9 +31,10 @@ def read_recuit(
     """
     print("Running Recuit Simulé")
     from app.db import reset_db
+    # db = get_db().send(None)
     solutions_finales = []
     reset_db.clean(db)
-    
+    print("Collecting ")
     f = crud.commande.get_fournisseurs(db = db)
     c = crud.commande.get_clients(db = db)
     d = crud.depot.get_first(db = db)
@@ -46,6 +48,7 @@ def read_recuit(
     try :
         recuit = RecuitSimule(list_initial, db= db)
         res = recuit.start()
+        # return "OK"
         solutions_finales.append(res)
         db.close_all()
     except Exception as e:
@@ -87,7 +90,7 @@ def read_genetic(
             print(f" Start")
             res = genetic.start()
             print(f" end")
-            db.close_all()
+            # db.close_all()
             solutions_finales.append(res)
         except Exception as e:
             #print"Exception API::: ", e)

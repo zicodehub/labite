@@ -35,7 +35,7 @@ export default ({ nodes = [], edges = [], refresh, setDisplayNode }) => {
         
         shape: n.node_type == Client ? 'circle' : 'box',
         color: {
-            background: n.node_type == Client ? 'blue' : n.node_type == Depot ? 'green' : 'red',
+            background: n.node_type == Client ? 'blue' : n.node_type == Depot ? 'red' : 'green',
             hover: {
                 border: 'white',
                 background: 'gray'
@@ -97,7 +97,7 @@ export default ({ nodes = [], edges = [], refresh, setDisplayNode }) => {
   };
   console.log("render parent ", graph.nodes)
   return (
-    <Col id="zomap" className="bg-warning" style={{zIndex: 5, width: ZO_MAP_WIDTH, height: ZO_MAP_HEIGHT}} 
+    <Col id="zomap" className="bg-dark" style={{zIndex: 5, width: ZO_MAP_WIDTH, height: ZO_MAP_HEIGHT}} 
      
     >
       {

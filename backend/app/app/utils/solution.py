@@ -1,4 +1,6 @@
 from math import sqrt
+from random import randrange
+from time import time
 from app.models.client import Client
 from app.models.fournisseur import Fournisseur
 from app.core.config import settings
@@ -100,15 +102,17 @@ class Solution:
 
     def muter(self):
         k = len(self.chemin)
-        mutations: List[self] = self._muter(self.chemin, len(self.chemin)-1)
+        size = len(self.chemin) -1
+        mutations: List[self] = self._muter(self.chemin,  size, size//30)
         return mutations
 
     @classmethod
     def _muter(cls, chemin: list, k: int):
         mutations: List[cls] = []
+        size = len(chemin) -1
         clone = chemin.copy()
-        for i in range(1, min(k, len(chemin))):
-            cls._permute(clone, i, i+1)
+        for i in range(1, min(5, k, len(chemin))):
+            cls._permute(clone, randrange(1, size), randrange(1, size))
             #printf"\n\n Try to mutate {[i.name for i in clone]} ")
             # if cls._is_precedence_ok(clone) : #and cls._is_fenetre_ok(chemin) :
             if cls._is_precedence_ok(clone): # and cls._is_fenetre_ok(clone) :
