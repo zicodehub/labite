@@ -1,4 +1,5 @@
 import queue
+from datetime import datetime as DateTime
 from typing import Any, List, Union
 from app.utils.solution import Solution
 from app import crud, models, schemas
@@ -14,6 +15,7 @@ class Genetic:
     SAMPLE_SOLUTIONS = 1
     def __init__(self, list_commandes: List[Union[models.Depot, models.Fournisseur, models.Client]], db: Session = SessionLocal()) -> None:
         #print"ZOAMDI")
+        self.start_at = DateTime.now()
         self.initial_solution: Solution = self.generate_initial_solution(list_commandes)
         self.db = db
         # #printf"Initial solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({self.initial_solution.is_precedence_ok()}) ")
@@ -93,6 +95,7 @@ class Genetic:
 
         dataset["distance"] = distance_tous_trajet
         dataset["cout"] = cout_tous_vehicules
+        dataset["duration"] = str(DateTime.now() - self.start_at)
         return dataset
 
     @staticmethod

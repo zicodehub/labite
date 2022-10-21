@@ -472,28 +472,28 @@ const Results = () => {
                                             <Accordion.Header>Boutons de control</Accordion.Header>
                                             <Accordion.Body>
                                                 <Col >
-                                                <Button className="text-white mb-3 btn-xs btn-secondary"
+                                                <Button className="text-white mb-3 btn-xs btn-secondary w-100"
                                                         onClick={() => setModalListCommandes(true) }
                                                         >List des commandes</Button>
 
-                                                    <Button className="text-white btn-primary mb-1 btn-xs"
+                                                    <Button className="text-white btn-primary mb-1 btn-xs w-100"
                                                         onClick={() => setModalVehicule(true) }
                                                         >Ajouter un véhcule</Button>
 
-                                                    <Button className="text-white btn-primary mb-1"
+                                                    <Button className="text-white btn-primary mb-1 w-100"
                                                         onClick={() => setModalCreateDepot(true) }
                                                         >Ajouter un dépot</Button>
                                             
-                                                    <Button className="text-white btn-primary mb-1"
+                                                    <Button className="text-white btn-primary mb-1 w-100"
                                                         onClick={() => setModalProduit(true) }
                                                         >Ajouter un produit</Button>
                                             
-                                                    <Button className="text-white btn-primary w-100 mb-3"
+                                                    <Button className="text-white btn-primary w-100 mb-3 w-100"
                                                         onClick={() => setModalTypeProduit(true) }
                                                         >Ajouter un type de produit</Button>
                                             
 
-                                                    <Button className="text-dark w-100 btn-warning mb-1" onClick={()=> {
+                                                    <Button className="text-dark w-100 btn-warning mb-1 w-100" onClick={()=> {
                                                         setIsRunning(prev => true)
                                                         runGenetic()
                                                         .then(handleAlgoResponse)
@@ -504,7 +504,7 @@ const Results = () => {
                                                             setIsRunning(prev => false)
                                                         } )
                                                     }} >Génétique</Button>
-                                                    <Button className="text-dark w-100 btn-warning mb-1" onClick={()=> {
+                                                    <Button className="text-dark w-100 btn-warning mb-1 w-100" onClick={()=> {
                                                         setIsRunning(prev => true)
                                                         runRecuit()
                                                         .then(handleAlgoResponse)
@@ -515,14 +515,14 @@ const Results = () => {
                                                             setIsRunning(prev => false)
                                                         } )
                                                     }} >Recuit simulé</Button>
-                                                    <Button className="text-white mt-3 btn-success mb-1"
+                                                    <Button className="text-white mt-3 btn-success mb-1 w-100"
                                                         onClick={() => {
                                                             refresh()
                                                             setDetails({})
                                                             selectedEdges[idSolution] = []
                                                         } }
                                                         >Rafraichir la page</Button>
-                                                        <Button className="text-white btn-danger mb-1"
+                                                        <Button className="text-white btn-danger mb-1 w-100"
                                                         onClick={() => {
                                                             setIsRunning(prev => true)
                                                             resetDB().then(() => {
