@@ -9,12 +9,13 @@ engine = create_engine(settings.SQLALCHEMY_DATABASE_URI, pool_pre_ping=True, poo
 orm.configure_mappers() 
 
 def SessionLocal():
-    print("Calling SessionLocal")
     return sessionmaker(autocommit=False, autoflush=False, bind=engine)()
 
 def get_db() -> Generator:
     try:
+        print("Calling SessionLocal")
         db = SessionLocal()
         yield db
     finally:
+        print("out")
         db.close()

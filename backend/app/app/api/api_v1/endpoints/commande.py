@@ -52,7 +52,7 @@ async def read_recuit(
         solutions_finales.append(res)
         db.close_all()
     except Exception as e:
-        #print"Exception API::: ", e)
+        print("Exception API recuit::: ", e)
         db.close_all()
         raise e
         return HTTPException(status_code=500, detail= e)
@@ -90,7 +90,7 @@ def read_genetic(
             print(f" Start")
             res = genetic.start()
             print(f" end")
-            # db.close_all()
+            db.close_all()
             solutions_finales.append(res)
         except Exception as e:
             #print"Exception API::: ", e)

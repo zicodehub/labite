@@ -12,9 +12,9 @@ from app.db.session import SessionLocal
 class RecuitSimule:
     def __init__(self, list_commandes: List[Union[models.Depot, models.Fournisseur, models.Client]], db: Session = SessionLocal()) -> None:
         #print"RECUIT")
+        self.start_at = DateTime.now()
         self.initial_solution: Solution = self.generate_initial_solution(list_commandes)
         self.db = db
-        self.start_at = DateTime.now()
         # #printf"Initial solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({self.initial_solution.is_precedence_ok()}) ")
 
     def __del__(self):
@@ -28,8 +28,9 @@ class RecuitSimule:
 
 
         current_solution = self.initial_solution
-        temp = 1000
-        reducteur = 0.99999
+        temp = 10
+        reducteur = 0.99
+        # reducteur = 0.9999
         #printf"\n\n\n!! Start solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({init_precedence}) ")
         if not init_precedence :
             # #print"Précedence initiale non respectée ", self.initial_solution.chemin)
@@ -43,10 +44,12 @@ class RecuitSimule:
                 # #printf"Generation n°{g} created : {len(any_sols)}")
                 if neighbor.cout > current_solution.cout:
                     current_solution = neighbor
+                    print(f"\n Best {neighbor.cout} \n")
                 else:
                     proba = exp(
                         -(abs(neighbor.cout - current_solution.cout)) / temp
                     )
+                    print("Proba ", proba)
                     if proba > 0.51:
                         current_solution = neighbor
                     temp *= reducteur
@@ -97,9 +100,11 @@ class RecuitSimule:
     def generate_neighbord(self, s: Solution) -> Solution:
         muted_sol = s        
         for i in range(random.randint(2, 10)):
+            temp = muted_sol.muter()
             try:
-                muted_sol = muted_sol.muter()[0]
-            except:
+                muted_sol = temp[0]
+            except Exception as e:
+                raise e
                 pass
             if random.random() > 0.45:
                 ##printlen(muted_sols))

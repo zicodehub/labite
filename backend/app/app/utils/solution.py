@@ -1,13 +1,15 @@
 from math import sqrt
-from random import randrange
+from random import randrange, randint
 from time import time
 from app.models.client import Client
 from app.models.fournisseur import Fournisseur
 from app.core.config import settings
 from app import crud, models, schemas
-from app.db.session import SessionLocal
+from app.db.session import SessionLocal, get_db
 from sqlalchemy.orm import Session
 from typing import List, Union
+
+db = get_db().send(None)
 
 def get_node_type(node: Union[models.Depot, models.Fournisseur, models.Client]) -> schemas.NodeType:
     if isinstance(node, models.Depot):
@@ -57,7 +59,7 @@ class Solution:
                 fournisseurs_associes = set([i.id for i in crud.commande.get_fournisseurs_for_client(client= pt)])
                 for f in chemin[:index] :
                     if isinstance(f, models.Fournisseur):
-                        is_ok = crud.commande.must_deliver_client(db = SessionLocal(), f = f, client = pt)
+                        is_ok = crud.commande.must_deliver_client(db, f = f, client = pt)
                         # #printf"\n\nTest {pt.name} -> {f.name}/{fournisseurs_associes} ({is_ok}) ")
                         if is_ok: 
                             # #printf"--- YES {pt.name} est fourni par {f.name}, reste ({fournisseurs_associes})")
@@ -101,18 +103,30 @@ class Solution:
         return True
 
     def muter(self):
-        k = len(self.chemin)
+        print("Gonna mutate")
         size = len(self.chemin) -1
-        mutations: List[self] = self._muter(self.chemin,  size, size//30)
+        mutations: List[self] = self._muter(self.chemin,  size)
+        print("Yes my loard")
         return mutations
 
     @classmethod
     def _muter(cls, chemin: list, k: int):
+        print("Mowdia")
         mutations: List[cls] = []
+        print("One")
         size = len(chemin) -1
+        print("mutation A: ", k, size)
+        # print("mutation B: ", randint(size))
+        print("Two")
         clone = chemin.copy()
-        for i in range(1, min(5, k, len(chemin))):
-            cls._permute(clone, randrange(1, size), randrange(1, size))
+        print("Three")
+        # rand_mut_num = randint(size)
+        # print("mutation ", k, rand_mut_num)
+        # raise
+        for i in range(2, size-1):
+            # cls._permute(clone, randrange(1, size), randrange(1, size))
+            cls._permute(clone, i, i+1)
+            
             #printf"\n\n Try to mutate {[i.name for i in clone]} ")
             # if cls._is_precedence_ok(clone) : #and cls._is_fenetre_ok(chemin) :
             if cls._is_precedence_ok(clone): # and cls._is_fenetre_ok(clone) :
