@@ -42,7 +42,7 @@ class RecuitSimule:
                 neighbor = self.generate_neighbord(current_solution)
                 # return "yes"
                 # #printf"Generation n°{g} created : {len(any_sols)}")
-                if neighbor.cout > current_solution.cout:
+                if neighbor.cout >= current_solution.cout:
                     current_solution = neighbor
                     print(f"\n Best {neighbor.cout} \n")
                 else:

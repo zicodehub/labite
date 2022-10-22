@@ -51,27 +51,33 @@ class Solution:
         return self._is_precedence_ok(self.chemin)
     
     @classmethod
-    def _is_precedence_ok(cls, chemin) -> bool:
+    def _is_precedence_ok(cls, chemin, db= db) -> bool:
+        # for index, pt in enumerate(chemin):
+        #     is_ok = False
+        #     if isinstance(pt, models.Client):
+        #         fournisseurs_associes = set([i.id for i in crud.commande.get_fournisseurs_for_client(client= pt)])
+        #         for f in chemin[:index] :
+        #             if isinstance(f, models.Fournisseur):
+        #                 is_ok = crud.commande.must_deliver_client(db, f = f, client = pt)
+        #                 if is_ok: 
+        #                     fournisseurs_associes.remove(f.id)
+                
+        #         if not is_ok and len(fournisseurs_associes) != 0:
+        #             return False
+
         for index, pt in enumerate(chemin):
             is_ok = False
             if isinstance(pt, models.Client):
-                # #printf"Client {pt.name} à index #{index}/{len(chemin[1:-1])} ")
-                fournisseurs_associes = set([i.id for i in crud.commande.get_fournisseurs_for_client(client= pt)])
+                mes_fournisseurs_ids = [four.fournisseur_id for four in pt.commandes ]
+                fournisseurs_associes = set(mes_fournisseurs_ids)
                 for f in chemin[:index] :
                     if isinstance(f, models.Fournisseur):
-                        is_ok = crud.commande.must_deliver_client(db, f = f, client = pt)
-                        # #printf"\n\nTest {pt.name} -> {f.name}/{fournisseurs_associes} ({is_ok}) ")
+                        is_ok = f.id in mes_fournisseurs_ids
                         if is_ok: 
-                            # #printf"--- YES {pt.name} est fourni par {f.name}, reste ({fournisseurs_associes})")
-                            # break
                             fournisseurs_associes.remove(f.id)
-                    # else:
-                    #     #printf"Fournisseur {f.name} of type {type(f)} no instance of {models.Fournisseur} ")
-
+                
                 if not is_ok and len(fournisseurs_associes) != 0:
-                    # #printf"------- DANGER client {pt.name} NON fourni ({fournisseurs_associes}). Parcouru {len(chemin[:index])} ({[i.name for i in chemin[:index]]}) index {index} ---------")
                     return False
-                # #printf"Client {pt.name} est fourni par {f.name} ")
         return True
 
     @classmethod
@@ -103,39 +109,31 @@ class Solution:
         return True
 
     def muter(self):
-        print("Gonna mutate")
+        # print("Gonna mutate")
         size = len(self.chemin) -1
-        mutations: List[self] = self._muter(self.chemin,  size)
-        print("Yes my loard")
+        mutations: List[self] = self._muter(self,  size)
+        # print("Yes my loard")
         return mutations
+        # return self.chemin
 
     @classmethod
-    def _muter(cls, chemin: list, k: int):
-        print("Mowdia")
+    def _muter(cls, sol, k: int, db = db):
+        chemin = sol.chemin
         mutations: List[cls] = []
-        print("One")
         size = len(chemin) -1
-        print("mutation A: ", k, size)
-        # print("mutation B: ", randint(size))
-        print("Two")
         clone = chemin.copy()
-        print("Three")
-        # rand_mut_num = randint(size)
-        # print("mutation ", k, rand_mut_num)
-        # raise
-        for i in range(2, size-1):
+        for i in range(1, size-1):
             # cls._permute(clone, randrange(1, size), randrange(1, size))
             cls._permute(clone, i, i+1)
             
-            #printf"\n\n Try to mutate {[i.name for i in clone]} ")
-            # if cls._is_precedence_ok(clone) : #and cls._is_fenetre_ok(chemin) :
-            if cls._is_precedence_ok(clone): # and cls._is_fenetre_ok(clone) :
+            if cls._is_precedence_ok(clone, db= db): # and cls._is_fenetre_ok(clone) :
                 mutations.append(cls(clone.copy()))
             # mutations.append(cls(clone))
         if len(mutations) == 0:
             pass
             #print"Aucune mutation trouvée ne respecte les contraintes ")
             # raise Exception("Aucune mutation trouvée ne respecte les contraintes ")
+        print(f"Found {len(mutations)} mutations ")
         return mutations
 
     def test_solution_by_vehicules(self, db: Session = SessionLocal()) -> List[models.Vehicule]:

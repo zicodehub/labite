@@ -11,10 +11,12 @@ from fastapi import APIRouter, Depends, HTTPException
 class Genetic:
     MAX_GEN_POP_LENGTH = 10
     NB_GEN = 10
-    MAX_SELECTION_IN_GEN = 15
+    MAX_SELECTION_IN_GEN = 1
     SAMPLE_SOLUTIONS = 1
-    def __init__(self, list_commandes: List[Union[models.Depot, models.Fournisseur, models.Client]], db: Session = SessionLocal()) -> None:
+    def __init__(self, list_commandes: List[Union[models.Depot, models.Fournisseur, models.Client]], db: Session = SessionLocal(), **kw) -> None:
         #print"ZOAMDI")
+        for key in kw:
+            setattr(self, key, kw[key])
         self.start_at = DateTime.now()
         self.initial_solution: Solution = self.generate_initial_solution(list_commandes)
         self.db = db
@@ -117,10 +119,14 @@ class Genetic:
         """
         Sélection des X meilleures solutions
         """
-        best = generation[0]
+        # best = generation[0]
 
-        for sol in generation:
-            if sol.cout <= best.cout :
-                best = sol
-        return [best]
+        # for sol in generation:
+        #     if sol.cout <= best.cout :
+        #         best = sol
+        # return [best]
+
+        generation.sort(key= lambda x: x.cout)
+        print(f"Selected {self.MAX_SELECTION_IN_GEN}/{len(generation)} people")
+        return generation[:self.MAX_SELECTION_IN_GEN]
   
