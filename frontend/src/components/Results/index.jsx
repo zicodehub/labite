@@ -18,6 +18,9 @@ import ModalCreateDepot from "components/ModalCreateDepot"
 import ZoMap from "components/ZoMap"
 import ModalListNodeCommandes from "components/ModalListNodeCommandes "
 import node from "components/ZoMap/node"
+import ModalListFournisseurs from "components/ModalListFournisseurs"
+import ModalListClients from "components/ModalListClients"
+import ModalListVehicules from "components/ModalListVehicules"
 
 Button.defaultProps = {
     style: {
@@ -43,6 +46,9 @@ const Results = () => {
     const [isModalNodeOpen, setModalNode] = useState(false)
     const [isModalAlgoOpen, setModalAlgo] = useState(false)
     const [isModalListCommandesOpen, setModalListCommandes] = useState(false)
+    const [isModalListFournisseursOpen, setModalListFournisseurs] = useState(false)
+    const [isModalListClientsOpen, setModalListClients] = useState(false)
+    const [isModalListVehiculesOpen, setModalListVehicules] = useState(false)
     const [isModalVehiculeOpen, setModalVehicule] = useState(false)
     const [isModalProduitOpen, setModalProduit] = useState(false)
     const [isModalCreateDepot, setModalCreateDepot] = useState(false)
@@ -347,6 +353,42 @@ const Results = () => {
                             )
                         }
                         {
+                            isModalListFournisseursOpen && (
+                                <ModalListFournisseurs
+                                    open={isModalListFournisseursOpen} hide={setModalListFournisseurs} 
+                                    onCreate={(values) => {
+                                        
+                                    }}
+                                    list_fournisseurs={fournisseurs}
+                                    setFournisseurs={setFournisseurs}
+                                    />
+                            )
+                        }
+                        {
+                            isModalListClientsOpen && (
+                                <ModalListClients
+                                    open={isModalListClientsOpen} hide={setModalListClients} 
+                                    onCreate={(values) => {
+                                        
+                                    }}
+                                    list_clients={clients}
+                                    setClients={setClients}
+                                    />
+                            )
+                        }
+                        {
+                            isModalListVehiculesOpen && (
+                                <ModalListVehicules
+                                    open={isModalListVehiculesOpen} hide={setModalListVehicules} 
+                                    onCreate={(values) => {
+                                        
+                                    }}
+                                    list_vehicules={cars}
+                                    setVehicules={setCars}
+                                    />
+                            )
+                        }
+                        {
                             wanna_display_node.isOpen && (
                                 <ModalListNodeCommandes
                                     open={() => setDisplayNode(prev => ({...prev, isOpen: true}))} 
@@ -472,9 +514,18 @@ const Results = () => {
                                             <Accordion.Header>Boutons de control</Accordion.Header>
                                             <Accordion.Body>
                                                 <Col >
-                                                <Button className="text-white mb-3 btn-xs btn-secondary w-100"
+                                                <Button className="text-white mb-1 btn-xs btn-secondary w-100"
                                                         onClick={() => setModalListCommandes(true) }
                                                         >List des commandes</Button>
+                                                <Button className="text-white mb-1 btn-xs btn-secondary w-100"
+                                                        onClick={() => setModalListVehicules(true) }
+                                                        >List des véhicules</Button>
+                                                <Button className="text-white mb-1 btn-xs btn-secondary w-100"
+                                                        onClick={() => setModalListClients(true) }
+                                                        >List des noeuds Clients</Button>
+                                                <Button className="text-white mb-3 btn-xs btn-secondary w-100"
+                                                        onClick={() => setModalListFournisseurs(true) }
+                                                        >List des noeuds Fournisseurs</Button>
 
                                                     <Button className="text-white btn-primary mb-1 btn-xs w-100"
                                                         onClick={() => setModalVehicule(true) }
