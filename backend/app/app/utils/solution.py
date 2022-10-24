@@ -66,18 +66,19 @@ class Solution:
         #             return False
 
         for index, pt in enumerate(chemin):
-            is_ok = False
+            reject = False
             if isinstance(pt, models.Client):
                 mes_fournisseurs_ids = [four.fournisseur_id for four in pt.commandes ]
                 fournisseurs_associes = set(mes_fournisseurs_ids)
-                for f in chemin[:index] :
+                for f in chemin[index:] :
                     if isinstance(f, models.Fournisseur):
-                        is_ok = f.id in mes_fournisseurs_ids
-                        if is_ok: 
-                            fournisseurs_associes.remove(f.id)
+                        reject = f.id in fournisseurs_associes
+                        if reject: 
+                            # fournisseurs_associes.remove(f.id)
+                            return False
                 
-                if not is_ok and len(fournisseurs_associes) != 0:
-                    return False
+                # if not is_ok and len(fournisseurs_associes) != 0:
+                #     return False
         return True
 
     @classmethod
