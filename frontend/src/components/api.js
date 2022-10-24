@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost/api/v1'
+    baseURL: 'http://174.129.96.181/api/v1'
 })
 
 export const listClients = () => api.get('/clients/')
