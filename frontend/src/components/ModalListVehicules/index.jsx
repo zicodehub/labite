@@ -5,12 +5,12 @@ import { Form, Modal, Row, Col, Button, Spinner, Table } from 'react-bootstrap';
 import TextInput from '../TextInput';
 import SelectInput from '../SelectInput';
 import { Client, Fournisseur } from '../constants';
-import { deleteCommande, deleteFournisseur } from 'components/api';
+import { deleteCommande, deleteFournisseur, deleteVehicule } from 'components/api';
 
 
 export default ({open, hide, onCreate, list_vehicules, setVehicules}) => {
     const [ isLoading, setIsLoading ] = useState(false)
-  const handleDelete = (id) => deleteFournisseur(id).then(() => setVehicules( prev => prev.filter( c => c.id != id)))
+  const handleDelete = (id) => deleteVehicule(id).then(() => setVehicules( prev => prev.filter( c => c.id != id)))
     useEffect(() => {
 
     }, [setIsLoading])

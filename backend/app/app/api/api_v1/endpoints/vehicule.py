@@ -51,18 +51,21 @@ def read_item(
     return item
 
 
-@router.delete("/{id}", response_model=schemas.Vehicule)
+@router.delete("/{id}")
 def delete_item(
     *,
-    # db: Session = Depends(deps.get_db),
+    db: Session = Depends(deps.get_db),
     id: int,
     # current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Delete an item.
     """
-    item = crud.vehicule.get(id=id)
+    item = crud.vehicule.get(id=id, db= db)
     if not item:
-        raise HTTPException(status_code=404, detail="Item not found")
-    item = crud.vehicule.remove(id=id)
-    return item
+        raise HTTPException(status_code=405, detail="Item not found")
+    item.depot_id = None
+    db.commit()
+    db.delete(item)
+    db.commit()
+    return True

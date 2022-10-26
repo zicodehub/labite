@@ -35,6 +35,7 @@ export const deleteCommande = (id) => api.delete(`/commandes/${id}`)
 export const deleteClient = (id) => api.delete(`/clients/${id}`)
 export const deleteDepot = (id) => api.delete(`/depots/${id}`)
 export const deleteFournisseur = (id) => api.delete(`/fournisseurs/${id}`)
+export const deleteVehicule = (id) => api.delete(`/vehicules/${id}`)
 
 export const runGenetic = () => api.get(`/commandes/genetic`)
 
