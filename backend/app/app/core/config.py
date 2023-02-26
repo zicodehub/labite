@@ -2,15 +2,20 @@ import secrets
 from typing import Any, Dict, List, Optional, Union
 
 from pydantic import AnyHttpUrl, BaseSettings, EmailStr, HttpUrl, PostgresDsn, validator
+import os
+import sys
 
+app_path = os.path.dirname(__file__)
+app_path = os.path.dirname(app_path)
+app_path = os.path.dirname(app_path)
 
 class Settings(BaseSettings):
-    API_V1_STR: str = "/api/v1"
+    API_V1_STR: str = "/api"
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
-    SERVER_NAME: str
-    SERVER_HOST: AnyHttpUrl
+    SERVER_NAME: str = "my-server"
+    SERVER_HOST: AnyHttpUrl = "http://0.0.0.0"
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000", \
     # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
@@ -24,19 +29,12 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    PROJECT_NAME: str
-    SENTRY_DSN: Optional[HttpUrl] = None
-
-    @validator("SENTRY_DSN", pre=True)
-    def sentry_dsn_can_be_blank(cls, v: str) -> Optional[str]:
-        if len(v) == 0:
-            return None
-        return v
-
-    POSTGRES_SERVER: str
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
-    POSTGRES_DB: str
+    PROJECT_NAME: str = "libata"
+    
+    POSTGRES_SERVER: str = "0.0.0.0"
+    POSTGRES_USER: str = "postgres"
+    POSTGRES_PASSWORD: str = "postgres"
+    POSTGRES_DB: str = "app"
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = None
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
@@ -53,8 +51,8 @@ class Settings(BaseSettings):
 
     USERS_OPEN_REGISTRATION: bool = False
 
-    UPLOAD_FILES_DIRS: str = '/app/static'
-    TEMPLATES_DIR: str = '/app/app/static'
+    UPLOAD_FILES_DIRS: str = app_path+'/static'
+    TEMPLATES_DIR: str = 'app/app/static'
     STATICFILES_ENDPOINT: str = '/api/static'
 
     VITESSE_VEHICULE: int = 60 # km/s
