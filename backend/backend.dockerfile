@@ -27,3 +27,5 @@ RUN bash -c "if [ $INSTALL_JUPYTER == 'true' ] ; then pip install jupyterlab ; f
 
 COPY ./app /app
 ENV PYTHONPATH=/app
+
+RUN wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && cp ./wait-for-it.sh / && chmod u+x /wait-for-it.sh
