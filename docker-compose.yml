@@ -128,7 +128,7 @@ services:
       - SMTP_HOST=${SMTP_HOST}
     build:
       context: ./backend
-      dockerfile: backend.dockerfile
+      dockerfile: Dockerfile
       args:
         INSTALL_DEV: ${INSTALL_DEV-false}
     volumes:
@@ -141,7 +141,7 @@ services:
         - traefik.http.services.${STACK_NAME?Variable not set}-backend.loadbalancer.server.port=80
 
     # command: [ "/wait-for-it.sh", "db:5432", "--", "bash", "/start-reload.sh"]
-    command: ["/start-reload.sh"]
+    command: ["/start-docker.sh"]
 
   frontend:
     image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
