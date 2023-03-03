@@ -64,7 +64,7 @@ class RecuitSimule:
             # "routes": self.test_solution(curent_gen[0]),
             # "long": curent_gen[0],
         })
-        trajet_dict = current_solution.test_solution_by_orders(db= self.db)
+        trajet_dict = current_solution.test_solution_by_vehicules(db= self.db)
         dataset["trajet"] = trajet_dict
         cout_tous_vehicules = 0 
         distance_tous_trajet = 0

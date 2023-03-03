@@ -152,13 +152,17 @@ class Solution:
                 name = vehicule.depot.name, coords = vehicule.depot.coords, 
                 code = vehicule.depot.code, type = get_node_type(vehicule.depot)
             ) ]
-
             for node in solution.chemin :
+                print(vehicule.name , " on ", node.name)
                 if isinstance(node, models.Fournisseur):
                     #printf"FOURNISSEUR {node.name} ")
                     commandes = crud.commande.get_by_fournisseur(f = node)
+                    # print(f"1* Fournoisseurs got {len(commandes)} orders")
                     for order in commandes:
+                        order = crud.commande.get(order.id)
+                        # print("2* Gonna hold ")
                         qty_packed = crud.vehicule.hold(vehicule, order)
+                        # print("3* Holded order ", qty_packed)
                         #printf"V{vehicule.id}, Order {order.id}, Packed {qty_packed}/{order.qty_fixed} in V{vehicule.id} à {node.name} ")
                         qty_remaining = order.qty_fixed - qty_packed
                         if qty_remaining < 0 :
@@ -170,6 +174,7 @@ class Solution:
                                 code = node.code, type = get_node_type(node),
                                 mvt = qty_packed 
                             )
+                            print(vehicule.name , len(order.holdings), " -- ", node_schema.json(), end='\n')
                             if node_schema.name not in [ i.name for i in trajet_final[vehicule.name] ]:
                                 trajet_final[vehicule.name].append(node_schema)
                             crud.vehicule.add_node_to_route(vehicule, node_schema, db= db)
@@ -191,9 +196,12 @@ class Solution:
                                 )
                         if node_schema.name not in [ i.name for i in trajet_final[vehicule.name] ]:
                             trajet_final[vehicule.name].append(node_schema)
-                        crud.vehicule.add_node_to_route(vehicule, node_schema, db = self.db)
+                        crud.vehicule.add_node_to_route(vehicule, node_schema)
+                        print(vehicule.name , len(order.holdings), " -- ", node_schema.json(), end='\n')
+                            
                         #print[ f"Commande {h.commande.id}, Qté {h.qty_holded}/{h.commande.qty_fixed} \n" for h in client_holded_orders ])
-
+                    else:
+                        print("No for client ", len(client_holded_orders))
             #printf"  Le VEHICULE {vehicule.name} avant test {len(trajet_final[vehicule.name])} %%%%%%%%")
             if len(trajet_final[vehicule.name]) == 1:
                 #print" test == 1")

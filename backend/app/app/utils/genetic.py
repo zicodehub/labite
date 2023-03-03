@@ -72,7 +72,7 @@ class Genetic:
         # trajet_dict = self.test_solution(curent_gen[0])
         # #printf"Finale : {curent_gen[0].cout} -> {curent_gen[0].is_precedence_ok()} ")
         # trajet_dict = curent_gen[0].test_solution_by_vehicules(db= self.db)
-        trajet_dict = curent_gen[0].test_solution_by_orders(db= self.db)
+        trajet_dict = curent_gen[0].test_solution_by_vehicules(db= self.db)
         dataset["trajet"] = trajet_dict
         cout_tous_vehicules = 0 
         distance_tous_trajet = 0

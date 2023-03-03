@@ -22,11 +22,27 @@ class CRUDItem(CRUDBase[Commande, CommandeCreate, CommandeUpdate]):
         return db_obj
 
     def decrease_qty(self, db: Session, order: Commande, value: int = 1) -> Commande:
-        order.qty -= value
-        local_object = db.merge(order)
+        # db.add(order)
+        # db.commit()
+        
+        local_object = db.merge(order, load= True)
+        local_object.qty -= value
         db.add(local_object)
+        # print("Leurs IDS ", order.id, local_object.id, order is local_object )
+        # print(db.query(HoldedOrder).filter)
         db.commit()
         db.refresh(local_object)
+        # db.refresh(order)
+
+
+        # print("Local ", len(local_object.holdings))
+
+        # local_object = db.query(models.Commande).filter(models.Commande.id == order.id).first()
+        # local_object.qty -= value
+        # db.add(local_object)
+        # db.commit()
+
+        
         return local_object
 
     def must_deliver_client(self, db: Session, f: models.Fournisseur, client: models.Client) -> bool:

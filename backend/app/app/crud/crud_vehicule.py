@@ -55,7 +55,7 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
             elif qty_holded_by_vehicule > max_vehicule_qty :
                 raise Exception("Le véhicule a accueillit plus de produits qu'il ne peut supporter")
             
-            elif len(comp.holded_orders) != 0 :
+            elif  db.query(HoldedOrder).count(HoldedOrder.compartiment_id == comp.id) != 0 : #len(comp.holded_orders) != 0 :
                 #printf" {comp.holded_orders[0].commande} à {comp.holded_orders[0].commande.id} ")
                 size_free = self.get_free_space_in_compartment(comp, comp.holded_orders[0].commande.produit, order.produit)
                 # #printf"Le Compart {comp.id} a {size_free} dispo ")
@@ -82,11 +82,14 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
         return qty_holded_for_order
 
     def add_order_to_compartment(self, compartment: models.Compartiment, order: models.Commande, qty_to_hold: int):
+        # try:
+        # print("TO ADD: ", order.id, compartment.id, qty_to_hold)
         h = models.HoldedOrder(commande_id = order.id, compartiment_id = compartment.id, qty_holded = qty_to_hold)
         db.add(h)
         db.commit()
         crud.commande.decrease_qty(db, order, qty_to_hold)
-       
+        # except Exception as e:
+            # raise e
     def add_node_to_route(self, vehicule: models.Vehicule, node: schemas.Node, db: Session = db ) -> bool:
         # TODO: This function is the problem
 
@@ -235,17 +238,25 @@ class CRUDItem(CRUDBase[Vehicule, VehiculeCreate, VehiculeUpdate]):
         #         l.append(comm)
 
         # Si une holded_order est inactive c'est qu'elle est déjà déchargée chez un client
-        return [ h for h in compartiment.holded_orders if h.commande.client_id == client.id and h.is_active == True ] 
-
+        # print(f"Comp {compartiment.id} size {sum([ h.qty_holded for h in compartiment.holded_orders])} ")
+        # return [ h for h in compartiment.holded_orders if h.commande.client_id == client.id and h.is_active == True ] 
+        return db.query(models.HoldedOrder).filter(
+            models.HoldedOrder.commande_id == client.id,
+            models.HoldedOrder.is_active == True
+        ).all()
     def get_client_holded_orders_in_vehicule(self, vehicule: models.Vehicule, client: models.Client) -> List[models.HoldedOrder]:
         orders = []
         # #printf"\nGetting comparments in {vehicule.name} ")
         # db.query(models.Compartiment).filter
-        for comp in vehicule.compartiments :
+        compos = db.query(models.Compartiment).filter(models.Compartiment.vehicule_id == vehicule.id).all()
+        print(f"V{vehicule.id} -> Comps: {len(compos)} ")
+        for comp in compos :
         # for comp in crud.compartiment.get_all():
             # #printf"Compp {comp.id} ")
             # #printf"Compartment {comp.id} of {comp.vehicule_id}  ")
-            orders.extend(self.get_client_holded_orders_in_compartiment(comp, client))
+
+            cc = self.get_client_holded_orders_in_compartiment(comp, client)
+            orders.extend(cc)
         return orders
 
 
