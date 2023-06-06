@@ -7,3 +7,4 @@ docker-stack.yml
 .metals/
 **/static/**
 lastfront
+**/__pycache__
