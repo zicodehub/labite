@@ -8,7 +8,7 @@ class ClientSchema(BaseModel):
     x: float
     y: float
 
-class ClientModel(Base[ClientModelType]):
+class ClientModel(Base[ClientModelType, ClientSchema]):
     SCHEMA = ClientSchema
     _ID: int = 1
     DATA_DICT: Dict[Any,object] = {}

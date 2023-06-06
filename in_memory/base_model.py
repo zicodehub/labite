@@ -7,8 +7,15 @@ from schemas.config import PK_MNT_METHOD, ModelFilterSchema, FilterAgregationRul
 import json
 
 ModelType = TypeVar("ModelType", bound= "Base")
+SchemaType = TypeVar("SchemaType", bound= "BaseModel")
 
-class Base(Generic[ModelType]):
+class Base(Generic[ModelType, SchemaType]):
+    '''
+    Attributes to implement
+
+        _ID: int = 1
+        DATA_DICT: Dict[Any,object] = {}
+    '''
     SCHEMA: BaseModel
 
     def __init__(self, datum: Dict[str, Any]):
@@ -19,12 +26,12 @@ class Base(Generic[ModelType]):
         
     def _create(self, datum: Dict[str, Any]):
         self.raw_datum = datum
-        self.datum = self._serialize()  
+        self.datum: SchemaType = self._serialize()  
         self._merge_attributes()      
         self._register_relations()
         self._commit()
 
-    def _serialize(self):
+    def _serialize(self) -> SchemaType:
         return self.SCHEMA(**self.raw_datum)
     
     def _merge_attributes(self):

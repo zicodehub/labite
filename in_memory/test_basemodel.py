@@ -10,7 +10,7 @@ class TestSchema(BaseModel):
 
 TestModelType = TypeVar("TestModelType", bound= "TestModel")
 
-class TestModel(base_model.Base[TestModelType]):
+class TestModel(base_model.Base[TestModelType, TestSchema]):
     SCHEMA = TestSchema
     _ID: int = 1
     DATA_DICT: Dict[Any,object] = {}
