@@ -3,7 +3,7 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from configs import Settings
 
-from schemas.config import PK_MNT_METHOD
+from schemas.config import PK_MNT_METHOD, ModelFilterSchema, FilterAgregationRuleSchema
 
 ModelType = TypeVar("ModelType", bound= "Base")
 
@@ -83,6 +83,52 @@ class Base(Generic[ModelType]):
     def list_all(cls) -> List[ModelType]:
         return [cls.DATA_DICT[key] for key in cls.DATA_DICT]
     
+    @classmethod
+    def filter(cls, 
+               filters: List[ModelFilterSchema], 
+               rule: FilterAgregationRuleSchema = FilterAgregationRuleSchema.AND,
+               bypass_type_checking = False) -> List[ModelType]:
+        '''
+        Filter among criterias with and
+
+        *filters: [
+            {
+                'field': 'name',
+                'operator': '==',
+                'value': 3
+            },
+        ]
+        '''
+        results = []
+        for pk in cls.DATA_DICT:
+            datum = cls.DATA_DICT[pk]
+            found: bool = False
+           
+            for index, criteria in enumerate(filters):
+                datum_field = getattr(datum, criteria.field)
+                if not bypass_type_checking:
+                    assert type(datum_field) == type(criteria.value)
+
+                query = f"{datum_field}{criteria.operator}{criteria.value}"
+                if eval(query) is True:
+                    if rule == FilterAgregationRuleSchema.OR:
+                        found = True
+                        continue
+
+                    # Pour la rule AND, on attend que le dernier critère soit satisfait avant de conclure
+                    # Dès qu'un critère n'est du AND n'est pas respecté, la condition suivante n'estv même pas évalué   
+                    elif rule == FilterAgregationRuleSchema.AND and index+1 == len(filters):
+                        found = True
+                else:
+                    if rule == FilterAgregationRuleSchema.AND:
+                        break
+
+            if found:
+                results.append(datum)
+
+        return results
+        
+
     @classmethod
     def delete(cls, pk) -> ModelType:
         obj = cls.DATA_DICT.get(pk, None)
