@@ -12,3 +12,12 @@ class ClientModel(Base[ClientModelType, ClientSchema]):
     SCHEMA = ClientSchema
     _ID: int = 1
     DATA_DICT: Dict[Any,object] = {}
+
+    def __init__(self, datum: Dict[str, Any]):
+        from model_order import OrderModel
+        
+        self.orders: list[OrderModel] = []
+        super().__init__(datum)
+
+    def register_order(self, order):
+        self.orders.append(order)

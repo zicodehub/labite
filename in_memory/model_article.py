@@ -15,8 +15,10 @@ class ArticleModel(Base[ArticleModelType, ArticleSchema]):
 
     def __init__(self, datum: Dict[str, Any]):
         from  model_type_article import TypeArticleModel
+        from model_order import OrderModel
+
         self.type_article: TypeArticleModel
- 
+        self.orders: list[OrderModel] = []
         super().__init__(datum)
 
 
@@ -26,3 +28,6 @@ class ArticleModel(Base[ArticleModelType, ArticleSchema]):
         type_article = TypeArticleModel.get(self.datum.type_article_id)
         self.type_article = type_article
         type_article.register_article(self)
+
+    def register_order(self, order):
+        self.orders.append(order)
