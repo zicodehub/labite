@@ -4,12 +4,11 @@ from pydantic import BaseModel
 from configs import Settings
 
 from schemas.config import PK_MNT_METHOD, ModelFilterSchema, FilterAgregationRuleSchema
+import json
 
 ModelType = TypeVar("ModelType", bound= "Base")
 
 class Base(Generic[ModelType]):
-    _ID: int = 1
-    DATA_DICT: Dict[Any,object] = {}
     SCHEMA: BaseModel
 
     def __init__(self, datum: Dict[str, Any]):
@@ -48,11 +47,11 @@ class Base(Generic[ModelType]):
     
         # Ensure no one already holds this pk
         if self.DATA_DICT.get(pk, None) is not None:
-            raise Exception(f"PK key {pk} already set")
+            raise Exception(f"PK key {pk} already set. DATASET = ", self.DATA_DICT)
         
         self.DATA_DICT[pk] = self
         self._set_pk(pk)
-        self._increase_pk()
+        self.__class__._increase_pk()
 
     def _set_pk(self, pk: Any):
         self.id =  pk
@@ -65,7 +64,9 @@ class Base(Generic[ModelType]):
         cls._ID += 1
     
     def __str__(self) -> str:
-        return self.datum.json()
+        cp = self.datum.dict()
+        cp['id'] = self.id
+        return json.dumps(cp)
     
     @classmethod
     def create(cls, datum: Dict[str, Any]) -> ModelType:
@@ -107,8 +108,9 @@ class Base(Generic[ModelType]):
             for index, criteria in enumerate(filters):
                 datum_field = getattr(datum, criteria.field)
                 if not bypass_type_checking:
-                    assert type(datum_field) == type(criteria.value)
-
+                    if type(datum_field) != type(criteria.value):
+                        raise AssertionError(f"type(datum_field) != type(criteria.value). Types are {type(datum_field)} != {type(criteria.value)}")
+                    
                 query = f"{datum_field}{criteria.operator}{criteria.value}"
                 if eval(query) is True:
                     if rule == FilterAgregationRuleSchema.OR:

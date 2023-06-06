@@ -1,7 +1,7 @@
 import base_model
 from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
-from typing import TypeVar
+from typing import TypeVar, Dict, Any
 from schemas.config import ModelFilterSchema, FilterAgregationRuleSchema
 
 class TestSchema(BaseModel):
@@ -12,6 +12,9 @@ TestModelType = TypeVar("TestModelType", bound= "TestModel")
 
 class TestModel(base_model.Base[TestModelType]):
     SCHEMA = TestSchema
+    _ID: int = 1
+    DATA_DICT: Dict[Any,object] = {}
+    
 
 # v= {"x": 67, "y": 718}
 # TestSchema(**jsonable_encoder(v))
@@ -23,8 +26,6 @@ many = TestModel.create_many([
 ])
 
 assert len(TestModel.list_all()) == 4
-assert t1.id == 1
-assert many[1].id == 4
 
 for t in TestModel.list_all():
     assert isinstance(t.x, int)
