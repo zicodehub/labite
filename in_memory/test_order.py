@@ -9,6 +9,12 @@ from model_client import *
 from model_supplier import *
 from model_order import *
 
+ClientModel.reset_db()
+SupplierModel.reset_db()
+OrderModel.reset_db()
+TypeArticleModel.reset_db()
+ArticleModel.reset_db()
+
 client1 = ClientModel({
     'x': 1,
     'y': 28

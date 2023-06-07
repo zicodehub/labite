@@ -5,6 +5,8 @@ from typing import TypeVar
 from schemas.config import ModelFilterSchema, FilterAgregationRuleSchema
 from model_supplier import *
 
+SupplierModel.reset_db()
+
 t1 = SupplierModel({"x": 45.0, "y": 90.0})
 print(t1)
 t2 = SupplierModel.create({"x": 21.0, "y": 718.0})

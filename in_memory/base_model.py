@@ -28,8 +28,8 @@ class Base(Generic[ModelType, SchemaType]):
         self.raw_datum = datum
         self.datum: SchemaType = self._serialize()  
         self._merge_attributes()      
-        self._register_relations()
         self._commit()
+        self._register_relations()
 
     def _serialize(self) -> SchemaType:
         return self.SCHEMA(**self.raw_datum)
@@ -146,3 +146,8 @@ class Base(Generic[ModelType, SchemaType]):
         
         del cls.DATA_DICT[pk]
         return obj
+    
+    @classmethod
+    def reset_db(cls):
+        cls._ID = 1
+        cls.DATA_DICT = {}
