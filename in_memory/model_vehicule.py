@@ -41,3 +41,7 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
 
     def register_compartment(self, compartment):
         self.compartments.append(compartment)
+        
+    @property
+    def name(self) -> str:
+        return f"V{self.id}"

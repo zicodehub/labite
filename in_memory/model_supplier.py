@@ -21,3 +21,7 @@ class SupplierModel(Base[SupplierModelType, SupplierSchema]):
 
     def register_order(self, order):
         self.orders.append(order)
+    
+    @property
+    def name(self) -> str:
+        return f"S{self.id}"
