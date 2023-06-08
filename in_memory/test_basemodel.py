@@ -3,6 +3,9 @@ from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
 from typing import TypeVar, Dict, Any
 from schemas.config import ModelFilterSchema, FilterAgregationRuleSchema
+from utils import reset_all
+
+reset_all()
 
 class TestSchema(BaseModel):
     x: int

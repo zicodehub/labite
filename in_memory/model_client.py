@@ -22,6 +22,10 @@ class ClientModel(Base[ClientModelType, ClientSchema]):
     def register_order(self, order):
         self.orders.append(order)
 
+    @staticmethod
+    def prefix():
+        return 'C'
+    
     @property
     def name(self) -> str:
-        return f"C{self.id}"
+        return f"{self.prefix()}{self.id}"

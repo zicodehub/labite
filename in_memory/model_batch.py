@@ -4,7 +4,7 @@ from base_model import Base
 from _types import *
 
 class BatchSchema(BaseModel):
-    compatment_id: int
+    compartment_id: int
     order_id: int
     qty_holded: int
     is_active: bool = True
@@ -27,7 +27,7 @@ class BatchModel(Base[BatchModelType, BatchSchema]):
         from model_compartment import CompartmentModel
         from model_order import OrderModel
         
-        _compartment = CompartmentModel.get(self.datum.compatment_id)
+        _compartment = CompartmentModel.get(self.datum.compartment_id)
         self.compartment = _compartment
         self.compartment.register_batch(self)
         

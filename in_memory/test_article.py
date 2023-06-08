@@ -6,8 +6,9 @@ from schemas.config import ModelFilterSchema, FilterAgregationRuleSchema
 from model_type_article import *
 from model_article import *
 
-TypeArticleModel.reset_db()
-ArticleModel.reset_db()
+from utils import reset_all
+
+reset_all()
 
 t1 = TypeArticleModel({"name": "Riz"})
 print(t1)

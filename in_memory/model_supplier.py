@@ -22,6 +22,10 @@ class SupplierModel(Base[SupplierModelType, SupplierSchema]):
     def register_order(self, order):
         self.orders.append(order)
     
+    @staticmethod
+    def prefix():
+        return 'S'
+    
     @property
     def name(self) -> str:
-        return f"S{self.id}"
+        return f"{self.prefix()}{self.id}"

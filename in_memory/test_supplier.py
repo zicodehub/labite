@@ -4,6 +4,9 @@ from fastapi.encoders import jsonable_encoder
 from typing import TypeVar
 from schemas.config import ModelFilterSchema, FilterAgregationRuleSchema
 from model_supplier import *
+from utils import reset_all
+
+reset_all()
 
 SupplierModel.reset_db()
 

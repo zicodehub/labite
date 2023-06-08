@@ -8,12 +8,9 @@ from model_article import *
 from model_client import *
 from model_supplier import *
 from model_order import *
+from utils import reset_all
 
-ClientModel.reset_db()
-SupplierModel.reset_db()
-OrderModel.reset_db()
-TypeArticleModel.reset_db()
-ArticleModel.reset_db()
+reset_all()
 
 client1 = ClientModel({
     'x': 1,

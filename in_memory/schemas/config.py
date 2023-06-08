@@ -24,7 +24,7 @@ class NodeType(enum.Enum):
 
 class Node(BaseModel):
     name: Optional[str]
-    code: Optional[str]
-    coords: str
+    x: float
+    y: float
     type: NodeType
     mvt: Optional[int]

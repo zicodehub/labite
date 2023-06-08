@@ -6,6 +6,9 @@ from schemas.config import ModelFilterSchema, FilterAgregationRuleSchema
 from model_warehouse import *
 from model_vehicule import *
 from model_compartment import *
+from utils import reset_all
+
+reset_all()
 
 w1 = WarehoudeModel({"name": "Garage 01"})
 assert w1.name == "Garage 01"

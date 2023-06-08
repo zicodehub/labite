@@ -5,8 +5,9 @@ from typing import TypeVar
 from schemas.config import ModelFilterSchema, FilterAgregationRuleSchema
 from model_client import *
 
+from utils import reset_all
 
-ClientModel.reset_db()
+reset_all()
 
 t1 = ClientModel({"x": 45.0, "y": 90.0})
 print(t1)

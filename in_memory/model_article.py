@@ -32,5 +32,6 @@ class ArticleModel(Base[ArticleModelType, ArticleSchema]):
     def register_order(self, order):
         self.orders.append(order)
 
-    def are_produits_similar(self, produit_1: ArticleModelType, produit_2: ArticleModelType) -> bool:
+    @staticmethod
+    def are_produits_similar(produit_1: ArticleModelType, produit_2: ArticleModelType) -> bool:
         return produit_1.id == produit_2.id

@@ -5,7 +5,8 @@ from base_model import Base
 WarehoudeModelType = TypeVar("WarehoudeModelType", bound= "WarehoudeModel")
 
 class WarehouseSchema(BaseModel):
-    name: str
+    x: float
+    y: float
 
 class WarehoudeModel(Base[WarehoudeModelType, WarehouseSchema]):
     
@@ -22,3 +23,10 @@ class WarehoudeModel(Base[WarehoudeModelType, WarehouseSchema]):
     def register_vehicule(self, vehicule):
         self.vehicules.append(vehicule)
     
+    @staticmethod
+    def prefix():
+        return 'W'
+    
+    @property
+    def name(self) -> str:
+        return f"{self.prefix()}{self.id}"

@@ -45,18 +45,17 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
 
     def register_compartment(self, compartment):
         self.compartments.append(compartment)
-        
-    @property
-    def prefix(self):
+    @staticmethod
+    def prefix():
         return 'V'
     
     @property
     def name(self) -> str:
-        return f"{self.prefix}{self.id}"
+        return f"{self.prefix()}{self.id}"
     
     @classmethod
     def get_by_name(cls, name: str) -> VehiculeModelType:
-        pk = name.split(cls.prefix)[-1]
+        pk = name.split(cls.prefix())[-1]
         try:
             pk = int(pk)
         except:
@@ -64,15 +63,17 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
         
         return VehiculeModel.get(pk)
 
-    def can_hold(self, vehicule: VehiculeModelType, produit: ArticleModel, qty: int) -> int:
-        dispo1 = self.get_available_space_in_free_compartments(vehicule)
-        dispo2 = self.get_available_space_for_produit(vehicule, produit)
+    @classmethod
+    def can_hold(cls, vehicule: VehiculeModelType, produit: ArticleModel, qty: int) -> int:
+        dispo1 = cls.get_available_space_in_free_compartments(vehicule)
+        dispo2 = cls.get_available_space_for_produit(vehicule, produit)
 
         qty_holdable = dispo1 + dispo2 
         # #printf"Dispo ({dispo1} + {dispo2}) = {qty_holdable} ")
         return qty_holdable
         
-    def hold(self, vehicule: VehiculeModelType, order: OrderModel) -> int:
+    @classmethod
+    def hold(cls, vehicule: VehiculeModelType, order: OrderModel) -> int:
         """
             - On empack d'abord dans les compartments contenant des produits similaires
             - Si la commande n'est totalement rentrée dans les précedents compartments, 
@@ -82,11 +83,12 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
         """
         holded = False 
         max_vehicule_qty = vehicule.nb_compartments * vehicule.size_compartment
-        qty_holded_by_vehicule = self.get_used_space_in_busy_compartments(vehicule)
+        qty_holded_by_vehicule = cls.get_used_space_in_busy_compartments(vehicule)
         qty_holded_for_order = 0
         for comp in vehicule.compartments:
             # #print"Found compartments")
             if qty_holded_by_vehicule == order.qty :
+                print("ONE")
                 break
             
             elif qty_holded_by_vehicule > max_vehicule_qty :
@@ -99,12 +101,13 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
                     value= comp.id
                 )
             ])) != 0:
+                print("TWO")
                 #printf" {comp.holded_orders[0].commande} à {comp.holded_orders[0].commande.id} ")
-                size_free = self.get_free_space_in_compartment(comp, comp.batches[0].order.article, order.article)
+                size_free = cls.get_free_space_in_compartment(comp, comp.batches[0].order.article, order.article)
                 # #printf"Le Compart {comp.id} a {size_free} dispo ")
                 qty_to_hold = min(size_free, order.qty )
                 if qty_to_hold > 0:
-                    self.add_order_to_compartment(comp, order, qty_to_hold)
+                    cls.add_order_to_compartment(comp, order, qty_to_hold)
                     qty_holded_for_order += qty_to_hold
                     qty_holded_by_vehicule += qty_to_hold
                     #printf"V{vehicule.id}, comp {comp.id} a pu retenir {qty_to_hold} supplémentaires pour la order {order.id} ")
@@ -112,11 +115,15 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
         size_free = vehicule.size_compartment # Car on rempli désormais les compartments vides. 
         # #printf"V{vehicule.id} Qté empaquetable : {qty_to_hold} ")
         qty_to_hold = min(size_free, order.qty )
-        while qty_holded_for_order < order.qty and (qty_holded_by_vehicule + qty_to_hold) <= max_vehicule_qty and vehicule.nb_compartments > len(vehicule.compartments) :
+        print(f"\t qty_to_hold ", qty_to_hold)
+        print(f"\t qty_holded_for_order({qty_holded_for_order}) < order.qty({order.qty}) <==>  {qty_holded_for_order < order.qty}")
+        print(f"\t (qty_holded_by_vehicule({qty_holded_by_vehicule}) + qty_to_hold({qty_to_hold}))({qty_holded_by_vehicule + qty_to_hold}) <= max_vehicule_qty({max_vehicule_qty}) <==>  {(qty_holded_by_vehicule + qty_to_hold) <= max_vehicule_qty}")
+        print(f"\t vehicule.nb_compartments({vehicule.nb_compartments}) >= len(vehicule.compartments)({len(vehicule.compartments)}) <==> {vehicule.nb_compartments >= len(vehicule.compartments)} ")
+        while qty_holded_for_order < order.qty and (qty_holded_by_vehicule + qty_to_hold) <= max_vehicule_qty and vehicule.nb_compartments >= len(vehicule.compartments) :
             qty_to_hold = min(size_free, order.qty )
             if qty_to_hold > 0:
-                comp = self.create_compartment(vehicule)                
-                self.add_order_to_compartment(comp, order, qty_to_hold)
+                comp = cls.create_compartment(vehicule)                
+                cls.add_order_to_compartment(comp, order, qty_to_hold)
                 qty_holded_for_order += qty_to_hold
                 qty_holded_by_vehicule += qty_to_hold
                 index += 1
@@ -124,7 +131,8 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
         # #printf"Résumé: iter={index}, qty_to_hold={qty_to_hold}, qty_holded_by_vehicule={qty_holded_by_vehicule}, qty_holded_for_order={qty_holded_for_order} ")
         return qty_holded_for_order
 
-    def add_order_to_compartment(self, compartment: CompartmentModel, order: OrderModel, qty_to_hold: int):
+    @classmethod
+    def add_order_to_compartment(cls, compartment: CompartmentModel, order: OrderModel, qty_to_hold: int):
         # h = models.HoldedOrder(commande_id = order.id, compartiment_id = compartment.id, qty_holded = qty_to_hold)
         BatchModel.create({
             'order_id': order.id,
@@ -133,7 +141,8 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
         })
         OrderModel.decrease_qty(order, qty_to_hold)
         
-    def add_node_to_route(self, vehicule: VehiculeModelType, node: Node) -> bool:
+    @classmethod
+    def add_node_to_route(cls, vehicule: VehiculeModelType, node: Node) -> bool:
         # TODO: This function is the problem
 
         return False
@@ -151,14 +160,16 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
         ])
         # return db.query(models.HoldedOrder).filter(models.HoldedOrder.compartiment_id == compartiment.id).all()
 
-    def get_free_space_in_compartment(self, compartiment: CompartmentModel, produit_1: ArticleModel, produit_2: ArticleModel) -> int:
+    @classmethod
+    def get_free_space_in_compartment(cls, compartiment: CompartmentModel, produit_1: ArticleModel, produit_2: ArticleModel) -> int:
         size_used = sum([ batch.qty_holded for batch in compartiment.batches if batch.is_active == True ])
         if size_used != 0:
             if not ArticleModel.are_produits_similar(produit_1, produit_2) :
                 return 0
         return compartiment.vehicule.size_compartment - size_used
 
-    def get_available_space_for_produit(self, vehicule: VehiculeModelType, produit: ArticleModel) -> int:
+    @classmethod
+    def get_available_space_for_produit(cls, vehicule: VehiculeModelType, produit: ArticleModel) -> int:
         """
         Espace disponible dans les compartments où il y déjà un --MÊME-- popduit similaire TODO: même poduit ou du même type
         """
@@ -173,9 +184,10 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
         # return qty_available
 
         # Method 2
-        return (len(vehicule.compartments) * vehicule.size_compartment) - self.get_used_space_by_produit(vehicule, produit)
+        return (len(vehicule.compartments) * vehicule.size_compartment) - cls.get_used_space_by_produit(vehicule, produit)
 
-    def get_used_space_by_produit(self, vehicule: VehiculeModelType, produit: ArticleModel) -> int:
+    @classmethod
+    def get_used_space_by_produit(cls, vehicule: VehiculeModelType, produit: ArticleModel) -> int:
         """
         Espace disponible dans les compartments où il y déjà un --MÊME-- popduit similaire TODO: même poduit ou du même type
         """
@@ -188,11 +200,12 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
                     # #printf"Produit trouvé dans comp {index} : {holded_order.qty_holded} ")
         return qty_used
     
-    def get_used_space_in_busy_compartments(self, vehicule: VehiculeModelType) -> int:
+    @classmethod
+    def get_used_space_in_busy_compartments(cls, vehicule: VehiculeModelType) -> int:
         """
         Espace disponible dans les compartments où il y déjà un --MÊME-- popduit similaire TODO: même poduit ou du même type
         """
-        _v: VehiculeModel = VehiculeModel.get(id= vehicule.id)
+        _v: VehiculeModel = VehiculeModel.get(vehicule.id)
         qty_used = 0
 
         for index, comp in enumerate(_v.compartments):
@@ -202,7 +215,8 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
                 # #printf"Compartiment {index} : {holded_order.qty_holded} ")
         return qty_used
 
-    def get_available_space_in_free_compartments(self, vehicule: VehiculeModelType) -> int:
+    @classmethod
+    def get_available_space_in_free_compartments(cls, vehicule: VehiculeModelType) -> int:
         # Ne prend pas en compte les restangoglos dans les compartements à moitié plein
         _v: VehiculeModel = VehiculeModel.get(vehicule.id)
         nb_remaining_compartments: int = _v.nb_compartments - len(_v.compartments)
@@ -210,13 +224,15 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
         # #print[i for i in vehicule.compartments])
         return nb_remaining_compartments * _v.size_compartment
 
-    def create_compartment(self, vehicule: VehiculeModelType) -> CompartmentModel:
+    @classmethod
+    def create_compartment(cls, vehicule: VehiculeModelType) -> CompartmentModel:
         # c = crud.compartiment.create(obj_in= obj_in, db = db)
         return CompartmentModel({
             'vehicule_id': vehicule.id
         })
     
-    def get_client_holded_orders_in_compartiment(self, compartiment: CompartmentModel, client: ClientModelType) -> List[BatchModel]:
+    @classmethod
+    def get_client_holded_orders_in_compartiment(cls, compartiment: CompartmentModel, client: ClientModelType) -> List[BatchModel]:
         
         results: List[BatchModel] = []
         for batch in BatchModel.list_all():
@@ -229,7 +245,8 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
         #     models.HoldedOrder.is_active == True
         # ).all()
     
-    def get_client_holded_orders_in_vehicule(self, vehicule: VehiculeModelType, client: ClientModelType) -> List[BatchModel]:
+    @classmethod
+    def get_client_holded_orders_in_vehicule(cls, vehicule: VehiculeModelType, client: ClientModelType) -> List[BatchModel]:
         orders = []
         # #printf"\nGetting comparments in {vehicule.name} ")
         # db.query(models.Compartiment).filter
@@ -242,7 +259,7 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
         # compos = db.query(models.Compartiment).filter(models.Compartiment.vehicule_id == vehicule.id).all()
         # print(f"V{vehicule.id} -> Comps: {len(compos)} ")
         for comp in compos :
-            cc = self.get_client_holded_orders_in_compartiment(comp, client)
+            cc = cls.get_client_holded_orders_in_compartiment(comp, client)
             orders.extend(cc)
         print(orders)
         return orders
@@ -251,11 +268,13 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
     # def get_active_compartments(self, vehicule: models.Vehicule) -> List[models.Compartiment]:
     #     return [ comp for comp in vehicule.compartments if comp.is_active == True ]
 
-    def deactivate_holded_order(self, batch: BatchModel) -> BatchModel:
+    @classmethod
+    def deactivate_holded_order(cls, batch: BatchModel) -> BatchModel:
         batch.is_active = False
         
         return batch
 
+    @classmethod
     def remove_holded_order(self, batch: BatchModel) -> BatchModel:
         BatchModel.delete(batch.id)
         
