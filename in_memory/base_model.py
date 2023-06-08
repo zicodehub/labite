@@ -118,6 +118,11 @@ class Base(Generic[ModelType, SchemaType]):
                     if type(datum_field) != type(criteria.value):
                         raise AssertionError(f"type(datum_field) != type(criteria.value). Types are {type(datum_field)} != {type(criteria.value)}")
                     
+                if criteria.format is not None:
+                    if criteria.format == "count":
+                        datum_field = len(datum_field)
+                    else: 
+                        raise Exception(f" 'criteria.format = {criteria.format}' non pris en compte  ")
                 query = f"{datum_field}{criteria.operator}{criteria.value}"
                 if eval(query) is True:
                     if rule == FilterAgregationRuleSchema.OR:

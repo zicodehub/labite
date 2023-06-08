@@ -1,6 +1,6 @@
 import enum
 from pydantic import BaseModel
-from typing import Any
+from typing import Any, Optional
 
 class PK_MNT_METHOD(enum.Enum):
     SERIAL = "SERIAL"
@@ -13,5 +13,6 @@ class FilterAgregationRuleSchema(enum.Enum):
 
 class ModelFilterSchema(BaseModel):
     field: str
+    format: Optional[str]
     operator: str = '=='
     value: Any
