@@ -85,7 +85,10 @@ class Base(Generic[ModelType, SchemaType]):
     
     @classmethod
     def get(cls, pk) -> ModelType:
-        return cls.DATA_DICT[pk]
+        res = cls.DATA_DICT.get(pk, None)
+        if res is None:
+            raise AssertionError(f"{cls.__class__} cannot get element at pk = {pk} ")
+        return res
     
     @classmethod
     def list_all(cls) -> List[ModelType]:

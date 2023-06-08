@@ -52,21 +52,21 @@ order1 = OrderModel({
     'client_id': client1.id,
     'supplier_id': supplier1.id,
     'article_id': art1.id,
-    'qty': 20
+    'qty_fixed': 20
 })
 
 order2 = OrderModel({
     'client_id': client2.id,
     'supplier_id': supplier1.id,
     'article_id': art1.id,
-    'qty': 20
+    'qty_fixed': 20
 })
 
 order3 = OrderModel({
     'client_id': client3.id,
     'supplier_id': supplier2.id,
     'article_id': art1.id,
-    'qty': 20
+    'qty_fixed': 20
 })
 
 assert OrderModel.must_deliver_client(f= supplier1, client= client1) == True
@@ -87,7 +87,7 @@ assert supplier1 not in OrderModel.get_fournisseurs_for_client(client= client3)
 assert client1 in OrderModel.get_clients_for_fournisseur(f= supplier1)
 assert client3 not in OrderModel.get_clients_for_fournisseur(f= supplier1)
 
-assert order1.qty_flex is order1.datum.qty
+assert order1.qty is order1.datum.qty_fixed
 assert order1.article is art1
 assert order1.client is client1
 assert order1.supplier is supplier1
@@ -97,7 +97,7 @@ try:
         'client_id': 902816982,
         'supplier_id': supplier1.id,
         'article_id': art1.id,
-        'qty': 20
+        'qty_fixed': 20
     })
 except:
     pass

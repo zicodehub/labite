@@ -10,7 +10,7 @@ class OrderSchema(BaseModel):
     supplier_id: int
     client_id: int
     article_id: int
-    qty: int
+    qty_fixed: int
     
 class OrderModel(Base[OrderModelType, OrderSchema]):
     SCHEMA = OrderSchema
@@ -27,7 +27,7 @@ class OrderModel(Base[OrderModelType, OrderSchema]):
         self.supplier: SupplierModel
 
         super().__init__(datum)
-        self.qty_flex: int = self.datum.qty
+        self.qty: int = self.datum.qty_fixed
 
     def _register_relations(self):
         from model_article import ArticleModel
@@ -47,9 +47,15 @@ class OrderModel(Base[OrderModelType, OrderSchema]):
         self.supplier = _supplier
         self.supplier.register_order(self)
 
-    def decrease_qty(self, order: OrderModelType, value: int = 1) -> OrderModelType:
-        self.qty_flex -= value
-        return self
+        self.batches: List[BatchModelType] = []
+
+    def register_batch(self, batch: BatchModelType):
+        self.batches.append(batch)
+    
+    @staticmethod
+    def decrease_qty(order: OrderModelType, value: int = 1) -> OrderModelType:
+        order.qty -= value
+        return order
 
     @classmethod
     def must_deliver_client(cls, f: ClientModelType, client: ClientModelType) -> bool:

@@ -1,12 +1,11 @@
 from typing import TypeVar, Dict, Any
 from pydantic import BaseModel
 from base_model import Base
-
-CompartmentModelType = TypeVar("CompartmentModelType", bound= "CompartmentModel")
+from _types import *
 
 class CompartmentSchema(BaseModel):
     vehicule_id: int
-    size: int
+    # size: int
     
 class CompartmentModel(Base[CompartmentModelType, CompartmentSchema]):
     SCHEMA = CompartmentSchema
@@ -17,7 +16,8 @@ class CompartmentModel(Base[CompartmentModelType, CompartmentSchema]):
         from  model_vehicule import VehiculeModel
 
         self.vehicule: VehiculeModel
-        
+        self.batches: list[BatchModelType] = []
+
         super().__init__(datum)
 
 
@@ -28,3 +28,5 @@ class CompartmentModel(Base[CompartmentModelType, CompartmentSchema]):
         self.vehicule = _vehicule
         self.vehicule.register_compartment(self)
       
+    def register_batch(self, batch: BatchModelType):
+        self.batches.append(batch)

@@ -16,3 +16,15 @@ class ModelFilterSchema(BaseModel):
     format: Optional[str]
     operator: str = '=='
     value: Any
+
+class NodeType(enum.Enum):
+    fournisseur = "Fournisseur"
+    client = "Client"
+    depot = "Depot"
+
+class Node(BaseModel):
+    name: Optional[str]
+    code: Optional[str]
+    coords: str
+    type: NodeType
+    mvt: Optional[int]

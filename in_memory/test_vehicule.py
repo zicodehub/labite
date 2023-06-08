@@ -14,10 +14,10 @@ assert w1.id == 1
 v1 = VehiculeModel({
     "warehouse_id": w1.id,
     "nb_compartments": 12,
-    "size_compartments": 24,
+    "size_compartment": 24,
     "cost": 390
 })
 
 assert v1.warehouse is w1
 assert len(v1.compartments) == 12
-assert v1.compartments[0].size == 24
+
