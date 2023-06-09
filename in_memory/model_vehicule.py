@@ -236,7 +236,7 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
         
         results: List[BatchModel] = []
         for batch in BatchModel.list_all():
-            if batch.is_active is True and batch.order.client.id == client.id:
+            if batch.is_active is True and batch.order.client.id == client.id and  batch.compartment.id == compartiment.id:
                 results.append(batch)
 
         return results
@@ -247,22 +247,23 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
     
     @classmethod
     def get_client_holded_orders_in_vehicule(cls, vehicule: VehiculeModelType, client: ClientModelType) -> List[BatchModel]:
-        orders = []
+        batches = []
         # #printf"\nGetting comparments in {vehicule.name} ")
         # db.query(models.Compartiment).filter
-        compos = CompartmentModel.filter([
-            ModelFilterSchema(
-                field = 'vehicule_id',
-                value = vehicule.id
-            )
-        ])
+        # compos = CompartmentModel.filter([
+        #     ModelFilterSchema(
+        #         field = 'vehicule_id',
+        #         value = vehicule.id
+        #     )
+        # ])
         # compos = db.query(models.Compartiment).filter(models.Compartiment.vehicule_id == vehicule.id).all()
         # print(f"V{vehicule.id} -> Comps: {len(compos)} ")
-        for comp in compos :
+        for comp in vehicule.compartments :
             cc = cls.get_client_holded_orders_in_compartiment(comp, client)
-            orders.extend(cc)
-        print(orders)
-        return orders
+            # print("\t ", [ b.id for b in cc])
+            batches.extend(cc)
+        
+        return batches
 
 
     # def get_active_compartments(self, vehicule: models.Vehicule) -> List[models.Compartiment]:
