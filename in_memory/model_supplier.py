@@ -24,7 +24,7 @@ class SupplierModel(Base[SupplierModelType, SupplierSchema]):
     
     @staticmethod
     def prefix():
-        return 'S'
+        return 'F'
     
     @property
     def name(self) -> str:

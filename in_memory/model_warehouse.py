@@ -25,7 +25,7 @@ class WarehoudeModel(Base[WarehoudeModelType, WarehouseSchema]):
     
     @staticmethod
     def prefix():
-        return 'W'
+        return 'D'
     
     @property
     def name(self) -> str:
