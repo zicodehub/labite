@@ -18,10 +18,14 @@ class Base(Generic[ModelType, SchemaType]):
     '''
     SCHEMA: BaseModel
 
-    def __init__(self, datum: Dict[str, Any]):
+    class Config(Settings):
+        pass
+
+    def __init__(self, datum: Dict[str, Any], **kwargs):
         """
         Base class inherited by all models
         """
+        self.auto_create_pk = kwargs.get('auto_create_pk', False)
         self._create(datum)
         
     def _create(self, datum: Dict[str, Any]):
@@ -43,14 +47,17 @@ class Base(Generic[ModelType, SchemaType]):
         pass
 
     def _commit(self):
-        if Settings.PK_MANAGER == PK_MNT_METHOD.SERIAL:
+        if self.Config.PK_MANAGER == PK_MNT_METHOD.SERIAL:
             pk = self._get_next_pk()
-        elif Settings.PK_MANAGER == PK_MNT_METHOD.MANUAL:
+        elif self.Config.PK_MANAGER == PK_MNT_METHOD.MANUAL:
             pk = self.raw_datum.get('id')
             if not pk:
-                raise Exception(f"Manual Primary Key not set")
+                if self.auto_create_pk is True:
+                    pk = 2 * len(self.DATA_DICT)
+                else:
+                    raise Exception(f"Manual Primary Key not set ** ", self.auto_create_pk)
         else: 
-            raise Exception("Settings.PK_MANAGER not coherent")
+            raise Exception("Config.PK_MANAGER not coherent")
     
         # Ensure no one already holds this pk
         if self.DATA_DICT.get(pk, None) is not None:

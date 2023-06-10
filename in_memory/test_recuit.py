@@ -22,7 +22,7 @@ w1 = WarehoudeModel({
     'x': 0,
     'y': 0
 })
-assert w1.name == "W1"
+assert w1.name == "D1"
 assert w1.id == 1
 
 v1 = VehiculeModel({

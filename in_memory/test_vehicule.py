@@ -10,8 +10,8 @@ from utils import reset_all
 
 reset_all()
 
-w1 = WarehoudeModel({"name": "Garage 01"})
-assert w1.name == "Garage 01"
+w1 = WarehoudeModel({'x': 0.0, 'y': 0.0})
+assert w1.name == "D1"
 assert w1.id == 1
 
 v1 = VehiculeModel({

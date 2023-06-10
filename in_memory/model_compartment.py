@@ -18,7 +18,7 @@ class CompartmentModel(Base[CompartmentModelType, CompartmentSchema]):
         self.vehicule: VehiculeModel
         self.batches: list[BatchModelType] = []
 
-        super().__init__(datum)
+        super().__init__(datum, auto_create_pk = True)
 
 
     def _register_relations(self):

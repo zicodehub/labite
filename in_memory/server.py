@@ -11,7 +11,8 @@ from model_article import *
 from model_client import *
 from model_supplier import *
 from model_order import *
-
+from base_model import Base
+from schemas.config import PK_MNT_METHOD
 from recuit import RecuitSimule
 
 class APIInput(BaseModel):
@@ -30,7 +31,13 @@ async def recuit(obj: APIInput):
     print(obj)
     reset_all()
 
+    Base.Config.PK_MANAGER = PK_MNT_METHOD.MANUAL
+
     ClientModel.create_many(obj.clients)
+    print("\n\n CLIENTS ")
+    for i in ClientModel.list_all():
+        print(i)
+        
     SupplierModel.create_many(obj.suppliers)
     TypeArticleModel.create_many(obj.type_articles)
     ArticleModel.create_many(obj.articles)
@@ -51,3 +58,4 @@ async def recuit(obj: APIInput):
     recuit = RecuitSimule(list_initial)
     res = recuit.start()
     return res
+    return {}

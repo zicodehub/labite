@@ -20,7 +20,7 @@ class BatchModel(Base[BatchModelType, BatchSchema]):
         self.compartment: CompartmentModel
         self.order: OrderModelType
         
-        super().__init__(datum)
+        super().__init__(datum, auto_create_pk = True)
 
 
     def _register_relations(self):
