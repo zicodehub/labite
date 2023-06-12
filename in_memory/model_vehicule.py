@@ -129,10 +129,11 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
                 qty_holded_for_order += qty_to_hold
                 qty_holded_by_vehicule += qty_to_hold
                 index += 1
+                print(f"Itération {index} : v.nb_comp = {len(vehicule.compartments)}/{vehicule.nb_compartments}, order_holded = {qty_holded_for_order}/{order.qty_fixed}, total_in_vehicule = {qty_holded_by_vehicule}/{max_vehicule_qty} with_step = {qty_to_hold}/{vehicule.size_compartment} ")
             else:
+                print(f"NOO - Itération {index} : v.nb_comp = {len(vehicule.compartments)}/{vehicule.nb_compartments}, order_holded = {qty_holded_for_order}/{order.qty_fixed}, total_in_vehicule = {qty_holded_by_vehicule}/{max_vehicule_qty} with_step = {qty_to_hold}/{vehicule.size_compartment} ")
                 break
             if DEBUG:
-                print(f"Itération {index} : v.nb_comp = {len(vehicule.compartments)}/{vehicule.nb_compartments}, order_holded = {qty_holded_for_order}/{order.qty_fixed}, total_in_vehicule = {qty_holded_by_vehicule}/{max_vehicule_qty} with_step = {qty_to_hold}/{vehicule.size_compartment} ")
         if DEBUG:
             print(f"Résumé: iter={index}, qty_to_hold={qty_to_hold}, qty_holded_by_vehicule={qty_holded_by_vehicule}, qty_holded_for_order={qty_holded_for_order} ")
             print(f"\t qty_holded_for_order({qty_holded_for_order}) < order.qty({order.qty_fixed}) <==>  {qty_holded_for_order < order.qty_fixed}")
