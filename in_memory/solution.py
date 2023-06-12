@@ -134,7 +134,7 @@ class Solution:
         size = len(chemin) -1
         clone = chemin.copy()
         # print("Muter size=", size)
-        for i in range(1, size-1):
+        for i in range(randrange(1, size//2), randrange(size//2, size-1)):
             # cls._permute(clone, randrange(1, size), randrange(1, size))
             cls._permute(clone, i, i+1)
             
