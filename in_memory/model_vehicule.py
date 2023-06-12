@@ -38,10 +38,11 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
         self.warehouse.register_vehicule(self)
         
         for i in range(self.datum.nb_compartments):
-            _comp = CompartmentModel({
-                'vehicule_id': self.id,
-                'size': self.datum.size_compartment
-            })
+            # _comp = CompartmentModel({
+            #     'vehicule_id': self.id,
+            #     'size': self.datum.size_compartment
+            # })
+            pass
 
     def register_compartment(self, compartment):
         self.compartments.append(compartment)

@@ -167,6 +167,30 @@ list_initial = f + c
 recuit = RecuitSimule(list_initial)
 res = recuit.start()
 
+vehicules = {}
+for v in VehiculeModel.list_all():
+    vehicules[v.name] = {}
+    vehicules[v.name].update({
+        field: getattr(v, field) for field in VehiculeSchema.__fields__
+    })
+    vehicules[v.name]['compartments'] = {}
+
+    v_qty_holded = 0
+    for comp in v.compartments:
+        vehicules[v.name]['compartments'][comp.id] = {}
+        vehicules[v.name]['compartments'][comp.id].update({
+            field: getattr(comp, field) for field in CompartmentSchema.__fields__
+        })
+        vehicules[v.name]['compartments'][comp.id]['total_batches'] = len(comp.batches)
+        vehicules[v.name]['compartments'][comp.id]['filled_batches'] = len([ c for c in comp.batches if c.is_active is True])
+        vehicules[v.name]['compartments'][comp.id]['holded'] = sum([ c.qty_holded for c in comp.batches])
+
+        for h in comp.batches:
+            v_qty_holded += h.qty_holded
+
+    vehicules[v.name]['holded'] = v_qty_holded
+
+res['vehiucules'] = vehicules
 import json
 with open("res.json", 'w') as  file:
     json.dump(res, file)

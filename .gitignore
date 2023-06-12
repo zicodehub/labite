@@ -8,3 +8,5 @@ docker-stack.yml
 **/static/**
 lastfront
 **/__pycache__
+
+**/res.json
