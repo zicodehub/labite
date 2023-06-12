@@ -10,6 +10,7 @@ from model_client import ClientModel
 from model_supplier import SupplierModel
 from model_article import ArticleModel
 from model_type_article import TypeArticleModel
+from model_order import OrderModel, OrderSchema
 
 from utils import reset_all
 import random
@@ -190,7 +191,13 @@ for v in VehiculeModel.list_all():
 
     vehicules[v.name]['holded'] = v_qty_holded
 
-res['vehiucules'] = vehicules
+res['vehicules'] = vehicules
+res['orders'] = {}
+OrderSchema.__fields__.update({'qty': 91})
+for order in OrderModel.list_all():
+    res['orders'][order.id] = {
+        field: getattr(order, field) for field in OrderSchema.__fields__
+    }
 import json
 with open("res.json", 'w') as  file:
     json.dump(res, file)

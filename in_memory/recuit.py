@@ -4,11 +4,13 @@ from time import time
 from datetime import time as Time, datetime as DateTime
 from typing import List, Union
 from solution import Solution
-from model_client import ClientModel
-from model_supplier import SupplierModel
-from model_vehicule import VehiculeModel
-from model_warehouse import WarehoudeModel
-from model_order import OrderModel
+from model_client import ClientModel, ClientSchema
+from model_supplier import SupplierModel, SupplierSchema
+from model_vehicule import VehiculeModel, VehiculeSchema
+from model_warehouse import WarehoudeModel, WarehouseSchema
+from model_order import OrderModel, OrderSchema
+from model_compartment import CompartmentModel, CompartmentSchema
+from model_batch import BatchModel, BatchSchema
 from schemas.config import *
 
 class RecuitSimule:
@@ -94,6 +96,38 @@ class RecuitSimule:
         for key in dataset["trajet"]:
             dataset["trajet"][key] = [i.json() for i in dataset["trajet"][key]]
 
+                
+        vehicules = {}
+        for v in VehiculeModel.list_all():
+            vehicules[v.name] = {}
+            vehicules[v.name].update({
+                field: getattr(v, field) for field in VehiculeSchema.__fields__
+            })
+            vehicules[v.name]['compartments'] = {}
+
+            v_qty_holded = 0
+            for comp in v.compartments:
+                vehicules[v.name]['compartments'][comp.id] = {}
+                vehicules[v.name]['compartments'][comp.id].update({
+                    field: getattr(comp, field) for field in CompartmentSchema.__fields__
+                })
+                vehicules[v.name]['compartments'][comp.id]['total_batches'] = len(comp.batches)
+                vehicules[v.name]['compartments'][comp.id]['filled_batches'] = len([ c for c in comp.batches if c.is_active is True])
+                vehicules[v.name]['compartments'][comp.id]['holded'] = sum([ c.qty_holded for c in comp.batches])
+
+                for h in comp.batches:
+                    v_qty_holded += h.qty_holded
+
+            vehicules[v.name]['holded'] = v_qty_holded
+
+        dataset['vehicules'] = vehicules
+        dataset['orders'] = {}
+        OrderFields = OrderSchema.__fields__.copy()
+        OrderFields.update({'qty': 91})
+        for order in OrderModel.list_all():
+            dataset['orders'][order.id] = {
+                field: getattr(order, field) for field in OrderFields
+            }
         return dataset
 
     @staticmethod
