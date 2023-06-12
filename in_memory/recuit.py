@@ -41,13 +41,15 @@ class RecuitSimule:
         else:
             while temp > 1:
                 # print(temp)
-                print(f"Temp=", temp)
+                if DEBUG:
+                    print(f"Temp=", temp)
                 neighbor = self.generate_neighbord(current_solution)
                 # return "yes"
                 # #printf"Generation n°{g} created : {len(any_sols)}")
                 if neighbor.cout > current_solution.cout:
                     current_solution = neighbor
-                    print(f"\n Best {neighbor.cout} \n")
+                    if DEBUG:
+                        print(f"\n Best {neighbor.cout} \n")
                 else:
                     proba = exp(
                         -(abs(neighbor.cout - current_solution.cout)) / temp

@@ -116,11 +116,12 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
         size_free = vehicule.size_compartment # Car on rempli désormais les compartments vides. 
         # #printf"V{vehicule.id} Qté empaquetable : {qty_to_hold} ")
         qty_to_hold = min(size_free, order.qty )
-        print(f"\t qty_to_hold ", qty_to_hold)
-        print(f"\t qty_holded_for_order({qty_holded_for_order}) < order.qty({order.qty}) <==>  {qty_holded_for_order < order.qty}")
-        print(f"\t (qty_holded_by_vehicule({qty_holded_by_vehicule}) + qty_to_hold({qty_to_hold}))({qty_holded_by_vehicule + qty_to_hold}) <= max_vehicule_qty({max_vehicule_qty}) <==>  {(qty_holded_by_vehicule + qty_to_hold) <= max_vehicule_qty}")
-        print(f"\t vehicule.nb_compartments({vehicule.nb_compartments}) >= len(vehicule.compartments)({len(vehicule.compartments)}) <==> {vehicule.nb_compartments >= len(vehicule.compartments)} ")
-        while qty_holded_for_order < order.qty and (qty_holded_by_vehicule + qty_to_hold) <= max_vehicule_qty and vehicule.nb_compartments >= len(vehicule.compartments) :
+        if DEBUG:
+            print(f"\t qty_to_hold ", qty_to_hold)
+            print(f"\t qty_holded_for_order({qty_holded_for_order}) < order.qty({order.qty_fixed}) <==>  {qty_holded_for_order < order.qty_fixed}")
+            print(f"\t (qty_holded_by_vehicule({qty_holded_by_vehicule}) + qty_to_hold({qty_to_hold}))({qty_holded_by_vehicule + qty_to_hold}) <= max_vehicule_qty({max_vehicule_qty}) <==>  {(qty_holded_by_vehicule + qty_to_hold) <= max_vehicule_qty}")
+            print(f"\t vehicule.nb_compartments({vehicule.nb_compartments}) >= len(vehicule.compartments)({len(vehicule.compartments)}) <==> {vehicule.nb_compartments >= len(vehicule.compartments)} ")
+        while qty_holded_for_order < order.qty_fixed and (qty_holded_by_vehicule + qty_to_hold) <= max_vehicule_qty and vehicule.nb_compartments >= len(vehicule.compartments) :
             qty_to_hold = min(size_free, order.qty )
             if qty_to_hold > 0:
                 comp = cls.create_compartment(vehicule)                
@@ -128,8 +129,15 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
                 qty_holded_for_order += qty_to_hold
                 qty_holded_by_vehicule += qty_to_hold
                 index += 1
-            #printf"Itération {index} : v.nb_comp = {len(crud.vehicule.get_compartiments(vehicule.id))}/{vehicule.nb_compartments}, order_holded = {qty_holded_for_order}/{order.qty_fixed}, total_in_vehicule = {qty_holded_by_vehicule}/{max_vehicule_qty} with_step = {qty_to_hold}/{vehicule.size_compartment} ")
-        # #printf"Résumé: iter={index}, qty_to_hold={qty_to_hold}, qty_holded_by_vehicule={qty_holded_by_vehicule}, qty_holded_for_order={qty_holded_for_order} ")
+            else:
+                break
+            if DEBUG:
+                print(f"Itération {index} : v.nb_comp = {len(vehicule.compartments)}/{vehicule.nb_compartments}, order_holded = {qty_holded_for_order}/{order.qty_fixed}, total_in_vehicule = {qty_holded_by_vehicule}/{max_vehicule_qty} with_step = {qty_to_hold}/{vehicule.size_compartment} ")
+        if DEBUG:
+            print(f"Résumé: iter={index}, qty_to_hold={qty_to_hold}, qty_holded_by_vehicule={qty_holded_by_vehicule}, qty_holded_for_order={qty_holded_for_order} ")
+            print(f"\t qty_holded_for_order({qty_holded_for_order}) < order.qty({order.qty_fixed}) <==>  {qty_holded_for_order < order.qty_fixed}")
+            print(f"\t (qty_holded_by_vehicule({qty_holded_by_vehicule}) + qty_to_hold({qty_to_hold}))({qty_holded_by_vehicule + qty_to_hold}) <= max_vehicule_qty({max_vehicule_qty}) <==>  {(qty_holded_by_vehicule + qty_to_hold) <= max_vehicule_qty}")
+            print(f"\t vehicule.nb_compartments({vehicule.nb_compartments}) >= len(vehicule.compartments)({len(vehicule.compartments)}) <==> {vehicule.nb_compartments >= len(vehicule.compartments)} ")
         return qty_holded_for_order
 
     @classmethod

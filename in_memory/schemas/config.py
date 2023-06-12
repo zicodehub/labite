@@ -2,6 +2,8 @@ import enum
 from pydantic import BaseModel
 from typing import Any, Optional
 
+DEBUG = False
+
 class PK_MNT_METHOD(enum.Enum):
     SERIAL = "SERIAL"
     MANUAL = "MANUAL"
