@@ -45,24 +45,35 @@ class Solution:
     @classmethod
     def _permute(cls, array, i, j):
         array[i], array[j] = array[j], array[i]
-    
-    def is_precedence_ok(self) -> bool:
-        return self._is_precedence_ok(self.chemin)
+    REFUSED = 0
+    ACCEPTED = 0
+    @classmethod
+    def is_precedence_ok(cls, chemin) -> bool:
+        res = cls._is_precedence_ok(chemin)
+        # form = [i.name for i in chemin]
+        # # print("Call precedndec")
+        # if res is False:
+        #     cls.REFUSED += 1
+        #     print("\n NONO precedence ", cls.REFUSED,  form)
+        # else:
+        #     cls.ACCEPTED += 1
+        #     print("\n YES precedence ----------- ", cls.ACCEPTED, form)
+        return res
     
     @classmethod
     def _is_precedence_ok(cls, chemin) -> bool:
-        # for index, pt in enumerate(chemin):
-        #     is_ok = False
-        #     if isinstance(pt, models.Client):
-        #         fournisseurs_associes = set([i.id for i in crud.commande.get_fournisseurs_for_client(client= pt)])
-        #         for f in chemin[:index] :
-        #             if isinstance(f, models.Fournisseur):
-        #                 is_ok = crud.commande.must_deliver_client(db, f = f, client = pt)
-        #                 if is_ok: 
-        #                     fournisseurs_associes.remove(f.id)
+        for index, pt in enumerate(chemin):
+            is_ok = False
+            if isinstance(pt, ClientModel):
+                fournisseurs_associes = set([i.id for i in OrderModel.get_fournisseurs_for_client(client= pt)])
+                for f in chemin[:index] :
+                    if isinstance(f, SupplierModel):
+                        is_ok = OrderModel.must_deliver_client(f = f, client = pt)
+                        if is_ok: 
+                            fournisseurs_associes.remove(f.id)
                 
-        #         if not is_ok and len(fournisseurs_associes) != 0:
-        #             return False
+                if not is_ok and len(fournisseurs_associes) != 0:
+                    return False
 
         for index, pt in enumerate(chemin):
             reject = False
@@ -96,7 +107,7 @@ class Solution:
 
 
     def is_fenetre_ok(self):
-        return self._is_fenetre_ok(self.chemin)
+        return self.is_fenetre_ok(self.chemin)
 
     @classmethod
     def _is_fenetre_ok(self, chemin):
@@ -122,6 +133,7 @@ class Solution:
         mutations: List[cls] = []
         size = len(chemin) -1
         clone = chemin.copy()
+        # print("Muter size=", size)
         for i in range(1, size-1):
             # cls._permute(clone, randrange(1, size), randrange(1, size))
             cls._permute(clone, i, i+1)

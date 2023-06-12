@@ -26,7 +26,7 @@ class RecuitSimule:
     def start(self) -> List:
         dataset = {}
 
-        init_precedence = self.initial_solution.is_precedence_ok()
+        init_precedence = self.initial_solution.is_precedence_ok(self.initial_solution.chemin)
         depot = WarehoudeModel.get(1)
 
 
@@ -41,13 +41,13 @@ class RecuitSimule:
         else:
             while temp > 1:
                 # print(temp)
-                # #printf"Going to create a generation  n°{g}")
+                print(f"Temp=", temp)
                 neighbor = self.generate_neighbord(current_solution)
                 # return "yes"
                 # #printf"Generation n°{g} created : {len(any_sols)}")
-                if neighbor.cout >= current_solution.cout:
+                if neighbor.cout > current_solution.cout:
                     current_solution = neighbor
-                    # print(f"\n Best {neighbor.cout} \n")
+                    print(f"\n Best {neighbor.cout} \n")
                 else:
                     proba = exp(
                         -(abs(neighbor.cout - current_solution.cout)) / temp
@@ -136,13 +136,22 @@ class RecuitSimule:
         return Solution(list_commandes)
 
     def generate_neighbord(self, s: Solution) -> Solution:
-        muted_sol = s        
-        for i in range(random.randint(2, 10)):
+        muted_sol = s  
+        # print("\n Neighborhood for ", [g.name for g in s.chemin])      
+        for i in range(random.randint(2, 5)):
             temp = muted_sol.muter()
             try:
-                muted_sol = temp[0]
-            except Exception as e:
-                raise e
+                if len(temp) > 1:
+                    # min_mutant = temp[0]
+                    # for m in temp:
+                    #     if m.cout < min_mutant.cout:
+                    #         min_mutant = m 
+                    muted_sol = temp[random.randrange(0, len(temp)-1)]
+                else:
+                    muted_sol = temp[0]
+            except IndexError as e:
+                # raise e
+                # print("Mutations no trouvées pour le chemin ", [k.name for k in s.chemin ])
                 pass
             if random.random() > 0.45:
                 ##printlen(muted_sols))
