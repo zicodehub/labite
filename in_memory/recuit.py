@@ -63,9 +63,11 @@ class RecuitSimule:
                 
                 #printf"Meilleurs cout de la generation n°{g} : {[i for i in curent_gen]} ")
         
+        duration = DateTime.now() - self.start_at
         dataset.update({
             "short": [depot.name] + [i.name for i in current_solution.chemin] + [depot.name],
-            "duration": str(DateTime.now() - self.start_at)
+            "duration": str(duration),
+            "duration_seconds": duration.seconds
             # "routes": self.test_solution(curent_gen[0]),
             # "long": curent_gen[0],
         })

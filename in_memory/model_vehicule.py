@@ -102,7 +102,7 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
                     value= comp.id
                 )
             ])) != 0:
-                print("TWO")
+                # print("TWO")
                 #printf" {comp.holded_orders[0].commande} à {comp.holded_orders[0].commande.id} ")
                 size_free = cls.get_free_space_in_compartment(comp, comp.batches[0].order.article, order.article)
                 # #printf"Le Compart {comp.id} a {size_free} dispo ")
