@@ -132,6 +132,7 @@ class RecuitSimule:
             dataset['orders'][order.id] = {
                 field: getattr(order, field) for field in OrderFields
             }
+        print("\n\n\t EXECUTION TERMINEE !")
         return dataset
 
     @staticmethod
