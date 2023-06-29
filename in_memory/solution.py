@@ -127,6 +127,28 @@ class Solution:
         return mutations
         # return self.chemin
 
+
+    # @classmethod
+    # def _muter(cls, sol, k: int):
+    #     chemin = sol.chemin
+    #     mutations: List[cls] = []
+    #     size = len(chemin) -1
+    #     clone = chemin.copy()
+    #     # print("Muter size=", size)
+    #     for i in range(randrange(1, size//2), randrange(size//2, size-1)):
+    #         # cls._permute(clone, randrange(1, size), randrange(1, size))
+    #         cls._permute(clone, i, i+1)
+            
+    #         if cls._is_precedence_ok(clone): # and cls._is_fenetre_ok(clone) :
+    #             mutations.append(cls(clone.copy()))
+    #         # mutations.append(cls(clone))
+    #     if len(mutations) == 0:
+    #         pass
+    #         #print"Aucune mutation trouvée ne respecte les contraintes ")
+    #         # raise Exception("Aucune mutation trouvée ne respecte les contraintes ")
+    #     # print(f"Found {len(mutations)} mutations ")
+    #     return mutations
+    
     @classmethod
     def _muter(cls, sol, k: int):
         chemin = sol.chemin
@@ -134,8 +156,9 @@ class Solution:
         size = len(chemin) -1
         clone = chemin.copy()
         # print("Muter size=", size)
-        for i in range(randrange(1, size//2), randrange(size//2, size-1)):
+        for i in range(size):
             # cls._permute(clone, randrange(1, size), randrange(1, size))
+            # cls._permute(clone, randint(0, size-1), randrange(size))
             cls._permute(clone, i, i+1)
             
             if cls._is_precedence_ok(clone): # and cls._is_fenetre_ok(clone) :
