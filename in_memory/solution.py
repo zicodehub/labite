@@ -174,6 +174,7 @@ class Solution:
     def test_solution_by_vehicules(self) -> List[VehiculeModel]:
         solution = self
         vehicules_queue = VehiculeModel.list_all()
+        vehicules_queue = sorted(vehicules_queue, key= lambda x: x.nb_compartments * x.size_compartment, reverse= True)
         trajet_final = {}
 
         #print"Test de la solution ", [i.name for i in solution.chemin])
@@ -211,15 +212,24 @@ class Solution:
                                 mvt = qty_packed 
                             )
                             print(vehicule.name , len(order.batches), " -- ", node_schema.json(), end='\n')
-                            if node_schema.name not in [ i.name for i in trajet_final[vehicule.name] ]:
+                            found_pushed_node = False
+                            for pushed_node in trajet_final[vehicule.name]:
+                                if node_schema.name == pushed_node.name:
+                                    pushed_node.mvt += node_schema.mvt
+                                    found_pushed_node = True
+                            if not found_pushed_node:
                                 trajet_final[vehicule.name].append(node_schema)
+                                
+                            # if node_schema.name not in [ i.name for i in trajet_final[vehicule.name] ]:
+                            #     trajet_final[vehicule.name].append(node_schema)
+
                             VehiculeModel.add_node_to_route(vehicule, node_schema)
                             # S'il y a encore des produits dans la commande, on passe au véhicule suivant 
                 
                 elif isinstance(node, ClientModel):
                     client_holded_orders = VehiculeModel.get_client_holded_orders_in_vehicule(vehicule, node)
                     qty_delivered = 0
-                    print(f"CLIENT C{node.name} reçu {len(client_holded_orders)} commandes du véhicule V{vehicule.id} ")
+                    print(f"CLIENT C{node.name} reçu {len(client_holded_orders)} chargements (de {len(set([h.order.id for h in client_holded_orders]))} commandes) du véhicule V{vehicule.id} ")
                     for h in client_holded_orders:
                         qty_delivered += h.qty_holded
                         # #printh.qty_holded)

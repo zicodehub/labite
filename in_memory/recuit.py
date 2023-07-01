@@ -31,7 +31,7 @@ class RecuitSimule:
 
 
         current_solution = self.initial_solution
-        temp = 10
+        temp = 1.1
         reducteur = 0.99
         # reducteur = 0.9999
         #printf"\n\n\n!! Start solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({init_precedence}) ")
@@ -102,7 +102,9 @@ class RecuitSimule:
 
                 
         vehicules = {}
-        for v in VehiculeModel.list_all():
+        vehicules_queue = VehiculeModel.list_all()
+        
+        for v in vehicules_queue:
             vehicules[v.name] = {}
             vehicules[v.name].update({
                 field: getattr(v, field) for field in VehiculeSchema.__fields__

@@ -1,4 +1,4 @@
-import random
+import random, json
 from fastapi import FastAPI, Body
 from pydantic import BaseModel
 from _types import *
@@ -58,6 +58,10 @@ async def recuit(obj: APIInput):
     list_initial = f + c 
     recuit = RecuitSimule(list_initial)
     res = recuit.start()
+    
+    with open("res.json", "w") as file:
+        json.dump(res, file)
+        
     return res
 
 
@@ -93,5 +97,8 @@ async def recuit(obj: APIInput):
     list_initial = f + c 
     gentic = Genetic(list_initial)
     res = gentic.start()
+    with open("res.json", "w") as file:
+        json.dump(res, file)
+
     return res
     return {}
