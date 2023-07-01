@@ -31,7 +31,7 @@ class RecuitSimule:
 
 
         current_solution = self.initial_solution
-        temp = 1.1
+        temp = 10
         reducteur = 0.99
         # reducteur = 0.9999
         #printf"\n\n\n!! Start solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({init_precedence}) ")
