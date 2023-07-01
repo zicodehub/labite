@@ -2,7 +2,7 @@ import enum
 from pydantic import BaseModel
 from typing import Any, Optional
 
-DEBUG = False
+DEBUG = True
 
 class PK_MNT_METHOD(enum.Enum):
     SERIAL = "SERIAL"
