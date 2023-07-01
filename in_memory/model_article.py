@@ -34,4 +34,4 @@ class ArticleModel(Base[ArticleModelType, ArticleSchema]):
 
     @staticmethod
     def are_produits_similar(produit_1: ArticleModelType, produit_2: ArticleModelType) -> bool:
-        return produit_1.id == produit_2.id
+        return produit_1.type_article.id == produit_2.type_article.id
