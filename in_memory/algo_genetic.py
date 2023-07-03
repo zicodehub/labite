@@ -15,13 +15,14 @@ from schemas.config import *
 
 class Genetic:
     MAX_GEN_POP_LENGTH = 7
-    NB_GEN = 10
-    MAX_SELECTION_IN_GEN = 70
+    # NB_GEN = 10
+    # MAX_SELECTION_IN_GEN = 70
     SAMPLE_SOLUTIONS = 3
 
-    def __init__(self, list_commandes: List[Union[WarehoudeModel, SupplierModel, ClientModel]]):
+    def __init__(self, list_commandes: List[Union[WarehoudeModel, SupplierModel, ClientModel]], params: GeneticParams):
         #print"RECUIT")
         self.start_at = DateTime.now()
+        self.params: GeneticParams = params
         self.initial_solution: Solution = self.generate_initial_solution(list_commandes)
         # #printf"Initial solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({self.initial_solution.is_precedence_ok()}) ")
 
@@ -41,8 +42,8 @@ class Genetic:
             # print("Précedence initiale non respectée ", self.initial_solution.chemin)
             raise Exception(f"Précedence initiale non respectée -{init_precedence}- {[i.name for i in self.initial_solution.chemin]} ")
         else:
-            for g in range(self.NB_GEN):
-                print(f"\n\nGeneration  n°{g}/{self.NB_GEN}. Pop = ", len(curent_gen))
+            for g in range(self.params.nb_generations):
+                print(f"\n\nGeneration  n°{g}/{self.params.nb_generations}. Pop = ", len(curent_gen))
                 any_sols = self.generation_next(curent_gen)
                 print("\t Population suivante ", len(any_sols),)
                 curent_gen = self.selection(any_sols)
@@ -153,4 +154,4 @@ class Genetic:
         #         best.append(sol)
         # return best
         
-        return random.sample(generation, min(self.MAX_SELECTION_IN_GEN, len(generation)))
+        return random.sample(generation, min(self.params.gen_max_selection, len(generation)))

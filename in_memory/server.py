@@ -12,24 +12,15 @@ from model_client import *
 from model_supplier import *
 from model_order import *
 from base_model import Base
-from schemas.config import PK_MNT_METHOD
+from schemas.config import *
 from recuit import RecuitSimule
 from algo_genetic import Genetic
-
-class APIInput(BaseModel):
-    clients: Any
-    suppliers: List
-    type_articles: List
-    articles: List
-    orders: List
-    warehouses: List
-    vehicules: List
 
 app = FastAPI()
 
 @app.post("/recuit")
-async def recuit(obj: APIInput):
-    print(obj)
+async def recuit(obj: APIRecuitInput):
+    print(obj.dict())
     reset_all()
 
     Base.Config.PK_MANAGER = PK_MNT_METHOD.MANUAL
@@ -56,7 +47,7 @@ async def recuit(obj: APIInput):
 
     # list_initial = [d] + f + c + [d]
     list_initial = f + c 
-    recuit = RecuitSimule(list_initial)
+    recuit = RecuitSimule(list_initial, obj.algo_params)
     res = recuit.start()
     
     with open("res.json", "w") as file:
@@ -66,7 +57,7 @@ async def recuit(obj: APIInput):
 
 
 @app.post("/genetic")
-async def recuit(obj: APIInput):
+async def recuit(obj: APIGeneticInput):
     print(obj)
     reset_all()
 
@@ -95,10 +86,9 @@ async def recuit(obj: APIInput):
 
     # list_initial = [d] + f + c + [d]
     list_initial = f + c 
-    gentic = Genetic(list_initial)
+    gentic = Genetic(list_initial, obj.algo_params)
     res = gentic.start()
     with open("res.json", "w") as file:
         json.dump(res, file)
 
     return res
-    return {}

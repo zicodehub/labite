@@ -14,9 +14,11 @@ from model_batch import BatchModel, BatchSchema
 from schemas.config import *
 
 class RecuitSimule:
-    def __init__(self, list_commandes: List[Union[WarehoudeModel, SupplierModel, ClientModel]]):
+    def __init__(self, 
+                 list_commandes: List[Union[WarehoudeModel, SupplierModel, ClientModel]], params: RecuitParams):
         #print"RECUIT")
         self.start_at = DateTime.now()
+        self.params: RecuitParams = params
         self.initial_solution: Solution = self.generate_initial_solution(list_commandes)
         # #printf"Initial solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({self.initial_solution.is_precedence_ok()}) ")
 
@@ -31,8 +33,8 @@ class RecuitSimule:
 
 
         current_solution = self.initial_solution
-        temp = 10
-        reducteur = 0.99
+        temp = self.params.temp
+        reducteur = self.params.reductor
         # reducteur = 0.9999
         #printf"\n\n\n!! Start solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({init_precedence}) ")
         if not init_precedence :
@@ -55,7 +57,7 @@ class RecuitSimule:
                         -(abs(neighbor.cout - current_solution.cout)) / temp
                     )
                     # print("Proba ", proba)
-                    if proba > 0.51:
+                    if proba > self.params.proba_admission:
                         current_solution = neighbor
                     temp *= reducteur
                 # temp -= 1
