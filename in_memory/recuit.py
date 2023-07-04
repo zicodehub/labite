@@ -35,6 +35,7 @@ class RecuitSimule:
         current_solution = self.initial_solution
         temp = self.params.temp
         reducteur = self.params.reductor
+
         # reducteur = 0.9999
         #printf"\n\n\n!! Start solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({init_precedence}) ")
         if not init_precedence :
@@ -43,8 +44,7 @@ class RecuitSimule:
         else:
             while temp > 1:
                 # print(temp)
-                if DEBUG:
-                    print(f"Temp=", temp)
+                print(f"Temp=", temp)
                 neighbor = self.generate_neighbord(current_solution)
                 # return "yes"
                 # #printf"Generation n°{g} created : {len(any_sols)}")

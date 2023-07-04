@@ -89,7 +89,6 @@ class VehiculeModel(Base[VehiculeModelType, VehiculeSchema]):
         for comp in vehicule.compartments:
             # #print"Found compartments")
             if qty_holded_by_vehicule == order.qty :
-                print("ONE")
                 break
             
             elif qty_holded_by_vehicule > max_vehicule_qty :

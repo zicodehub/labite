@@ -20,15 +20,11 @@ app = FastAPI()
 
 @app.post("/recuit")
 async def recuit(obj: APIRecuitInput):
-    print(obj.dict())
     reset_all()
 
     Base.Config.PK_MANAGER = PK_MNT_METHOD.MANUAL
 
     ClientModel.create_many(obj.clients)
-    print("\n\n CLIENTS ")
-    for i in ClientModel.list_all():
-        print(i)
         
     SupplierModel.create_many(obj.suppliers)
     TypeArticleModel.create_many(obj.type_articles)
@@ -58,15 +54,11 @@ async def recuit(obj: APIRecuitInput):
 
 @app.post("/genetic")
 async def recuit(obj: APIGeneticInput):
-    print(obj)
     reset_all()
 
     Base.Config.PK_MANAGER = PK_MNT_METHOD.MANUAL
 
     ClientModel.create_many(obj.clients)
-    print("\n\n CLIENTS ")
-    for i in ClientModel.list_all():
-        print(i)
         
     SupplierModel.create_many(obj.suppliers)
     TypeArticleModel.create_many(obj.type_articles)

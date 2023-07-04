@@ -188,17 +188,17 @@ class Solution:
                 code = vehicule.warehouse.name, type = get_node_type(vehicule.warehouse)
             ) ]
             for node in solution.chemin :
-                print("\n\n ", vehicule.name , " on ", node.name)
+                if DEBUG: print("\n\n ", vehicule.name , " on ", node.name)
                 if isinstance(node, SupplierModel):
                     #printf"FOURNISSEUR {node.name} ")
                     commandes: List[OrderModel] = OrderModel.get_by_fournisseur(f = node)
-                    print(f"{node.name} has {len(commandes)} orders")
+                    if DEBUG: print(f"{node.name} has {len(commandes)} orders")
                     for order in commandes:
                         order: OrderModel = OrderModel.get(order.id)
                         # print("2* Gonna hold ")
                         qty_packed = VehiculeModel.hold(vehicule, order)
                         # print("3* Holded order ", qty_packed)
-                        print(f"V{vehicule.id} ({node.name} -> {order.client.name}) , Order {order.id}, Packed {qty_packed}/{order.qty_fixed} in V{vehicule.id} à {node.name} ")
+                        if DEBUG: print(f"V{vehicule.id} ({node.name} -> {order.client.name}) , Order {order.id}, Packed {qty_packed}/{order.qty_fixed} in V{vehicule.id} à {node.name} ")
                         qty_remaining = order.qty_fixed - qty_packed
                         if qty_remaining < 0 :
                             # #printf" {order.qty} / {qty_packed} ")
@@ -211,7 +211,7 @@ class Solution:
                                 code = node.name, type = get_node_type(node),
                                 mvt = qty_packed 
                             )
-                            print(vehicule.name , len(order.batches), " -- ", node_schema.json(), end='\n')
+                            if DEBUG: print(vehicule.name , len(order.batches), " -- ", node_schema.json(), end='\n')
                             found_pushed_node = False
                             for pushed_node in trajet_final[vehicule.name]:
                                 if node_schema.name == pushed_node.name:
@@ -229,7 +229,7 @@ class Solution:
                 elif isinstance(node, ClientModel):
                     client_holded_orders = VehiculeModel.get_client_holded_orders_in_vehicule(vehicule, node)
                     qty_delivered = 0
-                    print(f"CLIENT C{node.name} reçu {len(client_holded_orders)} chargements (de {len(set([h.order.id for h in client_holded_orders]))} commandes) du véhicule V{vehicule.id} ")
+                    if DEBUG: print(f"CLIENT C{node.name} reçu {len(client_holded_orders)} chargements (de {len(set([h.order.id for h in client_holded_orders]))} commandes) du véhicule V{vehicule.id} ")
                     for h in client_holded_orders:
                         qty_delivered += h.qty_holded
                         # #printh.qty_holded)
@@ -246,11 +246,11 @@ class Solution:
                         if node_schema.name not in [ i.name for i in trajet_final[vehicule.name] ]:
                             trajet_final[vehicule.name].append(node_schema)
                         VehiculeModel.add_node_to_route(vehicule, node_schema)
-                        print(vehicule.name , len(order.batches), " -- ", node_schema.json(), end='\n')
+                        if DEBUG: print(vehicule.name , len(order.batches), " -- ", node_schema.json(), end='\n')
                             
                         #print[ f"Commande {h.commande.id}, Qté {h.qty_holded}/{h.commande.qty_fixed} \n" for h in client_holded_orders ])
                     else:
-                        print("No for client ", len(client_holded_orders))
+                        if DEBUG: print("No for client ", len(client_holded_orders))
             #printf"  Le VEHICULE {vehicule.name} avant test {len(trajet_final[vehicule.name])} %%%%%%%%")
             if len(trajet_final[vehicule.name]) == 1:
                 #print" test == 1")
