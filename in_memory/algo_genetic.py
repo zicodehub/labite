@@ -45,10 +45,10 @@ class Genetic:
             for g in range(self.params.nb_generations):
                 print(f"\n\nGeneration  n°{g}/{self.params.nb_generations}. Pop = ", len(curent_gen))
                 any_sols = self.generation_next(curent_gen)
-                print("\t Population suivante ", len(any_sols),)
+                print("\t Population après croisements ", len(any_sols))
                 curent_gen = self.selection(any_sols)
                 current_solution = curent_gen[0]
-                print("\t Best ", current_solution.cout, " ** ", [i.name for i in current_solution.chemin])
+                print("\t Best ", current_solution.cout, " --> ", [i.name for i in current_solution.chemin])
         
         duration = DateTime.now() - self.start_at
         dataset.update({
