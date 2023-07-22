@@ -2,7 +2,8 @@ import enum
 from pydantic import BaseModel
 from typing import Any, Optional, List
 
-DEBUG = False
+DEBUG = True
+DEBUG_PARCOURS = False
 
 class PK_MNT_METHOD(enum.Enum):
     SERIAL = "SERIAL"
@@ -42,16 +43,25 @@ class APIInput(BaseModel):
 
 class GeneticParams(BaseModel):
     nb_generations: int = 10
-    gen_max_selection: int = 70,
+    gen_max_selection: int = 70
     proba_mutation: float = 0.3
 
 class RecuitParams(BaseModel):
     temp: int = 10
-    reductor: float = 0.99,
+    reductor: float = 0.99
     proba_admission: float = 0.3
+
+class TabuParams(BaseModel):
+    max_iter: int = 10
+    max_tabu_list_size: int = 0
+    nb_out_at_time: int = 1
 
 class APIGeneticInput(APIInput):
     algo_params: GeneticParams
 
 class APIRecuitInput(APIInput):
     algo_params: RecuitParams
+
+
+class APITabuInput(APIInput):
+    algo_params: TabuParams

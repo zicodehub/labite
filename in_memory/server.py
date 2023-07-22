@@ -15,6 +15,7 @@ from base_model import Base
 from schemas.config import *
 from recuit import RecuitSimule
 from algo_genetic import Genetic
+from algo_tabu import TabuSearch
 
 app = FastAPI()
 
@@ -87,4 +88,37 @@ async def recuit(obj: APIGeneticInput):
     with open("res.json", "w") as file:
         json.dump(res, file)
 
+    return res
+
+@app.post("/tabu")
+async def tabu(obj: APITabuInput):
+    reset_all()
+
+    Base.Config.PK_MANAGER = PK_MNT_METHOD.MANUAL
+
+    ClientModel.create_many(obj.clients)
+        
+    SupplierModel.create_many(obj.suppliers)
+    TypeArticleModel.create_many(obj.type_articles)
+    ArticleModel.create_many(obj.articles)
+    OrderModel.create_many(obj.orders)
+    WarehoudeModel.create_many(obj.warehouses)
+    VehiculeModel.create_many(obj.vehicules)
+
+    f = OrderModel.get_fournisseurs()
+    c = OrderModel.get_clients()
+    d = WarehoudeModel.get(1)
+    print(f"Il y a {len(f)} fourn et {len(c)} clients ")
+
+    random.shuffle(f)
+    random.shuffle(c)
+
+    # list_initial = [d] + f + c + [d]
+    list_initial = f + c 
+    recuit = TabuSearch(list_initial, obj.algo_params)
+    res = recuit.start()
+    
+    with open("res.json", "w") as file:
+        json.dump(res, file)
+        
     return res
