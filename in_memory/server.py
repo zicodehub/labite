@@ -18,6 +18,10 @@ from algo_genetic import Genetic
 
 app = FastAPI()
 
+@app.get("/")
+async def ping():
+    return {'msg': 'OK'}
+
 @app.post("/recuit")
 async def recuit(obj: APIRecuitInput):
     reset_all()
