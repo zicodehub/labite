@@ -155,7 +155,7 @@ class Solution:
         mutations: List[cls] = []
         size = len(chemin) -1
         clone = chemin.copy()
-        print("Muter size=", size)
+        # print("Voisinnage = ", size)
         for i in range(size):
             # cls._permute(clone, randrange(1, size), randrange(1, size))
             # cls._permute(clone, randint(0, size-1), randrange(size))

@@ -41,17 +41,20 @@ class APIInput(BaseModel):
     warehouses: List
     vehicules: List
 
-class GeneticParams(BaseModel):
+class BaseAlgoParams(BaseModel):
+    pass
+
+class GeneticParams(BaseAlgoParams):
     nb_generations: int = 10
     gen_max_selection: int = 70
     proba_mutation: float = 0.3
 
-class RecuitParams(BaseModel):
+class RecuitParams(BaseAlgoParams):
     temp: int = 10
     reductor: float = 0.99
     proba_admission: float = 0.3
 
-class TabuParams(BaseModel):
+class TabuParams(BaseAlgoParams):
     max_iter: int = 10
     max_tabu_list_size: int = 0
     nb_out_at_time: int = 1
