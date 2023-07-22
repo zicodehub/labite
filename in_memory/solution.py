@@ -166,7 +166,7 @@ class Solution:
             # mutations.append(cls(clone))
         if len(mutations) == 0:
             pass
-            print("Aucune mutation trouvée ne respecte les contraintes ")
+            print("Aucun des vosins trouvée ne respecte les contraintes ")
             # raise Exception("Aucune mutation trouvée ne respecte les contraintes ")
         # print(f"Found {len(mutations)} mutations ")
         return mutations

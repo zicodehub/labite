@@ -53,7 +53,7 @@ class TabuSearch:
                 random_solutions = self.generate_neighborhood(current_solution)
                 valid_solutions = self.pick_valid_neighbours(random_solutions)  # those not in Tabu list
                 if len(valid_solutions) == 0:
-                    print(f"\n ERRR valid_solutions ({len(valid_solutions)}) while random_solutions ({len(random_solutions)}) ")
+                    print(f"\n No valid solution found ")
                 else:
                     best = self.selection(valid_solutions) # those not in Tabu list
 
