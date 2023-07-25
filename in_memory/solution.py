@@ -75,17 +75,17 @@ class Solution:
                 if not is_ok and len(fournisseurs_associes) != 0:
                     return False
 
-        for index, pt in enumerate(chemin):
-            reject = False
-            if isinstance(pt, ClientModel):
-                mes_fournisseurs_ids = [four.supplier.id for four in pt.orders ]
-                fournisseurs_associes = set(mes_fournisseurs_ids)
-                for f in chemin[index:] :
-                    if isinstance(f, SupplierModel):
-                        reject = f.id in fournisseurs_associes
-                        if reject: 
-                            # fournisseurs_associes.remove(f.id)
-                            return False
+        # for index, pt in enumerate(chemin):
+        #     reject = False
+        #     if isinstance(pt, ClientModel):
+        #         mes_fournisseurs_ids = [four.supplier.id for four in pt.orders ]
+        #         fournisseurs_associes = set(mes_fournisseurs_ids)
+        #         for f in chemin[index:] :
+        #             if isinstance(f, SupplierModel):
+        #                 reject = f.id in fournisseurs_associes
+        #                 if reject: 
+        #                     # fournisseurs_associes.remove(f.id)
+        #                     return False
                 
                 # if not is_ok and len(fournisseurs_associes) != 0:
                 #     return False
@@ -120,7 +120,7 @@ class Solution:
         return True
 
     def muter(self):
-        # print("Gonna mutate")
+        print("Gonna generate neighbouhood")
         size = len(self.chemin) -1
         mutations: List[self] = self._muter(self,  size)
         # print("Yes my loard")
@@ -155,15 +155,25 @@ class Solution:
         mutations: List[cls] = []
         size = len(chemin) -1
         clone = chemin.copy()
-        # print("Voisinnage = ", size)
-        for i in range(size):
+        print("Size = ", size)
+        
+        i = size
+        # for i in range(size):
+        while i > 0:
+            print("Round ", i)
             # cls._permute(clone, randrange(1, size), randrange(1, size))
-            # cls._permute(clone, randint(0, size-1), randrange(size))
-            cls._permute(clone, i, i+1)
-            
+            cls._permute(clone, randint(0, i), randrange(size))
+            # cls._permute(clone, i, i+1)
+            print("\t Permuted")
             if cls._is_precedence_ok(clone): # and cls._is_fenetre_ok(clone) :
-                mutations.append(cls(clone.copy()))
+                # mutations.append(cls(clone.copy())) #### YEAH
+
+                # Désormais, on retourne le premier voisin trouvé
+                return [cls(clone.copy())]
+            print("\t Checked")
             # mutations.append(cls(clone))
+            i -= 1
+
         if len(mutations) == 0:
             pass
             print("Aucun des vosins trouvée ne respecte les contraintes ")
