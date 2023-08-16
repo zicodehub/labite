@@ -23,6 +23,7 @@ app = FastAPI()
 async def ping():
     return {'msg': 'OK'}
 
+## RECUIT SIMULE ###############################################################################
 @app.post("/recuit")
 async def recuit(obj: APIRecuitInput):
     reset_all()
@@ -57,6 +58,62 @@ async def recuit(obj: APIRecuitInput):
     return res
 
 
+@app.post("/multi/recuit")
+async def multi_genetic(obj: MultiAPIRecuitInput):
+    dataset = {}
+
+    for id_area in obj.areas:
+        reset_all()
+
+        Base.Config.PK_MANAGER = PK_MNT_METHOD.MANUAL
+
+        selected_clients = [ c for c in obj.clients if c['area_id'] == id_area]
+        selected_clients_ids = [ c['id'] for c in selected_clients]
+        # print("\n selected_clients_ids ", selected_clients_ids)
+        ClientModel.create_many(selected_clients)
+            
+        selected_suppliers = [ c for c in obj.suppliers if c['area_id'] == id_area]
+        selected_suppliers_ids = [c['id'] for c in selected_suppliers]
+        # print("\n selected_suppliers_ids ", selected_suppliers_ids)
+        SupplierModel.create_many(selected_suppliers)
+
+        TypeArticleModel.create_many(obj.type_articles)
+        ArticleModel.create_many(obj.articles)
+        
+        selected_orders = [o for o in obj.orders if o['client_id'] in selected_clients_ids and o['supplier_id'] in selected_suppliers_ids]
+        OrderModel.create_many(selected_orders)
+
+        selected_warehouses = [ c for c in obj.warehouses if c['area_id'] == id_area]
+        selected_warehouses_ids = [ w['id'] for w in selected_warehouses]
+        # print("\n selected_warehouses_ids ", selected_warehouses_ids)
+        WarehoudeModel.create_many(selected_warehouses)
+
+        selected_vehicules = [ v for v in obj.vehicules if v['warehouse_id'] in selected_warehouses_ids]
+        # print("\n selected_vehicules ", selected_vehicules)
+        VehiculeModel.create_many(selected_vehicules)
+
+        f = OrderModel.get_fournisseurs()
+        c = OrderModel.get_clients()
+        d = WarehoudeModel.get_first()
+        # print(f"Il y a {len(f)} fourn et {len(c)} clients ")
+        # print("Dépot de base : D", d.id)
+        random.shuffle(f)
+        random.shuffle(c)
+
+        # list_initial = [d] + f + c + [d]
+        list_initial = f + c 
+        recuit = RecuitSimule(list_initial, obj.algo_params)
+        res = recuit.start()
+        dataset[id_area] = res
+        
+    with open("res_multi.json", "w") as file:
+        json.dump(dataset, file)
+        
+    return dataset
+
+
+
+## GENETIQUE ###############################################################################
 @app.post("/genetic")
 async def recuit(obj: APIGeneticInput):
     reset_all()
@@ -90,6 +147,62 @@ async def recuit(obj: APIGeneticInput):
 
     return res
 
+@app.post("/multi/genetic")
+async def multi_genetic(obj: MultiAPIGeneticInput):
+    dataset = {}
+
+    for id_area in obj.areas:
+        reset_all()
+
+        Base.Config.PK_MANAGER = PK_MNT_METHOD.MANUAL
+
+        selected_clients = [ c for c in obj.clients if c['area_id'] == id_area]
+        selected_clients_ids = [ c['id'] for c in selected_clients]
+        # print("\n selected_clients_ids ", selected_clients_ids)
+        ClientModel.create_many(selected_clients)
+            
+        selected_suppliers = [ c for c in obj.suppliers if c['area_id'] == id_area]
+        selected_suppliers_ids = [c['id'] for c in selected_suppliers]
+        # print("\n selected_suppliers_ids ", selected_suppliers_ids)
+        SupplierModel.create_many(selected_suppliers)
+
+        TypeArticleModel.create_many(obj.type_articles)
+        ArticleModel.create_many(obj.articles)
+        
+        selected_orders = [o for o in obj.orders if o['client_id'] in selected_clients_ids and o['supplier_id'] in selected_suppliers_ids]
+        OrderModel.create_many(selected_orders)
+
+        selected_warehouses = [ c for c in obj.warehouses if c['area_id'] == id_area]
+        selected_warehouses_ids = [ w['id'] for w in selected_warehouses]
+        # print("\n selected_warehouses_ids ", selected_warehouses_ids)
+        WarehoudeModel.create_many(selected_warehouses)
+
+        selected_vehicules = [ v for v in obj.vehicules if v['warehouse_id'] in selected_warehouses_ids]
+        # print("\n selected_vehicules ", selected_vehicules)
+        VehiculeModel.create_many(selected_vehicules)
+
+        f = OrderModel.get_fournisseurs()
+        c = OrderModel.get_clients()
+        d = WarehoudeModel.get_first()
+        # print(f"Il y a {len(f)} fourn et {len(c)} clients ")
+        # print("Dépot de base : D", d.id)
+        random.shuffle(f)
+        random.shuffle(c)
+
+        # list_initial = [d] + f + c + [d]
+        list_initial = f + c 
+        gentic = Genetic(list_initial, obj.algo_params)
+        res = gentic.start()
+        dataset[id_area] = res
+        
+    with open("res_multi.json", "w") as file:
+        json.dump(dataset, file)
+        
+    return dataset
+
+
+
+## TABOU ###############################################################################
 @app.post("/tabu")
 async def tabu(obj: APITabuInput):
     reset_all()
@@ -122,3 +235,57 @@ async def tabu(obj: APITabuInput):
         json.dump(res, file)
         
     return res
+
+
+@app.post("/multi/tabu")
+async def multi_tabu(obj: MultiAPITabuInput):
+    dataset = {}
+
+    for id_area in obj.areas:
+        reset_all()
+
+        Base.Config.PK_MANAGER = PK_MNT_METHOD.MANUAL
+
+        selected_clients = [ c for c in obj.clients if c['area_id'] == id_area]
+        selected_clients_ids = [ c['id'] for c in selected_clients]
+        # print("\n selected_clients_ids ", selected_clients_ids)
+        ClientModel.create_many(selected_clients)
+            
+        selected_suppliers = [ c for c in obj.suppliers if c['area_id'] == id_area]
+        selected_suppliers_ids = [c['id'] for c in selected_suppliers]
+        # print("\n selected_suppliers_ids ", selected_suppliers_ids)
+        SupplierModel.create_many(selected_suppliers)
+
+        TypeArticleModel.create_many(obj.type_articles)
+        ArticleModel.create_many(obj.articles)
+        
+        selected_orders = [o for o in obj.orders if o['client_id'] in selected_clients_ids and o['supplier_id'] in selected_suppliers_ids]
+        OrderModel.create_many(selected_orders)
+
+        selected_warehouses = [ c for c in obj.warehouses if c['area_id'] == id_area]
+        selected_warehouses_ids = [ w['id'] for w in selected_warehouses]
+        # print("\n selected_warehouses_ids ", selected_warehouses_ids)
+        WarehoudeModel.create_many(selected_warehouses)
+
+        selected_vehicules = [ v for v in obj.vehicules if v['warehouse_id'] in selected_warehouses_ids]
+        # print("\n selected_vehicules ", selected_vehicules)
+        VehiculeModel.create_many(selected_vehicules)
+
+        f = OrderModel.get_fournisseurs()
+        c = OrderModel.get_clients()
+        d = WarehoudeModel.get_first()
+        # print(f"Il y a {len(f)} fourn et {len(c)} clients ")
+        # print("Dépot de base : D", d.id)
+        random.shuffle(f)
+        random.shuffle(c)
+
+        # list_initial = [d] + f + c + [d]
+        list_initial = f + c 
+        tabu = TabuSearch(list_initial, obj.algo_params)
+        res = tabu.start()
+        dataset[id_area] = res
+        
+    with open("res_multi.json", "w") as file:
+        json.dump(dataset, file)
+        
+    return dataset

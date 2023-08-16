@@ -9,4 +9,4 @@ docker-stack.yml
 lastfront
 **/__pycache__
 
-**/res.json
+**/res*.json

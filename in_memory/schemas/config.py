@@ -2,7 +2,7 @@ import enum
 from pydantic import BaseModel
 from typing import Any, Optional, List
 
-DEBUG = True
+DEBUG = False
 DEBUG_PARCOURS = False
 
 class PK_MNT_METHOD(enum.Enum):
@@ -59,6 +59,7 @@ class TabuParams(BaseAlgoParams):
     max_tabu_list_size: int = 0
     nb_out_at_time: int = 1
 
+# Uni dépot
 class APIGeneticInput(APIInput):
     algo_params: GeneticParams
 
@@ -67,4 +68,19 @@ class APIRecuitInput(APIInput):
 
 
 class APITabuInput(APIInput):
+    algo_params: TabuParams
+
+
+# Multi dépots
+class MultiAPIInput(APIInput):
+    areas: List[int]
+
+class MultiAPIGeneticInput(MultiAPIInput):
+    algo_params: GeneticParams
+
+class MultiAPIRecuitInput(MultiAPIInput):
+    algo_params: RecuitParams
+
+
+class MultiAPITabuInput(MultiAPIInput):
     algo_params: TabuParams

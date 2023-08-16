@@ -34,13 +34,14 @@ class TabuSearch:
         self.MAX_ITERATION = params.max_iter
         self.MAX_TABU_LIST_SIZE = params.max_tabu_list_size
         self.NB_TABU_ITEMS_OUT_AT_TIME = params.nb_out_at_time
+        self.TABU_LIST = set()
 
     def start(self) -> List:
         dataset = {}
 
         init_precedence = Solution.is_precedence_ok(self.initial_solution.chemin)
         current_solution =  self.initial_solution
-        depot = WarehoudeModel.get(1)
+        depot = WarehoudeModel.get_first()
 
         print(f"\n\n\n!! Start solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({init_precedence}) ")
         if not init_precedence :

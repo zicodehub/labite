@@ -98,6 +98,13 @@ class Base(Generic[ModelType, SchemaType]):
         return res
     
     @classmethod
+    def get_first(cls) -> ModelType:
+        try:
+            return list(cls.DATA_DICT.values())[0]
+        except:
+            raise AssertionError(f"{cls.__class__} cannot get element first element")
+        
+    @classmethod
     def list_all(cls) -> List[ModelType]:
         return [cls.DATA_DICT[key] for key in cls.DATA_DICT]
     

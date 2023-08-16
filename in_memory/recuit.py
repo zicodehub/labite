@@ -29,7 +29,7 @@ class RecuitSimule:
         dataset = {}
 
         init_precedence = self.initial_solution.is_precedence_ok(self.initial_solution.chemin)
-        depot = WarehoudeModel.get(1)
+        depot = WarehoudeModel.get_first()
 
 
         current_solution = self.initial_solution

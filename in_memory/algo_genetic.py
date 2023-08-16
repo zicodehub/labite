@@ -35,7 +35,7 @@ class Genetic:
         init_precedence = Solution.is_precedence_ok(self.initial_solution.chemin)
         curent_gen = [self.initial_solution]
         current_solution =  curent_gen[0]
-        depot = WarehoudeModel.get(1)
+        depot = WarehoudeModel.get_first()
 
         print(f"\n\n\n!! Start solution {[i.name for i in self.initial_solution.chemin]} -- Cout {self.initial_solution.cout} -- HMM ({init_precedence}) ")
         if not init_precedence :
